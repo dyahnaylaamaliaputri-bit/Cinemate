@@ -8,10 +8,15 @@ class AppConstants {
   static const String appName = 'Cinemate';
   static const String appVersion = '1.0.0';
 
-  // ── Env keys ─────────────────────────────────────────────────────────────
+  // ── Env keys & Supabase Config ───────────────────────────────────────────
   static const String envSupabaseUrl = 'SUPABASE_URL';
   static const String envSupabaseAnonKey = 'SUPABASE_ANON_KEY';
   static const String envTmdbApiKey = 'TMDB_API_KEY';
+
+  static const String defaultSupabaseUrl =
+      'https://hbdhwsofkjkurewqnixk.supabase.co';
+  static const String defaultSupabaseAnonKey =
+      'sb_publishable_ps6_m_mcmw-Qe3fCokDJ2w_hUumridC';
 
   // ── Secure Storage Keys ───────────────────────────────────────────────────
   static const String keySessionToken = 'session_token';
@@ -35,7 +40,7 @@ class AppConstants {
   static const String boxUserPrefs = 'user_prefs';
   static const String boxChatHistory = 'chat_history';
 
-  // ── Auth Rules ────────────────────────────────────────────────────────────
+  // ── Auth Rules ────────────────────────────────────────────────────
   static const int maxLoginAttempts = 5;
   static const int lockoutDurationMinutes = 5;
   static const int sessionExpiryDays = 7;

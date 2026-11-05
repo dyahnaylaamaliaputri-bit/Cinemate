@@ -4,17 +4,21 @@
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../utils/constants.dart';
 
 class SupabaseService {
   SupabaseService._internal();
   static final SupabaseService _instance = SupabaseService._internal();
   factory SupabaseService() => _instance;
 
-  /// Inisialisasi Supabase dari .env — dipanggil sekali di main()
+  /// Inisialisasi Supabase dari .env atau default constant
   static Future<void> initialize() async {
+    final url = dotenv.env['SUPABASE_URL'] ?? AppConstants.defaultSupabaseUrl;
+    final anonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? AppConstants.defaultSupabaseAnonKey;
+
     await Supabase.initialize(
-      url: dotenv.env['SUPABASE_URL']!,
-      anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+      url: url,
+      anonKey: anonKey,
     );
   }
 
