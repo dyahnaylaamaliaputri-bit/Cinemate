@@ -30,7 +30,11 @@ Future<void> main() async {
   await Hive.initFlutter();
 
   // 5. Inisialisasi Supabase (PB-002)
-  await SupabaseService.initialize();
+  try {
+    await SupabaseService.initialize();
+  } catch (e) {
+    debugPrint('Supabase init warning: $e');
+  }
 
   runApp(const CinemateApp());
 }
