@@ -1,3 +1,9 @@
+# Environment files & secrets (R-07 & DoD)
+.env
+*.env
+assets/.env
+!assets/.env.example
+
 # Miscellaneous
 *.class
 *.log
