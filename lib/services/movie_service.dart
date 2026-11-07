@@ -205,6 +205,8 @@ class MovieService {
   // MOCK DATA (Fallback jika offline & cache kosong pertama kali)
   // =========================================================================
 
+  static List<MovieModel> get mockNowPlaying => _mockNowPlaying;
+
   static final List<MovieModel> _mockNowPlaying = [
     const MovieModel(
       id: 693134,

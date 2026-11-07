@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../models/movie_model.dart';
+import '../../routes/app_routes.dart';
 import '../../utils/app_colors.dart';
 
 class MovieDetailView extends StatelessWidget {
@@ -386,18 +387,11 @@ class MovieDetailView extends StatelessWidget {
 
               const SizedBox(width: 20),
 
-              // Tombol Beli Tiket (PB-014)
+              // Tombol Beli Tiket (PB-014 -> PB-018)
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    Get.snackbar(
-                      'Pemesanan Tiket',
-                      'Lanjut ke pemilihan bioskop dan jadwal untuk "${movie.title}" (PB-018 / PB-019)',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: AppColors.card,
-                      colorText: AppColors.textPrimary,
-                      duration: const Duration(seconds: 3),
-                    );
+                    Get.toNamed(Routes.bookByCinema, arguments: movie);
                   },
                   icon: const Icon(Icons.confirmation_number_rounded),
                   label: const Text('Beli Tiket'),

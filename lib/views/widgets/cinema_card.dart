@@ -3,7 +3,9 @@
 // Desain Material 3 Dark Cinema theme.
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../models/cinema_model.dart';
+import '../../routes/app_routes.dart';
 import '../../utils/app_colors.dart';
 
 class CinemaCard extends StatelessWidget {
@@ -219,24 +221,31 @@ class CinemaCard extends StatelessWidget {
                     ),
 
                     // Action: Lihat Jadwal
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Text(
-                          'Lihat Jadwal',
-                          style: TextStyle(
-                            color: AppColors.primaryLight,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(6),
+                      onTap: () => Get.toNamed(Routes.bookByCinema, arguments: cinema),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Text(
+                              'Lihat Jadwal',
+                              style: TextStyle(
+                                color: AppColors.primaryLight,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(width: 2),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              size: 16,
+                              color: AppColors.primaryLight,
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 2),
-                        Icon(
-                          Icons.chevron_right_rounded,
-                          size: 16,
-                          color: AppColors.primaryLight,
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -380,12 +389,7 @@ class CinemaCard extends StatelessWidget {
                   ),
                   onPressed: () {
                     Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Memilih bioskop: ${cinema.name} (PB-018 preview)'),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
+                    Get.toNamed(Routes.bookByCinema, arguments: cinema);
                   },
                 ),
               ),

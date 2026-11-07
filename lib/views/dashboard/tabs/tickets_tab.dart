@@ -2,6 +2,8 @@
 // Tab Tiket: Daftar tiket aktif & riwayat pemesanan (PB-011, persiapan PB-022 s.d. PB-025)
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../../routes/app_routes.dart';
 import '../../../utils/app_colors.dart';
 
 class TicketsTab extends StatefulWidget {
@@ -62,6 +64,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
             icon: Icons.confirmation_number_outlined,
             title: 'Belum Ada Tiket Aktif',
             subtitle: 'Tiket bioskop yang kamu pesan akan muncul di sini lengkap dengan QR Code yang bisa dibuka tanpa internet (offline).',
+            actionLabel: 'Pesan Tiket Bioskop',
+            onAction: () => Get.toNamed(Routes.bookByCinema),
           ),
           _buildEmptyState(
             icon: Icons.history_rounded,
@@ -77,6 +81,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
     required IconData icon,
     required String title,
     required String subtitle,
+    String? actionLabel,
+    VoidCallback? onAction,
   }) {
     return Center(
       child: Padding(
@@ -112,6 +118,24 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                 height: 1.5,
               ),
             ),
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: const Icon(Icons.movie_filter_rounded, color: Colors.white, size: 18),
+                label: Text(
+                  actionLabel,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                onPressed: onAction,
+              ),
+            ],
           ],
         ),
       ),
