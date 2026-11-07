@@ -1,11 +1,12 @@
 // lib/services/movie_service.dart
-// Service untuk memanggil API katalog film TMDB (The Movie Database) (PB-012)
-// Referensi: SRS §3.1, PB-012
+// Service untuk memanggil API katalog film TMDB dengan Hive Cache & TTL 6 jam (PB-012, PB-013)
+// Referensi: SRS §3.1, PB-012, PB-013, Modul 6 & 7 Hive
 
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/movie_model.dart';
 import 'http_service.dart';
+import 'storage_service.dart';
 
 class MovieService {
   MovieService._internal();
@@ -13,6 +14,7 @@ class MovieService {
   factory MovieService() => _instance;
 
   final HttpService _http = HttpService();
+  final StorageService _storage = StorageService();
 
   String get _baseUrl =>
       dotenv.env['TMDB_BASE_URL'] ?? 'https://api.themoviedb.org/3';
@@ -25,85 +27,182 @@ class MovieService {
     return key;
   }
 
+  // =========================================================================
+  // 1. NOW PLAYING dengan Hive Cache (TTL 6 jam)
+  // =========================================================================
+
   /// Mengambil daftar film yang sedang tayang (Now Playing)
-  Future<List<MovieModel>> getNowPlaying({int page = 1}) async {
-    final key = _apiKey;
-    if (key == null) {
-      debugPrint('[MovieService] TMDB API key tidak ditemukan, memuat data mock Now Playing');
-      return _mockNowPlaying;
-    }
+  /// Mengembalikan record: `(movies: list, fromCache: bool, isExpired: bool, timestamp: DateTime?)`
+  Future<({List<MovieModel> movies, bool fromCache, bool isExpired, DateTime? timestamp})> getNowPlaying({
+    int page = 1,
+    bool forceRefresh = false,
+  }) async {
+    const cacheKey = 'now_playing';
 
-    try {
-      final response = await _http.get(
-        '$_baseUrl/movie/now_playing',
-        queryParameters: {
-          'api_key': key,
-          'language': 'id-ID',
-          'page': page,
-        },
-        options: Options(
-          headers: {'Authorization': 'Bearer $key'},
-        ),
-      );
-
-      if (response.statusCode == 200 && response.data != null) {
-        final List results = response.data['results'] ?? [];
-        return results.map((e) => MovieModel.fromJson(e)).toList();
+    // 1. Cek cache Hive jika tidak dipaksa refresh
+    if (!forceRefresh) {
+      final cached = await _storage.getCachedMovies(cacheKey);
+      if (cached.data != null && !cached.isExpired && cached.data!.isNotEmpty) {
+        final list = cached.data!.map((e) => MovieModel.fromJson(e)).toList();
+        return (movies: list, fromCache: true, isExpired: false, timestamp: cached.timestamp);
       }
-      return _mockNowPlaying;
-    } catch (e) {
-      debugPrint('[MovieService] Gagal memuat Now Playing ($e), memuat mock data');
-      return _mockNowPlaying;
     }
-  }
 
-  /// Mengambil daftar film yang akan segera tayang (Coming Soon / Upcoming)
-  Future<List<MovieModel>> getUpcoming({int page = 1}) async {
+    // 2. Fetch online dari API TMDB
     final key = _apiKey;
-    if (key == null) {
-      debugPrint('[MovieService] TMDB API key tidak ditemukan, memuat data mock Upcoming');
-      return _mockUpcoming;
-    }
+    if (key != null) {
+      try {
+        final response = await _http.get(
+          '$_baseUrl/movie/now_playing',
+          queryParameters: {
+            'api_key': key,
+            'language': 'id-ID',
+            'page': page,
+          },
+          options: Options(
+            headers: {'Authorization': 'Bearer $key'},
+          ),
+        );
 
-    try {
-      final response = await _http.get(
-        '$_baseUrl/movie/upcoming',
-        queryParameters: {
-          'api_key': key,
-          'language': 'id-ID',
-          'page': page,
-        },
-        options: Options(
-          headers: {'Authorization': 'Bearer $key'},
-        ),
-      );
+        if (response.statusCode == 200 && response.data != null) {
+          final List results = response.data['results'] ?? [];
+          final list = results.map((e) => MovieModel.fromJson(e)).toList();
 
-      if (response.statusCode == 200 && response.data != null) {
-        final List results = response.data['results'] ?? [];
-        return results.map((e) => MovieModel.fromJson(e)).toList();
+          // Simpan ke Hive box 'movies_cache' dengan timestamp baru (TTL 6 jam)
+          await _storage.cacheMovies(cacheKey, list.map((m) => m.toJson()).toList());
+          return (movies: list, fromCache: false, isExpired: false, timestamp: DateTime.now());
+        }
+      } catch (e) {
+        debugPrint('[MovieService] Error API Now Playing ($e), beralih ke cache Hive...');
       }
-      return _mockUpcoming;
-    } catch (e) {
-      debugPrint('[MovieService] Gagal memuat Upcoming ($e), memuat mock data');
-      return _mockUpcoming;
     }
-  }
 
-  /// Mengambil film sorotan untuk banner carousel utama
-  Future<List<MovieModel>> getBannerMovies() async {
-    final nowPlaying = await getNowPlaying();
-    if (nowPlaying.isNotEmpty) {
-      // Ambil 5 film berating/popularitas tertinggi untuk carousel
-      final sorted = List<MovieModel>.from(nowPlaying)
-        ..sort((a, b) => b.popularity.compareTo(a.popularity));
-      return sorted.take(5).toList();
+    // 3. Jika offline atau API gagal, muat dari Hive cache (meskipun TTL lewat)
+    final fallback = await _storage.getCachedMovies(cacheKey);
+    if (fallback.data != null && fallback.data!.isNotEmpty) {
+      final list = fallback.data!.map((e) => MovieModel.fromJson(e)).toList();
+      return (
+        movies: list,
+        fromCache: true,
+        isExpired: fallback.isExpired,
+        timestamp: fallback.timestamp,
+      );
     }
-    return _mockNowPlaying.take(5).toList();
+
+    // 4. Jika cache Hive pertama kali masih kosong, simpan mock data dan kembalikan
+    await _storage.cacheMovies(cacheKey, _mockNowPlaying.map((m) => m.toJson()).toList());
+    return (
+      movies: _mockNowPlaying,
+      fromCache: true,
+      isExpired: false,
+      timestamp: DateTime.now(),
+    );
   }
 
   // =========================================================================
-  // MOCK DATA (Fallback andal jika TMDB API Key belum dimasukkan)
-  // Poster & Backdrop path valid dari CDN resmi TMDB
+  // 2. COMING SOON / UPCOMING dengan Hive Cache (TTL 6 jam)
+  // =========================================================================
+
+  /// Mengambil daftar film yang akan segera tayang (Coming Soon / Upcoming)
+  Future<({List<MovieModel> movies, bool fromCache, bool isExpired, DateTime? timestamp})> getUpcoming({
+    int page = 1,
+    bool forceRefresh = false,
+  }) async {
+    const cacheKey = 'upcoming';
+
+    // 1. Cek cache Hive jika tidak dipaksa refresh
+    if (!forceRefresh) {
+      final cached = await _storage.getCachedMovies(cacheKey);
+      if (cached.data != null && !cached.isExpired && cached.data!.isNotEmpty) {
+        final list = cached.data!.map((e) => MovieModel.fromJson(e)).toList();
+        return (movies: list, fromCache: true, isExpired: false, timestamp: cached.timestamp);
+      }
+    }
+
+    // 2. Fetch online dari API TMDB
+    final key = _apiKey;
+    if (key != null) {
+      try {
+        final response = await _http.get(
+          '$_baseUrl/movie/upcoming',
+          queryParameters: {
+            'api_key': key,
+            'language': 'id-ID',
+            'page': page,
+          },
+          options: Options(
+            headers: {'Authorization': 'Bearer $key'},
+          ),
+        );
+
+        if (response.statusCode == 200 && response.data != null) {
+          final List results = response.data['results'] ?? [];
+          final list = results.map((e) => MovieModel.fromJson(e)).toList();
+
+          // Simpan ke Hive box 'movies_cache' dengan timestamp baru (TTL 6 jam)
+          await _storage.cacheMovies(cacheKey, list.map((m) => m.toJson()).toList());
+          return (movies: list, fromCache: false, isExpired: false, timestamp: DateTime.now());
+        }
+      } catch (e) {
+        debugPrint('[MovieService] Error API Upcoming ($e), beralih ke cache Hive...');
+      }
+    }
+
+    // 3. Jika offline atau API gagal, muat dari Hive cache
+    final fallback = await _storage.getCachedMovies(cacheKey);
+    if (fallback.data != null && fallback.data!.isNotEmpty) {
+      final list = fallback.data!.map((e) => MovieModel.fromJson(e)).toList();
+      return (
+        movies: list,
+        fromCache: true,
+        isExpired: fallback.isExpired,
+        timestamp: fallback.timestamp,
+      );
+    }
+
+    // 4. Simpan mock data ke cache dan kembalikan
+    await _storage.cacheMovies(cacheKey, _mockUpcoming.map((m) => m.toJson()).toList());
+    return (
+      movies: _mockUpcoming,
+      fromCache: true,
+      isExpired: false,
+      timestamp: DateTime.now(),
+    );
+  }
+
+  // =========================================================================
+  // 3. BANNER CAROUSEL dengan Hive Cache
+  // =========================================================================
+
+  /// Mengambil film sorotan untuk banner carousel utama
+  Future<({List<MovieModel> movies, bool fromCache})> getBannerMovies({
+    bool forceRefresh = false,
+  }) async {
+    const cacheKey = 'banner';
+
+    if (!forceRefresh) {
+      final cached = await _storage.getCachedMovies(cacheKey);
+      if (cached.data != null && !cached.isExpired && cached.data!.isNotEmpty) {
+        final list = cached.data!.map((e) => MovieModel.fromJson(e)).toList();
+        return (movies: list, fromCache: true);
+      }
+    }
+
+    final nowPlayingRes = await getNowPlaying(forceRefresh: forceRefresh);
+    if (nowPlayingRes.movies.isNotEmpty) {
+      final sorted = List<MovieModel>.from(nowPlayingRes.movies)
+        ..sort((a, b) => b.popularity.compareTo(a.popularity));
+      final topBanners = sorted.take(5).toList();
+
+      await _storage.cacheMovies(cacheKey, topBanners.map((m) => m.toJson()).toList());
+      return (movies: topBanners, fromCache: nowPlayingRes.fromCache);
+    }
+
+    return (movies: _mockNowPlaying.take(5).toList(), fromCache: true);
+  }
+
+  // =========================================================================
+  // MOCK DATA (Fallback jika offline & cache kosong pertama kali)
   // =========================================================================
 
   static final List<MovieModel> _mockNowPlaying = [

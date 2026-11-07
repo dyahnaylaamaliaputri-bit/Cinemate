@@ -141,7 +141,103 @@ class _HomeTabState extends State<HomeTab> {
                 }),
               ),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 12),
+
+              // =============================================================
+              // INDIKATOR MODE OFFLINE & HIVE CACHE (PB-013)
+              // =============================================================
+              Obx(() {
+                if (!_movieCtrl.isOfflineMode.value) return const SizedBox.shrink();
+
+                final cached = _movieCtrl.lastCacheTime.value;
+                final timeStr = cached != null
+                    ? '${cached.hour.toString().padLeft(2, '0')}:${cached.minute.toString().padLeft(2, '0')}'
+                    : 'Baru saja';
+
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.card,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.warning, width: 1.2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.warning.withValues(alpha: 0.15),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.warning.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.cloud_off_rounded,
+                          color: AppColors.warning,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Text(
+                                  'Mode Offline',
+                                  style: TextStyle(
+                                    color: AppColors.warning,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surface,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    'Hive (TTL 6 Jam)',
+                                    style: TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Data film dimuat dari cache lokal (tersimpan: $timeStr WIB).',
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.refresh_rounded, color: AppColors.warning, size: 20),
+                        tooltip: 'Muat Ulang',
+                        onPressed: () => _movieCtrl.fetchAllMovies(forceRefresh: true),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+
+              const SizedBox(height: 12),
 
               // =============================================================
               // 1. CAROUSEL BANNER (PB-012)

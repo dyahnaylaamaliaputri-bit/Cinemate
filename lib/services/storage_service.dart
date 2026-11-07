@@ -6,6 +6,8 @@
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:hive/hive.dart';
+import '../utils/constants.dart';
 
 class StorageService {
   StorageService._internal();
@@ -86,4 +88,58 @@ class StorageService {
   set notifBooking(bool v)  => _prefs.write('notif_booking',  v);
   set notifReminder(bool v) => _prefs.write('notif_reminder', v);
   set notifPromo(bool v)    => _prefs.write('notif_promo',    v);
+
+  // ================================================================
+  // HIVE — Cache data film dengan penanda waktu / TTL 6 jam (PB-013)
+  // Referensi: Modul 6 & 7 (Hive local storage)
+  // ================================================================
+  static const int movieCacheTtlHours = 6;
+
+  Future<Box> _openBox(String boxName) async {
+    if (Hive.isBoxOpen(boxName)) {
+      return Hive.box(boxName);
+    }
+    return await Hive.openBox(boxName);
+  }
+
+  /// Menyimpan list film ke Hive box 'movies_cache' dengan timestamp milidetik
+  Future<void> cacheMovies(String key, List<Map<String, dynamic>> moviesJson) async {
+    final box = await _openBox(AppConstants.boxMovies);
+    await box.put(key, {
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+      'data': moviesJson,
+    });
+  }
+
+  /// Mengambil list film dari Hive cache jika ada.
+  /// Menghitung apakah cache masih berada dalam batas TTL 6 jam.
+  Future<({List<Map<String, dynamic>>? data, bool isExpired, DateTime? timestamp})> getCachedMovies(String key) async {
+    final box = await _openBox(AppConstants.boxMovies);
+    final cached = box.get(key);
+    if (cached == null || cached is! Map) {
+      return (data: null, isExpired: true, timestamp: null);
+    }
+
+    final timestampMs = cached['timestamp'] as int? ?? 0;
+    final cachedTime = DateTime.fromMillisecondsSinceEpoch(timestampMs);
+    final rawData = cached['data'];
+
+    if (rawData is! List) {
+      return (data: null, isExpired: true, timestamp: cachedTime);
+    }
+
+    final dataList = rawData
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+    final difference = DateTime.now().difference(cachedTime);
+    final isExpired = difference.inHours >= movieCacheTtlHours;
+
+    return (data: dataList, isExpired: isExpired, timestamp: cachedTime);
+  }
+
+  /// Menghapus seluruh cache film di Hive
+  Future<void> clearMovieCache() async {
+    final box = await _openBox(AppConstants.boxMovies);
+    await box.clear();
+  }
 }

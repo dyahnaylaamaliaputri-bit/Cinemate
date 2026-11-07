@@ -1,5 +1,5 @@
 // lib/controllers/movie_controller.dart
-// Controller state management untuk katalog film & banner carousel (PB-012)
+// Controller state management untuk katalog film, banner, & cache Hive offline (PB-012, PB-013)
 
 import 'package:get/get.dart';
 import '../models/movie_model.dart';
@@ -22,6 +22,11 @@ class MovieController extends GetxController {
 
   final bannerIndex = 0.obs;
 
+  // ── Hive Cache & Offline State (PB-013) ────────────────────────────────────
+  final isOfflineMode = false.obs;
+  final isCacheExpired = false.obs;
+  final Rx<DateTime?> lastCacheTime = Rx<DateTime?>(null);
+
   @override
   void onInit() {
     super.onInit();
@@ -29,45 +34,59 @@ class MovieController extends GetxController {
   }
 
   /// Memuat semua data film (Banner, Now Playing, dan Coming Soon)
-  Future<void> fetchAllMovies() async {
+  Future<void> fetchAllMovies({bool forceRefresh = false}) async {
+    isOfflineMode.value = false;
     await Future.wait([
-      fetchBannerMovies(),
-      fetchNowPlaying(),
-      fetchUpcoming(),
+      fetchBannerMovies(forceRefresh: forceRefresh),
+      fetchNowPlaying(forceRefresh: forceRefresh),
+      fetchUpcoming(forceRefresh: forceRefresh),
     ]);
   }
 
-  Future<void> fetchBannerMovies() async {
+  Future<void> fetchBannerMovies({bool forceRefresh = false}) async {
     isLoadingBanner.value = true;
     try {
-      final movies = await _service.getBannerMovies();
-      bannerMovies.assignAll(movies);
+      final res = await _service.getBannerMovies(forceRefresh: forceRefresh);
+      bannerMovies.assignAll(res.movies);
+      if (res.fromCache) {
+        isOfflineMode.value = true;
+      }
     } catch (_) {
-      // Sedia fallback
+      isOfflineMode.value = true;
     } finally {
       isLoadingBanner.value = false;
     }
   }
 
-  Future<void> fetchNowPlaying() async {
+  Future<void> fetchNowPlaying({bool forceRefresh = false}) async {
     isLoadingNowPlaying.value = true;
     try {
-      final movies = await _service.getNowPlaying();
-      nowPlayingMovies.assignAll(movies);
+      final res = await _service.getNowPlaying(forceRefresh: forceRefresh);
+      nowPlayingMovies.assignAll(res.movies);
+      if (res.fromCache) {
+        isOfflineMode.value = true;
+        isCacheExpired.value = res.isExpired;
+        lastCacheTime.value = res.timestamp;
+      }
     } catch (_) {
-      // Sedia fallback
+      isOfflineMode.value = true;
     } finally {
       isLoadingNowPlaying.value = false;
     }
   }
 
-  Future<void> fetchUpcoming() async {
+  Future<void> fetchUpcoming({bool forceRefresh = false}) async {
     isLoadingUpcoming.value = true;
     try {
-      final movies = await _service.getUpcoming();
-      upcomingMovies.assignAll(movies);
+      final res = await _service.getUpcoming(forceRefresh: forceRefresh);
+      upcomingMovies.assignAll(res.movies);
+      if (res.fromCache) {
+        isOfflineMode.value = true;
+        isCacheExpired.value = res.isExpired;
+        lastCacheTime.value = res.timestamp;
+      }
     } catch (_) {
-      // Sedia fallback
+      isOfflineMode.value = true;
     } finally {
       isLoadingUpcoming.value = false;
     }
