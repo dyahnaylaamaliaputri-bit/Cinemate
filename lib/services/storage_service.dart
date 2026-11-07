@@ -20,7 +20,7 @@ class StorageService {
   );
 
   // --- GetStorage (preferensi) ---
-  final _prefs = GetStorage();
+  GetStorage get _prefs => GetStorage();
 
   // ================================================================
   // SECURE STORAGE — token & sesi
@@ -140,6 +140,39 @@ class StorageService {
   /// Menghapus seluruh cache film di Hive
   Future<void> clearMovieCache() async {
     final box = await _openBox(AppConstants.boxMovies);
+    await box.clear();
+  }
+
+  // ================================================================
+  // HIVE — Cache data bioskop (PB-015)
+  // ================================================================
+
+  /// Menyimpan daftar bioskop ke Hive box 'cinemas_cache'
+  Future<void> cacheCinemas(List<Map<String, dynamic>> cinemasJson) async {
+    final box = await _openBox(AppConstants.boxCinemas);
+    await box.put('all_cinemas', {
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+      'data': cinemasJson,
+    });
+  }
+
+  /// Mengambil daftar bioskop dari Hive box 'cinemas_cache'
+  Future<List<Map<String, dynamic>>?> getCachedCinemas() async {
+    final box = await _openBox(AppConstants.boxCinemas);
+    final cached = box.get('all_cinemas');
+    if (cached == null || cached is! Map) return null;
+
+    final rawData = cached['data'];
+    if (rawData is! List) return null;
+
+    return rawData
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+  }
+
+  /// Menghapus cache bioskop di Hive
+  Future<void> clearCinemaCache() async {
+    final box = await _openBox(AppConstants.boxCinemas);
     await box.clear();
   }
 }

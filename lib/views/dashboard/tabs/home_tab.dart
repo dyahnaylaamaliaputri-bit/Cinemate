@@ -5,10 +5,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/auth_controller.dart';
+import '../../../controllers/cinema_controller.dart';
 import '../../../controllers/movie_controller.dart';
 import '../../../models/movie_model.dart';
 import '../../../routes/app_routes.dart';
 import '../../../utils/app_colors.dart';
+import '../../widgets/cinema_card.dart';
 import '../../widgets/movie_card.dart';
 import '../../widgets/shimmer_loading.dart';
 
@@ -24,6 +26,7 @@ class _HomeTabState extends State<HomeTab> {
   Timer? _carouselTimer;
 
   MovieController get _movieCtrl => Get.find<MovieController>();
+  CinemaController get _cinemaCtrl => Get.find<CinemaController>();
   AuthController get _authCtrl => Get.find<AuthController>();
 
   @override
@@ -105,7 +108,12 @@ class _HomeTabState extends State<HomeTab> {
       body: RefreshIndicator(
         color: AppColors.primary,
         backgroundColor: AppColors.surface,
-        onRefresh: () => _movieCtrl.fetchAllMovies(),
+        onRefresh: () async {
+          await Future.wait([
+            _movieCtrl.fetchAllMovies(),
+            _cinemaCtrl.fetchCinemas(forceRefresh: true),
+          ]);
+        },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -368,6 +376,118 @@ class _HomeTabState extends State<HomeTab> {
               }),
 
               const SizedBox(height: 24),
+
+              // =============================================================
+              // 4. BIOSKOP TERDEKAT (PB-015 - Location-Based Services)
+              // =============================================================
+              _buildSectionHeader(
+                title: 'Bioskop Terdekat',
+                subtitle: 'LBS Geolocation',
+                actionLabel: 'Ganti Titik',
+                actionIcon: Icons.my_location_rounded,
+                onSeeAll: () => _showLocationPicker(context),
+              ),
+              const SizedBox(height: 8),
+
+              // Bar Indikator Titik Lokasi Acuan Pengguna
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Obx(() {
+                  final locName = _cinemaCtrl.selectedLocationName.value;
+                  final lat = _cinemaCtrl.userLat.value;
+                  final lng = _cinemaCtrl.userLng.value;
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.near_me_rounded,
+                          color: AppColors.primaryLight,
+                          size: 15,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Titik Acuan: $locName (${lat.toStringAsFixed(2)}, ${lng.toStringAsFixed(2)})',
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.card,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: AppColors.gold.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: const Text(
+                            '3 Terdekat',
+                            style: TextStyle(
+                              color: AppColors.gold,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ),
+
+              const SizedBox(height: 8),
+
+              Obx(() {
+                if (_cinemaCtrl.isLoading.value) {
+                  return const CinemaListSkeleton();
+                }
+
+                final nearest = _cinemaCtrl.nearestCinemas;
+                if (nearest.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.card,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'Tidak ada bioskop yang ditemukan di sekitar lokasi ini.',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                return Column(
+                  children: List.generate(nearest.length, (index) {
+                    final cinema = nearest[index];
+                    return CinemaCard(
+                      cinema: cinema,
+                      rank: index + 1,
+                    );
+                  }),
+                );
+              }),
+
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -493,6 +613,8 @@ class _HomeTabState extends State<HomeTab> {
     required String title,
     required String subtitle,
     required VoidCallback onSeeAll,
+    String actionLabel = 'Lihat Semua',
+    IconData? actionIcon,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -530,17 +652,138 @@ class _HomeTabState extends State<HomeTab> {
           ),
           TextButton(
             onPressed: onSeeAll,
-            child: const Text(
-              'Lihat Semua',
-              style: TextStyle(
-                color: AppColors.primaryLight,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (actionIcon != null) ...[
+                  Icon(actionIcon, size: 14, color: AppColors.primaryLight),
+                  const SizedBox(width: 4),
+                ],
+                Text(
+                  actionLabel,
+                  style: const TextStyle(
+                    color: AppColors.primaryLight,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  /// Menampilkan modal pemilih lokasi acuan untuk demonstrasi LBS (PB-015)
+  void _showLocationPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Pilih Titik Lokasi Anda (Simulasi LBS)',
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Jarak ke semua bioskop dihitung ulang seketika menggunakan rumus Haversine.',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ...CinemaController.presets.map((preset) {
+                return Obx(() {
+                  final isSelected =
+                      _cinemaCtrl.selectedLocationName.value == preset.name;
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.primary.withValues(alpha: 0.2)
+                            : AppColors.card,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isSelected ? AppColors.primary : AppColors.border,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.place_rounded,
+                        color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(
+                      preset.name,
+                      style: TextStyle(
+                        color: isSelected ? AppColors.primaryLight : AppColors.textPrimary,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${preset.description} (${preset.latitude}, ${preset.longitude})',
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 11,
+                      ),
+                    ),
+                    trailing: isSelected
+                        ? const Icon(Icons.check_circle_rounded, color: AppColors.primary)
+                        : null,
+                    onTap: () {
+                      _cinemaCtrl.setLocation(
+                        preset.name,
+                        preset.latitude,
+                        preset.longitude,
+                      );
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Lokasi diubah ke: ${preset.name}'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                  );
+                });
+              }),
+            ],
+          ),
+        ),
+      );
+    },
     );
   }
 

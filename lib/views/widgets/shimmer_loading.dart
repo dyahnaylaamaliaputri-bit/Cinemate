@@ -109,3 +109,62 @@ class MovieListSkeleton extends StatelessWidget {
     );
   }
 }
+
+/// Skeleton untuk daftar bioskop terdekat (PB-015)
+class CinemaListSkeleton extends StatelessWidget {
+  const CinemaListSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: List.generate(3, (index) {
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.card,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  ShimmerBox(width: 80, height: 20, borderRadius: 6),
+                  ShimmerBox(width: 65, height: 20, borderRadius: 20),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const ShimmerBox(width: 44, height: 44, borderRadius: 10),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        ShimmerBox(width: 160, height: 16, borderRadius: 4),
+                        SizedBox(height: 6),
+                        ShimmerBox(width: 220, height: 12, borderRadius: 4),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  ShimmerBox(width: 120, height: 16, borderRadius: 4),
+                  ShimmerBox(width: 80, height: 16, borderRadius: 4),
+                ],
+              ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+}
