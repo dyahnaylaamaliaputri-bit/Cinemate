@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/auth_controller.dart';
+import '../../routes/app_routes.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/validators.dart';
 
@@ -38,11 +39,21 @@ class _RegisterViewState extends State<RegisterView> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    await _ctrl.register(
-      email: _emailCtrl.text.trim(),
+    final email = _emailCtrl.text.trim();
+    final success = await _ctrl.register(
+      email: email,
       fullName: _nameCtrl.text.trim(),
       password: _passwordCtrl.text,
     );
+
+    if (success && mounted) {
+      // Menggunakan Navigator.pushReplacementNamed dengan passing data arguments
+      Navigator.pushReplacementNamed(
+        context,
+        Routes.login,
+        arguments: {'email': email},
+      );
+    }
   }
 
   @override
@@ -53,7 +64,7 @@ class _RegisterViewState extends State<RegisterView> {
         backgroundColor: AppColors.background,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.pop(context),
         ),
         elevation: 0,
       ),
@@ -189,7 +200,7 @@ class _RegisterViewState extends State<RegisterView> {
                     style: TextStyle(color: AppColors.textSecondary),
                   ),
                   TextButton(
-                    onPressed: () => Get.back(),
+                    onPressed: () => Navigator.pop(context),
                     child: const Text(
                       'Masuk',
                       style: TextStyle(

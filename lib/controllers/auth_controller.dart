@@ -5,7 +5,6 @@
 import 'package:get/get.dart';
 import '../models/user_model.dart';
 import '../repositories/auth_repository.dart';
-import '../routes/app_routes.dart';
 import '../services/storage_service.dart';
 import '../utils/constants.dart';
 
@@ -82,18 +81,17 @@ class AuthController extends GetxController {
 
   // ── CHECK SESSION (PB-007) ────────────────────────────────────────────────
 
-  Future<void> checkSession() async {
+  Future<UserModel?> checkSession() async {
     isLoading.value = true;
     try {
       final user = await _repository.checkSession();
       if (user != null) {
         currentUser.value = user;
-        Get.offAllNamed(Routes.dashboard);
-      } else {
-        Get.offAllNamed(Routes.login);
+        return user;
       }
+      return null;
     } catch (_) {
-      Get.offAllNamed(Routes.login);
+      return null;
     } finally {
       isLoading.value = false;
     }
@@ -101,7 +99,7 @@ class AuthController extends GetxController {
 
   // ── REGISTER (PB-005) ─────────────────────────────────────────────────────
 
-  Future<void> register({
+  Future<bool> register({
     required String email,
     required String fullName,
     required String password,
@@ -119,7 +117,7 @@ class AuthController extends GetxController {
         'Akun berhasil dibuat. Silakan login.',
         snackPosition: SnackPosition.BOTTOM,
       );
-      Get.offNamed(Routes.login);
+      return true;
     } catch (e) {
       errorMessage.value = e.toString().replaceFirst('Exception: ', '');
       Get.snackbar(
@@ -127,6 +125,7 @@ class AuthController extends GetxController {
         errorMessage.value,
         snackPosition: SnackPosition.BOTTOM,
       );
+      return false;
     } finally {
       isLoading.value = false;
     }
@@ -134,7 +133,7 @@ class AuthController extends GetxController {
 
   // ── LOGIN (PB-006) ────────────────────────────────────────────────────────
 
-  Future<void> login({
+  Future<bool> login({
     required String email,
     required String password,
   }) async {
@@ -146,7 +145,7 @@ class AuthController extends GetxController {
         'Terlalu banyak percobaan. Coba lagi dalam ${mins}m ${secs}s.',
         snackPosition: SnackPosition.BOTTOM,
       );
-      return;
+      return false;
     }
 
     isLoading.value = true;
@@ -155,7 +154,7 @@ class AuthController extends GetxController {
       final result = await _repository.login(email: email, password: password);
       currentUser.value = result.user;
       _resetLockout();
-      Get.offAllNamed(Routes.dashboard);
+      return true;
     } catch (e) {
       _incrementAttempts();
       errorMessage.value = 'Email atau password salah.';
@@ -166,6 +165,7 @@ class AuthController extends GetxController {
             : errorMessage.value,
         snackPosition: SnackPosition.BOTTOM,
       );
+      return false;
     } finally {
       isLoading.value = false;
     }
@@ -178,11 +178,9 @@ class AuthController extends GetxController {
     try {
       await _repository.logout();
       currentUser.value = null;
-      Get.offAllNamed(Routes.login);
     } catch (_) {
       // Tetap logout lokal meskipun server gagal
       currentUser.value = null;
-      Get.offAllNamed(Routes.login);
     } finally {
       isLoading.value = false;
     }

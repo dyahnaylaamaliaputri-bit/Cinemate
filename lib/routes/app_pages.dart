@@ -4,6 +4,7 @@
 
 import 'package:get/get.dart';
 import '../bindings/auth_binding.dart';
+import '../bindings/dashboard_binding.dart';
 import '../views/splash/splash_view.dart';
 import '../views/auth/login_view.dart';
 import '../views/auth/register_view.dart';
@@ -34,7 +35,7 @@ class AppPages {
     GetPage(
       name: Routes.dashboard,
       page: () => const DashboardView(),
-      binding: AuthBinding(),
+      binding: DashboardBinding(),
     ),
   ];
 }

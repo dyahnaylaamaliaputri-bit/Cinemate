@@ -32,10 +32,25 @@ class _LoginViewState extends State<LoginView> {
 
   AuthController get _ctrl => Get.find<AuthController>();
 
+  bool _initializedArgs = false;
+
   @override
   void initState() {
     super.initState();
     _startLockoutTimerIfNeeded();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initializedArgs) {
+      _initializedArgs = true;
+      // Passing data antar halaman: Menerima arguments via ModalRoute.of(context)
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is Map && args.containsKey('email')) {
+        _emailCtrl.text = args['email'] as String;
+      }
+    }
   }
 
   void _startLockoutTimerIfNeeded() {
@@ -78,10 +93,16 @@ class _LoginViewState extends State<LoginView> {
     }
     if (!_formKey.currentState!.validate()) return;
 
-    await _ctrl.login(
+    final success = await _ctrl.login(
       email: _emailCtrl.text.trim(),
       password: _passwordCtrl.text,
     );
+
+    if (success && mounted) {
+      // Menggunakan Navigator.pushNamedAndRemoveUntil untuk membersihkan stack
+      Navigator.pushNamedAndRemoveUntil(context, Routes.dashboard, (route) => false);
+      return;
+    }
 
     // Jika baru terkena lockout setelah percobaan ini
     if (_ctrl.isLockedOut && mounted) {
@@ -254,7 +275,7 @@ class _LoginViewState extends State<LoginView> {
                     style: TextStyle(color: AppColors.textSecondary),
                   ),
                   TextButton(
-                    onPressed: () => Get.toNamed(Routes.register),
+                    onPressed: () => Navigator.pushNamed(context, Routes.register),
                     child: const Text(
                       'Daftar',
                       style: TextStyle(

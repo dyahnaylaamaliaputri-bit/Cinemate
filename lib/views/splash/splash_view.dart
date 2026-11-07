@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/auth_controller.dart';
+import '../../routes/app_routes.dart';
 import '../../utils/app_colors.dart';
 
 class SplashView extends StatefulWidget {
@@ -32,9 +33,15 @@ class _SplashViewState extends State<SplashView>
     );
     _animController.forward();
 
-    // Cek sesi setelah animasi selesai
-    Future.delayed(const Duration(seconds: 2), () {
-      Get.find<AuthController>().checkSession();
+    // Cek sesi setelah animasi selesai menggunakan Navigator.pushReplacementNamed
+    Future.delayed(const Duration(seconds: 2), () async {
+      final user = await Get.find<AuthController>().checkSession();
+      if (!mounted) return;
+      if (user != null) {
+        Navigator.pushReplacementNamed(context, Routes.dashboard);
+      } else {
+        Navigator.pushReplacementNamed(context, Routes.login);
+      }
     });
   }
 
