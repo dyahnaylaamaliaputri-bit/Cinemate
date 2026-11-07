@@ -7,6 +7,7 @@ import '../controllers/booking_movie_controller.dart';
 import '../controllers/booking_seat_controller.dart';
 import '../controllers/order_summary_controller.dart';
 import '../controllers/payment_controller.dart';
+import '../controllers/ticket_detail_controller.dart';
 
 class BookByCinemaBinding extends Bindings {
   @override
@@ -40,5 +41,12 @@ class PaymentBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<PaymentController>(() => PaymentController());
+  }
+}
+
+class TicketDetailBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<TicketDetailController>(() => TicketDetailController());
   }
 }

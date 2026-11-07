@@ -18,4 +18,5 @@ abstract class Routes {
   static const selectSeat   = '/select-seat';
   static const orderSummary = '/order-summary';
   static const payment      = '/payment';
+  static const ticketDetail = '/ticket-detail';
 }

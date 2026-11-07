@@ -175,4 +175,50 @@ class StorageService {
     final box = await _openBox(AppConstants.boxCinemas);
     await box.clear();
   }
+
+  // ================================================================
+  // HIVE — Cache data E-Ticket (PB-023, PB-024)
+  // ================================================================
+
+  /// Menyimpan daftar tiket bioskop ke Hive box 'tickets_cache'
+  Future<void> cacheTickets(List<Map<String, dynamic>> ticketsJson) async {
+    final box = await _openBox(AppConstants.boxTickets);
+    await box.put('user_tickets', {
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+      'data': ticketsJson,
+    });
+  }
+
+  /// Menambahkan satu tiket baru ke Hive box 'tickets_cache'
+  Future<void> addTicketToCache(Map<String, dynamic> ticketJson) async {
+    final current = await getCachedTickets() ?? [];
+    // Cek apakah tiket sudah ada (update atau tambahkan di awal list)
+    final existingIndex = current.indexWhere((t) => t['id'] == ticketJson['id']);
+    if (existingIndex >= 0) {
+      current[existingIndex] = ticketJson;
+    } else {
+      current.insert(0, ticketJson);
+    }
+    await cacheTickets(current);
+  }
+
+  /// Mengambil daftar tiket bioskop dari Hive box 'tickets_cache'
+  Future<List<Map<String, dynamic>>?> getCachedTickets() async {
+    final box = await _openBox(AppConstants.boxTickets);
+    final cached = box.get('user_tickets');
+    if (cached == null || cached is! Map) return null;
+
+    final rawData = cached['data'];
+    if (rawData is! List) return null;
+
+    return rawData
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+  }
+
+  /// Menghapus cache tiket di Hive
+  Future<void> clearTicketsCache() async {
+    final box = await _openBox(AppConstants.boxTickets);
+    await box.clear();
+  }
 }

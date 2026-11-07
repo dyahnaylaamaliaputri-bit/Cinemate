@@ -143,7 +143,7 @@ Tujuan: Membangun alur pemesanan tiket bioskop dari pemilihan jadwal hingga pene
    - Menyediakan pilihan metode pembayaran simulasi (Virtual Account, E-Wallet dummy, QRIS).
    - Terdapat batas waktu bayar (countdown timer 10 menit).
    - Tombol "Bayar Sekarang" yang mengubah status pesanan menjadi *Paid*.
-5. **PB-022 & PB-023 (E-Ticket dengan QR Code & Persistensi):**
+5. **PB-022 & PB-023 (E-Ticket dengan QR Code & Persistensi):** [SELESAI]
    - Buat model `TicketModel` di `lib/models/ticket_model.dart`.
    - Generate kode booking unik (misal: `CNM-XXXXX`) dan tampilkan QR code menggunakan package `qr_flutter`.
    - Simpan data transaksi ke tabel `bookings` & `booking_seats` Supabase, serta simpan salinannya ke Hive box `tickets_cache`.

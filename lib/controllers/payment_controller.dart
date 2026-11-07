@@ -10,7 +10,11 @@ import '../models/cinema_model.dart';
 import '../models/movie_model.dart';
 import '../models/payment_method_model.dart';
 import '../models/showtime_model.dart';
+import '../models/ticket_model.dart';
 import '../routes/app_routes.dart';
+import '../services/storage_service.dart';
+import '../services/ticket_service.dart';
+import 'tickets_controller.dart';
 
 class PaymentController extends GetxController {
   late final Rx<BookingOrderModel> order;
@@ -31,6 +35,7 @@ class PaymentController extends GetxController {
   /// Status proses pembayaran
   final isProcessing = false.obs;
   final isPaymentSuccess = false.obs;
+  final createdTicket = Rx<TicketModel?>(null);
 
   /// Input nomor ponsel untuk E-Wallet
   final phoneController = TextEditingController(text: '081234567890');
@@ -199,6 +204,19 @@ class PaymentController extends GetxController {
     );
 
     order.value = updated;
+
+    // Simpan ke Supabase & Hive via TicketService (PB-022, PB-023)
+    final userId = await StorageService().getUserId() ?? 'usr-local';
+    final ticket = await TicketService().createBooking(order: updated, userId: userId);
+    createdTicket.value = ticket;
+
+    // Sinkronkan ke TicketsController jika terdaftar
+    try {
+      if (Get.isRegistered<TicketsController>()) {
+        Get.find<TicketsController>().loadTickets(forceRefresh: true);
+      }
+    } catch (_) {}
+
     isProcessing.value = false;
     isPaymentSuccess.value = true;
     _countdownTimer?.cancel();
@@ -309,14 +327,11 @@ class PaymentController extends GetxController {
                     ),
                     onPressed: () {
                       Get.back(); // tutup modal
-                      Get.snackbar(
-                        'E-Ticket Siap',
-                        'Kode booking e-ticket QR Code dan penyimpanan offline akan aktif di PB-022 & PB-023!',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: const Color(0xFF16213E),
-                        colorText: Colors.white,
-                        icon: const Icon(Icons.confirmation_number_rounded, color: Color(0xFFFFD700)),
-                      );
+                      if (createdTicket.value != null) {
+                        Get.toNamed(Routes.ticketDetail, arguments: createdTicket.value);
+                      } else {
+                        Get.toNamed(Routes.ticketDetail);
+                      }
                     },
                   ),
                 ),
