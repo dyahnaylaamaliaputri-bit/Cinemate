@@ -1,9 +1,13 @@
 // lib/controllers/ticket_detail_controller.dart
-// Controller untuk melihat detail E-Ticket dan QR Code (PB-022)
+// Controller untuk melihat detail E-Ticket dan QR Code (PB-022, PB-024, PB-025)
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../models/ticket_model.dart';
+import '../services/ticket_service.dart';
+import '../utils/app_colors.dart';
+import 'tickets_controller.dart';
 
 class TicketDetailController extends GetxController {
   late final Rx<TicketModel> ticket;
@@ -59,5 +63,27 @@ class TicketDetailController extends GetxController {
       colorText: const Color(0xFFFFFFFF),
       duration: const Duration(seconds: 2),
     );
+  }
+
+  /// Simulasi Check-in / Scan QR untuk menandai tiket telah digunakan (PB-025)
+  Future<void> simulateCheckIn() async {
+    final updated = await TicketService().updateTicketStatus(
+      ticketId: ticket.value.id,
+      newStatus: 'used',
+    );
+    if (updated != null) {
+      ticket.value = updated;
+      if (Get.isRegistered<TicketsController>()) {
+        Get.find<TicketsController>().loadTickets(forceRefresh: true);
+      }
+      Get.snackbar(
+        'Check-in Berhasil 🎉',
+        'Tiket ${ticket.value.bookingCode} berhasil dipindai dan dipindahkan ke Riwayat.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.card,
+        colorText: Colors.white,
+        icon: const Icon(Icons.check_circle_rounded, color: AppColors.success),
+      );
+    }
   }
 }

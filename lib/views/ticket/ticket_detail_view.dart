@@ -1,5 +1,5 @@
 // lib/views/ticket/ticket_detail_view.dart
-// Halaman Detail E-Ticket bioskop dengan QR Code (PB-022)
+// Halaman Detail E-Ticket bioskop dengan QR Code & Akses Offline (PB-022, PB-024, PB-025)
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -41,12 +41,21 @@ class TicketDetailView extends GetView<TicketDetailController> {
           ],
         ),
         actions: [
+          Obx(() {
+            final isTicketActive = controller.ticket.value.isTicketActive;
+            if (!isTicketActive) return const SizedBox.shrink();
+            return IconButton(
+              icon: const Icon(Icons.sensor_occupied_rounded, color: AppColors.gold),
+              tooltip: 'Simulasi Check-in Studio (PB-025)',
+              onPressed: () => _showCheckInDialog(context),
+            );
+          }),
           IconButton(
             icon: const Icon(Icons.share_rounded, color: Colors.white70),
             onPressed: () {
               Get.snackbar(
                 'Bagikan Tiket',
-                'Tautan tiket digital siap dibagikan ke teman nontonmu!',
+                'Tautan tiket digital ${controller.ticket.value.bookingCode} siap dibagikan!',
                 snackPosition: SnackPosition.BOTTOM,
                 backgroundColor: AppColors.card,
                 colorText: Colors.white,
@@ -64,7 +73,7 @@ class TicketDetailView extends GetView<TicketDetailController> {
               // Badge Mode Offline Ready (PB-024)
               Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.success.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
@@ -74,11 +83,15 @@ class TicketDetailView extends GetView<TicketDetailController> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.offline_pin_rounded, color: AppColors.success, size: 16),
-                    SizedBox(width: 6),
+                    SizedBox(width: 8),
                     Flexible(
                       child: Text(
                         'Tersimpan Offline di Perangkat (Offline Ready)',
-                        style: TextStyle(color: AppColors.success, fontSize: 11, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: AppColors.success,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -91,48 +104,65 @@ class TicketDetailView extends GetView<TicketDetailController> {
 
               const SizedBox(height: 24),
 
-              // Tombol Navigasi
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: AppColors.border),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              // Tombol Navigasi Bawah
+              Obx(() {
+                final isHistory = controller.ticket.value.isTicketHistory;
+                return Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: const BorderSide(color: AppColors.border),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          Get.until((route) => route.settings.name == Routes.dashboard);
+                        },
+                        child: const Text('Ke Beranda', style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
-                      onPressed: () {
-                        Get.until((route) => route.settings.name == Routes.dashboard);
-                      },
-                      child: const Text('Ke Beranda', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      icon: const Icon(Icons.download_rounded, size: 18),
-                      label: const Text('Unduh PDF', style: TextStyle(fontWeight: FontWeight.bold)),
-                      onPressed: () {
-                        Get.snackbar(
-                          'Unduh Berhasil',
-                          'E-ticket ${controller.ticket.value.bookingCode} berhasil disimpan ke galeri dokumen.',
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppColors.card,
-                          colorText: Colors.white,
-                          icon: const Icon(Icons.check_circle_rounded, color: AppColors.success),
-                        );
-                      },
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: isHistory
+                          ? ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              icon: const Icon(Icons.refresh_rounded, size: 18),
+                              label: const Text('Pesan Lagi', style: TextStyle(fontWeight: FontWeight.bold)),
+                              onPressed: () {
+                                Get.toNamed(Routes.bookByCinema);
+                              },
+                            )
+                          : ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              icon: const Icon(Icons.download_rounded, size: 18),
+                              label: const Text('Unduh PDF', style: TextStyle(fontWeight: FontWeight.bold)),
+                              onPressed: () {
+                                Get.snackbar(
+                                  'Unduh Berhasil',
+                                  'E-ticket ${controller.ticket.value.bookingCode} berhasil disimpan ke dokumen.',
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  backgroundColor: AppColors.card,
+                                  colorText: Colors.white,
+                                  icon: const Icon(Icons.check_circle_rounded, color: AppColors.success),
+                                );
+                              },
+                            ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              }),
               const SizedBox(height: 16),
             ],
           ),
@@ -141,10 +171,51 @@ class TicketDetailView extends GetView<TicketDetailController> {
     );
   }
 
+  /// Dialog Konfirmasi Simulasi Check-in
+  void _showCheckInDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColors.card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.qr_code_scanner_rounded, color: AppColors.gold),
+            SizedBox(width: 10),
+            Text('Simulasi Check-in', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          'Tandai tiket ${controller.ticket.value.bookingCode} telah dipindai di pintu studio? Tiket akan otomatis dipindahkan ke tab Riwayat (PB-025).',
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Batal', style: TextStyle(color: Colors.white70)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              Get.back();
+              controller.simulateCheckIn();
+            },
+            child: const Text('Pindai & Masuk'),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Kartu E-Ticket Fisik Digital
   Widget _buildETicketCard() {
     return Obx(() {
       final ticket = controller.ticket.value;
+      final isHistory = ticket.isTicketHistory;
+
       return Container(
         decoration: BoxDecoration(
           color: AppColors.surface,
@@ -325,33 +396,61 @@ class TicketDetailView extends GetView<TicketDetailController> {
               child: Column(
                 children: [
                   // QR Code Box
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.25),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: QrImageView(
-                      data: ticket.qrData,
-                      version: QrVersions.auto,
-                      size: 190.0,
-                      backgroundColor: Colors.white,
-                      eyeStyle: const QrEyeStyle(
-                        eyeShape: QrEyeShape.square,
-                        color: Color(0xFF0A0A0A),
+                        child: Opacity(
+                          opacity: isHistory ? 0.35 : 1.0,
+                          child: QrImageView(
+                            data: ticket.qrData,
+                            version: QrVersions.auto,
+                            size: 190.0,
+                            backgroundColor: Colors.white,
+                            eyeStyle: const QrEyeStyle(
+                              eyeShape: QrEyeShape.square,
+                              color: Color(0xFF0A0A0A),
+                            ),
+                            dataModuleStyle: const QrDataModuleStyle(
+                              dataModuleShape: QrDataModuleShape.square,
+                              color: Color(0xFF0A0A0A),
+                            ),
+                          ),
+                        ),
                       ),
-                      dataModuleStyle: const QrDataModuleStyle(
-                        dataModuleShape: QrDataModuleShape.square,
-                        color: Color(0xFF0A0A0A),
-                      ),
-                    ),
+                      if (isHistory)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2E2E3E).withValues(alpha: 0.95),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: AppColors.border),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 16),
+                              const SizedBox(width: 6),
+                              Text(
+                                ticket.historyStatusLabel.toUpperCase(),
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
 
                   const SizedBox(height: 14),
@@ -389,9 +488,11 @@ class TicketDetailView extends GetView<TicketDetailController> {
                   ),
 
                   const SizedBox(height: 6),
-                  const Text(
-                    'Pindai kode QR ini pada gerbang masuk bioskop untuk cetak tiket fisik atau langsung masuk studio.',
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                  Text(
+                    isHistory
+                        ? 'Tiket ini telah digunakan untuk menonton atau masa berlakunya telah berakhir.'
+                        : 'Pindai kode QR ini pada gerbang masuk bioskop untuk cetak tiket fisik atau langsung masuk studio.',
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
                     textAlign: TextAlign.center,
                   ),
 
@@ -418,13 +519,17 @@ class TicketDetailView extends GetView<TicketDetailController> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: AppColors.success.withValues(alpha: 0.15),
+                          color: (isHistory ? AppColors.textDisabled : AppColors.success).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: AppColors.success),
+                          border: Border.all(color: isHistory ? AppColors.textDisabled : AppColors.success),
                         ),
                         child: Text(
-                          ticket.status.toUpperCase(),
-                          style: const TextStyle(color: AppColors.success, fontSize: 10, fontWeight: FontWeight.bold),
+                          isHistory ? ticket.historyStatusLabel.toUpperCase() : ticket.status.toUpperCase(),
+                          style: TextStyle(
+                            color: isHistory ? AppColors.textDisabled : AppColors.success,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -449,60 +554,75 @@ class TicketDetailView extends GetView<TicketDetailController> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: AppColors.textSecondary),
+          Icon(icon, color: AppColors.gold, size: 12),
           const SizedBox(width: 4),
-          Text(text, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+          Text(text, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
         ],
       ),
     );
   }
 
+  /// Efek lekukan sobekan perforasi tiket khas bioskop
   Widget _buildTicketPerforation() {
-    return Row(
-      children: [
-        // Cutout Kiri
-        ClipRRect(
-          borderRadius: const BorderRadius.horizontal(right: Radius.circular(14)),
-          child: Container(
-            width: 14,
-            height: 28,
-            color: AppColors.background,
-          ),
-        ),
-        // Dashed line
-        Expanded(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final boxWidth = constraints.constrainWidth();
-              const dashWidth = 6.0;
-              const dashHeight = 1.0;
-              final dashCount = (boxWidth / (2 * dashWidth)).floor();
-              return Flex(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                direction: Axis.horizontal,
-                children: List.generate(dashCount, (_) {
-                  return const SizedBox(
-                    width: dashWidth,
-                    height: dashHeight,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(color: AppColors.border),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const circleSize = 20.0;
+        final dashWidth = 6.0;
+        final dashSpace = 4.0;
+        final totalWidth = constraints.maxWidth - (circleSize * 2);
+        final dashCount = (totalWidth / (dashWidth + dashSpace)).floor();
+
+        return SizedBox(
+          height: circleSize,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Garis Putus-putus
+              Positioned(
+                left: circleSize,
+                right: circleSize,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(
+                    dashCount,
+                    (_) => Container(
+                      width: dashWidth,
+                      height: 1.5,
+                      color: AppColors.divider,
                     ),
-                  );
-                }),
-              );
-            },
+                  ),
+                ),
+              ),
+
+              // Lekukan Kiri
+              Positioned(
+                left: -(circleSize / 2),
+                child: Container(
+                  width: circleSize,
+                  height: circleSize,
+                  decoration: const BoxDecoration(
+                    color: AppColors.background,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+
+              // Lekukan Kanan
+              Positioned(
+                right: -(circleSize / 2),
+                child: Container(
+                  width: circleSize,
+                  height: circleSize,
+                  decoration: const BoxDecoration(
+                    color: AppColors.background,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-        // Cutout Kanan
-        ClipRRect(
-          borderRadius: const BorderRadius.horizontal(left: Radius.circular(14)),
-          child: Container(
-            width: 14,
-            height: 28,
-            color: AppColors.background,
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }

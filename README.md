@@ -147,9 +147,9 @@ Tujuan: Membangun alur pemesanan tiket bioskop dari pemilihan jadwal hingga pene
    - Buat model `TicketModel` di `lib/models/ticket_model.dart`.
    - Generate kode booking unik (misal: `CNM-XXXXX`) dan tampilkan QR code menggunakan package `qr_flutter`.
    - Simpan data transaksi ke tabel `bookings` & `booking_seats` Supabase, serta simpan salinannya ke Hive box `tickets_cache`.
-6. **PB-024 (Akses E-Ticket Offline):**
+6. **PB-024 (Akses E-Ticket Offline):** [SELESAI]
    - Saat perangkat tidak memiliki koneksi internet, pengguna tetap dapat membuka tab Tiket dan menampilkan QR code e-ticket langsung dari Hive cache.
-7. **PB-025 (Daftar Tiket Aktif & Riwayat):**
+7. **PB-025 (Daftar Tiket Aktif & Riwayat):** [SELESAI]
    - Pada tab "Tiket", sediakan tab/filter: **Tiket Aktif** (jadwal tayang belum lewat) dan **Riwayat** (sudah selesai/kedaluwarsa).
 
 ---

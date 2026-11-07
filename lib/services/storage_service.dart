@@ -26,23 +26,47 @@ class StorageService {
   // SECURE STORAGE — token & sesi
   // ================================================================
 
-  Future<void> saveSessionToken(String token) =>
-      _secure.write(key: 'session_token', value: token);
+  Future<void> saveSessionToken(String token) async {
+    try {
+      await _secure.write(key: 'session_token', value: token);
+    } catch (_) {}
+  }
 
-  Future<String?> getSessionToken() =>
-      _secure.read(key: 'session_token');
+  Future<String?> getSessionToken() async {
+    try {
+      return await _secure.read(key: 'session_token');
+    } catch (_) {
+      return null;
+    }
+  }
 
-  Future<void> saveUserId(String userId) =>
-      _secure.write(key: 'user_id', value: userId);
+  Future<void> saveUserId(String userId) async {
+    try {
+      await _secure.write(key: 'user_id', value: userId);
+    } catch (_) {}
+  }
 
-  Future<String?> getUserId() =>
-      _secure.read(key: 'user_id');
+  Future<String?> getUserId() async {
+    try {
+      return await _secure.read(key: 'user_id');
+    } catch (_) {
+      return null;
+    }
+  }
 
-  Future<void> saveUserEmail(String email) =>
-      _secure.write(key: 'user_email', value: email);
+  Future<void> saveUserEmail(String email) async {
+    try {
+      await _secure.write(key: 'user_email', value: email);
+    } catch (_) {}
+  }
 
-  Future<String?> getUserEmail() =>
-      _secure.read(key: 'user_email');
+  Future<String?> getUserEmail() async {
+    try {
+      return await _secure.read(key: 'user_email');
+    } catch (_) {
+      return null;
+    }
+  }
 
   /// Hapus semua data sesi (saat logout)
   Future<void> clearSession() async {
@@ -204,16 +228,25 @@ class StorageService {
 
   /// Mengambil daftar tiket bioskop dari Hive box 'tickets_cache'
   Future<List<Map<String, dynamic>>?> getCachedTickets() async {
+    final meta = await getCachedTicketsWithMeta();
+    return meta.data;
+  }
+
+  /// Mengambil tiket beserta metadata timestamp cache (PB-024)
+  Future<({List<Map<String, dynamic>>? data, DateTime? timestamp})> getCachedTicketsWithMeta() async {
     final box = await _openBox(AppConstants.boxTickets);
     final cached = box.get('user_tickets');
-    if (cached == null || cached is! Map) return null;
+    if (cached == null || cached is! Map) return (data: null, timestamp: null);
 
+    final timestampMs = cached['timestamp'] as int? ?? 0;
+    final cachedTime = DateTime.fromMillisecondsSinceEpoch(timestampMs);
     final rawData = cached['data'];
-    if (rawData is! List) return null;
+    if (rawData is! List) return (data: null, timestamp: cachedTime);
 
-    return rawData
+    final list = rawData
         .map((e) => Map<String, dynamic>.from(e as Map))
         .toList();
+    return (data: list, timestamp: cachedTime);
   }
 
   /// Menghapus cache tiket di Hive

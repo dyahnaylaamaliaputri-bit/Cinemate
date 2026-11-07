@@ -1,5 +1,5 @@
 // lib/models/ticket_model.dart
-// Model untuk E-Ticket bioskop dengan QR Code dan persistensi (PB-022, PB-023)
+// Model untuk E-Ticket bioskop dengan QR Code, persistensi, dan pemisahan tiket aktif & riwayat (PB-022 s.d. PB-025)
 
 import 'booking_order_model.dart';
 
@@ -78,10 +78,84 @@ class TicketModel {
   /// Format rupiah: Rp 106.000
   String get formattedPrice => BookingOrderModel.formatRupiah(totalPrice);
 
-  /// Status tiket aktif (bisa digunakan untuk check-in / masuk studio)
+  /// Status tiket aktif dasar
   bool get isActive => status == 'paid' || status == 'active';
   bool get isUsed => status == 'used';
   bool get isExpired => status == 'expired' || status == 'cancelled';
+
+  /// Parsing tanggal dan jam penayangan ke objek DateTime
+  DateTime? get showDateTime {
+    try {
+      final dateParts = showDate.split('-');
+      final timeParts = showTime.split(':');
+      if (dateParts.length == 3 && timeParts.length >= 2) {
+        return DateTime(
+          int.parse(dateParts[0]),
+          int.parse(dateParts[1]),
+          int.parse(dateParts[2]),
+          int.parse(timeParts[0]),
+          int.parse(timeParts[1]),
+        );
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  /// Jadwal telah terlewati jika waktu selesai tayang (+3 jam) telah lewat waktu saat ini
+  bool get isShowPassed {
+    final sdt = showDateTime;
+    if (sdt == null) return false;
+    final endDateTime = sdt.add(const Duration(hours: 3));
+    return DateTime.now().isAfter(endDateTime);
+  }
+
+  /// Evaluasi untuk Tab Tiket Aktif (PB-025):
+  /// Tiket berstatus 'paid'/'active' dan jadwal belum lewat
+  bool get isTicketActive {
+    if (status == 'used' || status == 'expired' || status == 'cancelled') {
+      return false;
+    }
+    return !isShowPassed;
+  }
+
+  /// Evaluasi untuk Tab Riwayat Tiket (PB-025):
+  /// Tiket yang sudah dipakai ('used'), dibatalkan ('cancelled'), expired, atau jadwalnya telah lewat
+  bool get isTicketHistory => !isTicketActive;
+
+  /// Label countdown waktu tayang untuk kartu tiket aktif
+  String get remainingTimeLabel {
+    final sdt = showDateTime;
+    if (sdt == null) return '$showDate • $showTime WIB';
+    final now = DateTime.now();
+    final diff = sdt.difference(now);
+
+    if (diff.isNegative) {
+      if (isShowPassed) {
+        return 'Penayangan Selesai';
+      } else {
+        return 'Sedang Tayang di Studio';
+      }
+    }
+
+    if (diff.inDays == 0 && sdt.day == now.day) {
+      if (diff.inHours == 0) {
+        return 'Dimulai dalam ${diff.inMinutes} menit!';
+      }
+      return 'Hari ini • $showTime WIB';
+    } else if (diff.inDays == 1 || (diff.inDays == 0 && sdt.day != now.day)) {
+      return 'Besok • $showTime WIB';
+    } else {
+      return 'Dalam ${diff.inDays} hari • $showTime WIB';
+    }
+  }
+
+  /// Label status riwayat untuk tab Riwayat
+  String get historyStatusLabel {
+    if (status == 'used') return 'Sudah Ditonton';
+    if (status == 'cancelled') return 'Dibatalkan';
+    if (status == 'expired' || isShowPassed) return 'Selesai';
+    return 'Riwayat';
+  }
 
   /// Format tanggal penayangan manusiawi (misal: "Sabtu, 7 November 2026")
   String get formattedShowDate {
@@ -102,6 +176,56 @@ class TicketModel {
       }
     } catch (_) {}
     return showDate;
+  }
+
+  TicketModel copyWith({
+    String? id,
+    String? bookingCode,
+    String? userId,
+    String? showtimeId,
+    int? movieId,
+    String? movieTitle,
+    String? posterPath,
+    String? backdropPath,
+    String? cinemaId,
+    String? cinemaName,
+    String? cinemaAddress,
+    String? hallName,
+    String? experience,
+    String? showDate,
+    String? showTime,
+    List<String>? seats,
+    int? totalPrice,
+    String? qrData,
+    String? status,
+    String? paymentMethod,
+    String? paymentReference,
+    DateTime? createdAt,
+  }) {
+    return TicketModel(
+      id: id ?? this.id,
+      bookingCode: bookingCode ?? this.bookingCode,
+      userId: userId ?? this.userId,
+      showtimeId: showtimeId ?? this.showtimeId,
+      movieId: movieId ?? this.movieId,
+      movieTitle: movieTitle ?? this.movieTitle,
+      posterPath: posterPath ?? this.posterPath,
+      backdropPath: backdropPath ?? this.backdropPath,
+      cinemaId: cinemaId ?? this.cinemaId,
+      cinemaName: cinemaName ?? this.cinemaName,
+      cinemaAddress: cinemaAddress ?? this.cinemaAddress,
+      hallName: hallName ?? this.hallName,
+      experience: experience ?? this.experience,
+      showDate: showDate ?? this.showDate,
+      showTime: showTime ?? this.showTime,
+      seats: seats ?? this.seats,
+      totalPrice: totalPrice ?? this.totalPrice,
+      qrData: qrData ?? this.qrData,
+      status: status ?? this.status,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      paymentReference: paymentReference ?? this.paymentReference,
+      createdAt: createdAt ?? this.createdAt,
+    );
   }
 
   Map<String, dynamic> toJson() {
