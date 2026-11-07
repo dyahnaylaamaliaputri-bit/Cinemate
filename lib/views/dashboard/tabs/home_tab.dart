@@ -1,18 +1,61 @@
 // lib/views/dashboard/tabs/home_tab.dart
-// Tab utama: Katalog film, banner carousel, dan bioskop terdekat (PB-011, persiapan PB-012 s.d. PB-015)
+// Tab utama: Banner Carousel, Now Playing, dan Coming Soon (PB-012)
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/auth_controller.dart';
+import '../../../controllers/movie_controller.dart';
+import '../../../models/movie_model.dart';
 import '../../../utils/app_colors.dart';
+import '../../widgets/movie_card.dart';
+import '../../widgets/shimmer_loading.dart';
 
-class HomeTab extends StatelessWidget {
+class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final authCtrl = Get.find<AuthController>();
+  State<HomeTab> createState() => _HomeTabState();
+}
 
+class _HomeTabState extends State<HomeTab> {
+  late final PageController _pageController;
+  Timer? _carouselTimer;
+
+  MovieController get _movieCtrl => Get.find<MovieController>();
+  AuthController get _authCtrl => Get.find<AuthController>();
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(viewportFraction: 0.92);
+    _startAutoScroll();
+  }
+
+  void _startAutoScroll() {
+    _carouselTimer?.cancel();
+    _carouselTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted || !_pageController.hasClients) return;
+      final count = _movieCtrl.bannerMovies.length;
+      if (count <= 1) return;
+      final nextPage = (_movieCtrl.bannerIndex.value + 1) % count;
+      _pageController.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOutCubic,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _carouselTimer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -48,316 +91,546 @@ class HomeTab extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.notifications_none_rounded, color: AppColors.textPrimary),
             onPressed: () {
-              Get.snackbar(
-                'Notifikasi',
-                'Belum ada notifikasi baru untuk saat ini.',
-                snackPosition: SnackPosition.BOTTOM,
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Belum ada notifikasi baru untuk saat ini.'),
+                  duration: Duration(seconds: 2),
+                ),
               );
             },
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Salam Pengguna
-            Obx(() {
-              final user = authCtrl.currentUser.value;
-              final name = user?.fullName.isNotEmpty == true ? user!.fullName : 'Pengguna';
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Halo, $name! 👋',
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Mau nonton film apa hari ini?',
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              );
-            }),
-
-            const SizedBox(height: 20),
-
-            // Card Banner Info Sprint 2
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: AppColors.cardGradient,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+      body: RefreshIndicator(
+        color: AppColors.primary,
+        backgroundColor: AppColors.surface,
+        onRefresh: () => _movieCtrl.fetchAllMovies(),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Salam Pengguna
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Obx(() {
+                  final user = _authCtrl.currentUser.value;
+                  final name = user?.fullName.isNotEmpty == true ? user!.fullName : 'Pengguna';
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Halo, $name! 👋',
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Mau nonton film apa hari ini?',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  );
+                }),
               ),
+
+              const SizedBox(height: 18),
+
+              // =============================================================
+              // 1. CAROUSEL BANNER (PB-012)
+              // =============================================================
+              Obx(() {
+                if (_movieCtrl.isLoadingBanner.value) {
+                  return const BannerCarouselSkeleton();
+                }
+
+                final banners = _movieCtrl.bannerMovies;
+                if (banners.isEmpty) return const SizedBox.shrink();
+
+                return Column(
+                  children: [
+                    SizedBox(
+                      height: 200,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: banners.length,
+                        onPageChanged: (idx) => _movieCtrl.onBannerPageChanged(idx),
+                        itemBuilder: (context, index) {
+                          final movie = banners[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            child: _buildBannerCard(context, movie),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Dot Indicator
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        banners.length,
+                        (index) => Obx(() {
+                          final isSelected = _movieCtrl.bannerIndex.value == index;
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            height: 6,
+                            width: isSelected ? 22 : 6,
+                            decoration: BoxDecoration(
+                              color: isSelected ? AppColors.primary : AppColors.border,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                  ],
+                );
+              }),
+
+              const SizedBox(height: 26),
+
+              // =============================================================
+              // 2. SEDANG TAYANG / NOW PLAYING (PB-012)
+              // =============================================================
+              _buildSectionHeader(
+                title: 'Sedang Tayang',
+                subtitle: 'Now Playing',
+                onSeeAll: () {},
+              ),
+              const SizedBox(height: 12),
+              Obx(() {
+                if (_movieCtrl.isLoadingNowPlaying.value) {
+                  return const MovieListSkeleton();
+                }
+
+                final list = _movieCtrl.nowPlayingMovies;
+                return SizedBox(
+                  height: 250,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: list.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 14),
+                    itemBuilder: (context, index) {
+                      final movie = list[index];
+                      return MovieCard(
+                        movie: movie,
+                        isUpcoming: false,
+                        onTap: () => _openMovieDetail(context, movie),
+                      );
+                    },
+                  ),
+                );
+              }),
+
+              const SizedBox(height: 24),
+
+              // =============================================================
+              // 3. SEGERA TAYANG / COMING SOON (PB-012)
+              // =============================================================
+              _buildSectionHeader(
+                title: 'Segera Tayang',
+                subtitle: 'Coming Soon',
+                onSeeAll: () {},
+              ),
+              const SizedBox(height: 12),
+              Obx(() {
+                if (_movieCtrl.isLoadingUpcoming.value) {
+                  return const MovieListSkeleton();
+                }
+
+                final list = _movieCtrl.upcomingMovies;
+                return SizedBox(
+                  height: 250,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: list.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 14),
+                    itemBuilder: (context, index) {
+                      final movie = list[index];
+                      return MovieCard(
+                        movie: movie,
+                        isUpcoming: true,
+                        onTap: () => _openMovieDetail(context, movie),
+                      );
+                    },
+                  ),
+                );
+              }),
+
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBannerCard(BuildContext context, MovieModel movie) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: () => _openMovieDetail(context, movie),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: Stack(
+          children: [
+            // Backdrop Image
+            Positioned.fill(
+              child: Image.network(
+                movie.backdropUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: AppColors.card,
+                  child: const Center(
+                    child: Icon(Icons.movie_outlined, size: 48, color: AppColors.textDisabled),
+                  ),
+                ),
+              ),
+            ),
+
+            // Gradient Overlay
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.3),
+                      Colors.black.withValues(alpha: 0.95),
+                    ],
+                    stops: const [0.3, 0.6, 1.0],
+                  ),
+                ),
+              ),
+            ),
+
+            // Konten Banner
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Text(
-                          'PB-011 SELESAI',
+                          'TRENDING',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 11,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text(
-                        'Navigasi 5 Menu Aktif',
-                        style: TextStyle(
-                          color: AppColors.gold,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      Row(
+                        children: [
+                          const Icon(Icons.star_rounded, color: AppColors.gold, size: 14),
+                          const SizedBox(width: 3),
+                          Text(
+                            movie.formattedRating,
+                            style: const TextStyle(
+                              color: AppColors.gold,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Jelajahi Film & Bioskop Terdekat',
-                    style: TextStyle(
+                  const SizedBox(height: 6),
+                  Text(
+                    movie.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Navigasi bawah dengan 5 tab telah aktif dan state terjaga dengan IndexedStack. Bagian ini siap dihubungkan ke TMDB API (PB-012) dan LBS Bioskop (PB-015).',
-                    style: TextStyle(
+                  const SizedBox(height: 2),
+                  Text(
+                    movie.genreString,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
                       color: AppColors.textSecondary,
-                      fontSize: 13,
-                      height: 1.4,
+                      fontSize: 12,
                     ),
                   ),
                 ],
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
 
-            const SizedBox(height: 28),
-
-            // Section Header: Sedang Tayang (Preview PB-012)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Sedang Tayang (Now Playing)',
-                  style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                  ),
+  Widget _buildSectionHeader({
+    required String title,
+    required String subtitle,
+    required VoidCallback onSeeAll,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(2),
                 ),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text('Lihat Semua'),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '($subtitle)',
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          TextButton(
+            onPressed: onSeeAll,
+            child: const Text(
+              'Lihat Semua',
+              style: TextStyle(
+                color: AppColors.primaryLight,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            const SizedBox(height: 8),
+          ),
+        ],
+      ),
+    );
+  }
 
-            // Dummy Carousel / Movie placeholder preview
-            SizedBox(
-              height: 220,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                itemCount: 4,
-                separatorBuilder: (_, __) => const SizedBox(width: 14),
-                itemBuilder: (context, index) {
-                  final movieTitle = 'Film ${index + 1}';
-                  const movieRating = '8.5';
-
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () {
-                      // Demonstrasi objektif: Navigator.push() dengan MaterialPageRoute dan passing data
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (detailContext) => Scaffold(
-                            backgroundColor: AppColors.background,
-                            appBar: AppBar(
-                              backgroundColor: AppColors.surface,
-                              title: Text(movieTitle),
-                              leading: IconButton(
-                                icon: const Icon(Icons.arrow_back_ios_new),
-                                onPressed: () => Navigator.pop(detailContext),
-                              ),
-                            ),
-                            body: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(24.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(24),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: const Icon(
-                                        Icons.movie_filter_rounded,
-                                        size: 64,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    Text(
-                                      movieTitle,
-                                      style: const TextStyle(
-                                        color: AppColors.textPrimary,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: const [
-                                        Icon(Icons.star_rounded, color: AppColors.gold, size: 20),
-                                        SizedBox(width: 6),
-                                        Text(
-                                          movieRating,
-                                          style: TextStyle(
-                                            color: AppColors.textSecondary,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 20),
-                                    Container(
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.card,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(color: AppColors.border),
-                                      ),
-                                      child: const Text(
-                                        'Halaman detail dibuka menggunakan Navigator.push() dengan MaterialPageRoute!\n\nPassing data judul dan rating film berhasil diterima antar halaman.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: AppColors.textSecondary,
-                                          fontSize: 13,
-                                          height: 1.5,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 32),
-                                    ElevatedButton.icon(
-                                      onPressed: () => Navigator.pop(detailContext),
-                                      icon: const Icon(Icons.arrow_back),
-                                      label: const Text('Kembali (Navigator.pop)'),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.primary,
-                                        minimumSize: const Size(220, 48),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+  /// Membuka halaman detail film menggunakan Navigator.push() dengan passing data model
+  void _openMovieDetail(BuildContext context, MovieModel movie) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (ctx) => Scaffold(
+          backgroundColor: AppColors.background,
+          body: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 300,
+                pinned: true,
+                backgroundColor: AppColors.surface,
+                leading: IconButton(
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 16),
+                  ),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.network(
+                        movie.backdropUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(color: AppColors.card),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              AppColors.background.withValues(alpha: 0.9),
+                              AppColors.background,
+                            ],
                           ),
                         ),
-                      );
-                    },
-                    child: Container(
-                      width: 140,
-                      decoration: BoxDecoration(
-                        color: AppColors.card,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.border),
                       ),
-                      child: Column(
+                    ],
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                color: AppColors.inputFill,
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.movie_outlined,
-                                  color: AppColors.textDisabled,
-                                  size: 40,
-                                ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: SizedBox(
+                              width: 100,
+                              height: 145,
+                              child: Image.network(
+                                movie.posterUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(color: AppColors.card),
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(10),
+                          const SizedBox(width: 16),
+                          Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  movieTitle,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  movie.title,
                                   style: const TextStyle(
                                     color: AppColors.textPrimary,
+                                    fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 13,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 8),
                                 Row(
-                                  children: const [
-                                    Icon(Icons.star_rounded, color: AppColors.gold, size: 14),
-                                    SizedBox(width: 4),
+                                  children: [
+                                    const Icon(Icons.star_rounded, color: AppColors.gold, size: 18),
+                                    const SizedBox(width: 4),
                                     Text(
-                                      movieRating,
-                                      style: TextStyle(
+                                      '${movie.formattedRating} / 10',
+                                      style: const TextStyle(
+                                        color: AppColors.gold,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '(${movie.voteCount} vote)',
+                                      style: const TextStyle(
                                         color: AppColors.textSecondary,
                                         fontSize: 12,
                                       ),
                                     ),
                                   ],
                                 ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Tahun Rilis: ${movie.releaseYear}',
+                                  style: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 13,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  );
-                },
+                      const SizedBox(height: 20),
+                      // Genre Chips
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: movie.genreNames.map((g) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Text(
+                              g,
+                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Sinopsis',
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        movie.overview.isNotEmpty ? movie.overview : 'Sinopsis belum tersedia.',
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 13,
+                          height: 1.6,
+                        ),
+                      ),
+                      const SizedBox(height: 36),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Pemesanan tiket "${movie.title}" akan tersedia di PB-018!'),
+                              backgroundColor: AppColors.card,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: const Text('Beli Tiket Sekarang'),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
               ),
-            ),
-
-            const SizedBox(height: 24),
-          ],
+            ],
+          ),
         ),
       ),
     );

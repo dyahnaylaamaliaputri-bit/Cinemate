@@ -4,6 +4,7 @@
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/dashboard_controller.dart';
+import '../controllers/movie_controller.dart';
 
 class DashboardBinding extends Bindings {
   @override
@@ -12,5 +13,6 @@ class DashboardBinding extends Bindings {
       Get.lazyPut<AuthController>(() => AuthController());
     }
     Get.lazyPut<DashboardController>(() => DashboardController());
+    Get.lazyPut<MovieController>(() => MovieController());
   }
 }
