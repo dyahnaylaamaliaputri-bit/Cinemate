@@ -15,4 +15,6 @@ abstract class Routes {
   static const movieDetail = '/movie-detail';
   static const bookByCinema = '/book-by-cinema';
   static const bookByMovie  = '/book-by-movie';
+  static const selectSeat   = '/select-seat';
+  static const orderSummary = '/order-summary';
 }

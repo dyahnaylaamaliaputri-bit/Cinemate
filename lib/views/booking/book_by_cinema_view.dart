@@ -8,6 +8,7 @@ import '../../controllers/booking_cinema_controller.dart';
 import '../../models/cinema_model.dart';
 import '../../models/movie_model.dart';
 import '../../models/showtime_model.dart';
+import '../../routes/app_routes.dart';
 import '../../utils/app_colors.dart';
 
 class BookByCinemaView extends StatefulWidget {
@@ -934,12 +935,17 @@ class _BookByCinemaViewState extends State<BookByCinemaView> {
                   ),
                   onPressed: () {
                     Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Jadwal dipilih: ${movie.title} @ ${st.showTime} WIB di ${controller.selectedCinema.value?.name}'),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
+                    final cinema = controller.selectedCinema.value;
+                    if (cinema != null) {
+                      Get.toNamed(
+                        Routes.selectSeat,
+                        arguments: {
+                          'movie': movie,
+                          'cinema': cinema,
+                          'showtime': st,
+                        },
+                      );
+                    }
                   },
                 ),
               ),

@@ -8,6 +8,7 @@ import '../../controllers/booking_movie_controller.dart';
 import '../../models/cinema_model.dart';
 import '../../models/movie_model.dart';
 import '../../models/showtime_model.dart';
+import '../../routes/app_routes.dart';
 import '../../utils/app_colors.dart';
 
 class BookByMovieView extends StatefulWidget {
@@ -964,11 +965,13 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                   ),
                   onPressed: () {
                     Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Pemesanan dikonfirmasi: ${movie.title} @ ${cinema.name} ${st.showTime} WIB'),
-                        duration: const Duration(seconds: 2),
-                      ),
+                    Get.toNamed(
+                      Routes.selectSeat,
+                      arguments: {
+                        'movie': movie,
+                        'cinema': cinema,
+                        'showtime': st,
+                      },
                     );
                   },
                 ),
