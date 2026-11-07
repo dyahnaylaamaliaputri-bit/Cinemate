@@ -1,9 +1,11 @@
 // lib/services/showtime_service.dart
-// Service untuk jadwal tayang bioskop (Showtimes) & integrasi Supabase (PB-018)
+// Service untuk jadwal tayang bioskop (Showtimes) & integrasi Supabase (PB-018, PB-019)
 
 import 'package:flutter/foundation.dart';
+import '../models/cinema_model.dart';
 import '../models/movie_model.dart';
 import '../models/showtime_model.dart';
+import 'cinema_service.dart';
 import 'movie_service.dart';
 import 'supabase_service.dart';
 
@@ -14,6 +16,28 @@ class ShowtimeService {
 
   final SupabaseService _supabase = SupabaseService();
   final MovieService _movieService = MovieService();
+  final CinemaService _cinemaService = CinemaService();
+
+  /// Mengambil bioskop yang menayangkan film tertentu, diurutkan berdasarkan jarak terdekat (PB-019)
+  Future<List<CinemaModel>> getCinemasForMovie(
+    int movieId, {
+    double userLat = -6.2000,
+    double userLng = 106.8167,
+  }) async {
+    final all = await _cinemaService.getAllCinemas();
+    final listWithDistance = all.cinemas.map((c) {
+      final dist = c.calculateDistanceFrom(userLat, userLng);
+      return c.copyWith(distanceKm: dist);
+    }).toList();
+
+    listWithDistance.sort((a, b) {
+      final da = a.distanceKm ?? double.infinity;
+      final db = b.distanceKm ?? double.infinity;
+      return da.compareTo(db);
+    });
+
+    return listWithDistance;
+  }
 
   /// Mengambil daftar film yang sedang tayang di bioskop tertentu
   Future<List<MovieModel>> getPlayingMoviesForCinema(String cinemaId) async {

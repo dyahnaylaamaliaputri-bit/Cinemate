@@ -7,6 +7,7 @@ import '../bindings/auth_binding.dart';
 import '../bindings/booking_binding.dart';
 import '../bindings/dashboard_binding.dart';
 import '../views/booking/book_by_cinema_view.dart';
+import '../views/booking/book_by_movie_view.dart';
 import '../views/splash/splash_view.dart';
 import '../views/auth/login_view.dart';
 import '../views/auth/register_view.dart';
@@ -48,6 +49,11 @@ class AppPages {
       name: Routes.bookByCinema,
       page: () => const BookByCinemaView(),
       binding: BookByCinemaBinding(),
+    ),
+    GetPage(
+      name: Routes.bookByMovie,
+      page: () => const BookByMovieView(),
+      binding: BookByMovieBinding(),
     ),
   ];
 }

@@ -14,4 +14,5 @@ abstract class Routes {
   static const fnb       = '/fnb';
   static const movieDetail = '/movie-detail';
   static const bookByCinema = '/book-by-cinema';
+  static const bookByMovie  = '/book-by-movie';
 }

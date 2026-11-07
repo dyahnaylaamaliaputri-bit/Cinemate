@@ -1,21 +1,26 @@
 // test/booking_cinema_test.dart
 // Pengujian unit alur pemesanan Booked by Cinema (PB-018)
 
+import 'dart:io';
 import 'package:cinemate/models/cinema_model.dart';
 import 'package:cinemate/models/movie_model.dart';
 import 'package:cinemate/models/showtime_model.dart';
 import 'package:cinemate/services/showtime_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() {
+    final tempDir = Directory.systemTemp.createTempSync();
+    Hive.init(tempDir.path);
+
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
       const MethodChannel('plugins.flutter.io/path_provider'),
-      (methodCall) async => '.',
+      (methodCall) async => tempDir.path,
     );
   });
 
@@ -97,6 +102,21 @@ void main() {
 
       expect(cinema.name, 'Metro Cinema Senayan');
       expect(movie.title, 'Deadpool & Wolverine');
+    });
+
+    test('ShowtimeService getCinemasForMovie should return cinemas sorted by proximity (PB-019)', () async {
+      final service = ShowtimeService();
+
+      final cinemas = await service.getCinemasForMovie(
+        533535,
+        userLat: -6.2176,
+        userLng: 106.8013,
+      );
+
+      expect(cinemas, isNotEmpty);
+      // Metro Cinema Senayan harus yang terdekat (0 km)
+      expect(cinemas.first.name, 'Metro Cinema Senayan');
+      expect(cinemas.first.distanceKm, lessThan(0.01));
     });
   });
 }

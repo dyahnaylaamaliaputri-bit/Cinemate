@@ -387,11 +387,11 @@ class MovieDetailView extends StatelessWidget {
 
               const SizedBox(width: 20),
 
-              // Tombol Beli Tiket (PB-014 -> PB-018)
+              // Tombol Beli Tiket (PB-019: Booked by Movie)
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    Get.toNamed(Routes.bookByCinema, arguments: movie);
+                    Get.toNamed(Routes.bookByMovie, arguments: movie);
                   },
                   icon: const Icon(Icons.confirmation_number_rounded),
                   label: const Text('Beli Tiket'),

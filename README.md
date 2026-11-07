@@ -133,9 +133,9 @@ Tujuan: Menampilkan layar utama dengan navigasi 5 menu, katalog film dari TMDB, 
 Tujuan: Membangun alur pemesanan tiket bioskop dari pemilihan jadwal hingga penerbitan *e-ticket* dengan QR code yang bisa dibuka offline.
 
 #### User Stories yang Harus Dikerjakan:
-1. **PB-018 (Alur Booked by Cinema):**
+1. **PB-018 (Alur Booked by Cinema):** [SELESAI]
    - Pengguna memilih bioskop terlebih dahulu -> memilih film yang tayang di bioskop tersebut -> memilih tanggal & jam tayang.
-2. **PB-019 (Alur Booked by Movie):**
+2. **PB-019 (Alur Booked by Movie):** [SELESAI]
    - Pengguna memilih film dari dashboard/detail -> sistem memfilter hanya bioskop yang menayangkan film tersebut -> memilih bioskop, tanggal, & jam.
 3. **PB-020 (Ringkasan Pesanan / Order Summary):**
    - Menampilkan detail pesanan: judul film, nama bioskop, tanggal, studio, jam, label kursi yang dipilih, rincian harga tiket, biaya layanan, dan total tagihan.

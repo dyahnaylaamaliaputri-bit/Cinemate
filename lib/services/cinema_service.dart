@@ -104,10 +104,14 @@ class CinemaService {
     }
 
     // 3. Fallback jika offline: periksa apakah ada cache lama
-    final cached = await _storage.getCachedCinemas();
-    if (cached != null && cached.isNotEmpty) {
-      final list = cached.map((e) => CinemaModel.fromJson(e)).toList();
-      return (cinemas: list, fromCache: true);
+    try {
+      final cached = await _storage.getCachedCinemas();
+      if (cached != null && cached.isNotEmpty) {
+        final list = cached.map((e) => CinemaModel.fromJson(e)).toList();
+        return (cinemas: list, fromCache: true);
+      }
+    } catch (e) {
+      debugPrint('[CinemaService] Error reading Hive fallback cache: $e');
     }
 
     // 4. Fallback terakhir: seed data lokal
