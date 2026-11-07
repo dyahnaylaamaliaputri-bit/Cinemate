@@ -112,41 +112,70 @@ docs/
 
 ## 🎯 TUGAS SELANJUTNYA (UNTUK ANGGOTA TIM)
 
-Sesuai Roadmap Sprint 3 dan Sprint 4, berikut adalah backlog fitur yang siap dikerjakan oleh anggota tim:
+Sesuai Roadmap Pengembangan Aplikasi Cinemate untuk **Sprint 3** dan **Sprint 4**, berikut adalah pembagian tugas, panduan branching, dan rincian *Product Backlog* yang siap dikerjakan oleh anggota tim:
+
+---
+
+### 👥 Rekomendasi Pembagian Tugas Anggota Tim
+
+| Anggota Tim | Peran & Fokus Modul | Backlog Item | File Utama yang Dibuat / Dimodifikasi |
+| :--- | :--- | :---: | :--- |
+| **Developer A** | **Frontend F&B & State Keranjang (Cart)** | **PB-026, PB-027** | `lib/models/fnb_item_model.dart`<br>`lib/controllers/fnb_controller.dart`<br>`lib/views/dashboard/tabs/fnb_tab.dart` |
+| **Developer B** | **Backend Service F&B, Supabase & E-Voucher QR** | **PB-028, PB-029, PB-030** | `lib/services/fnb_service.dart`<br>`lib/models/fnb_order_model.dart`<br>`docs/supabase_schema.sql`<br>`lib/views/fnb/fnb_order_detail_view.dart` |
+| **Developer C** | **AI Mood Recommendations Engine & TMDB Discovery** | **PB-031, PB-032, PB-033** | `lib/views/dashboard/tabs/home_tab.dart`<br>`lib/views/mood/mood_picker_view.dart`<br>`lib/services/mood_service.dart`<br>`lib/controllers/mood_controller.dart` |
+| **Developer D** | **Profil Pengguna, Konversi Mata Uang, Timezone & Notifikasi** | **PB-048, PB-049, PB-050, PB-058** | `lib/views/dashboard/tabs/profile_tab.dart`<br>`lib/utils/currency_helper.dart`<br>`lib/views/profile/edit_profile_view.dart`<br>`lib/services/notification_service.dart` |
+
+---
+
+### 🌿 Panduan Branching Git untuk Anggota Tim
+
+Setiap anggota tim disarankan membuat cabang (*branch*) baru dari update terbaru:
+```bash
+# Developer A & B (Epic F&B):
+git checkout -b feat/pb-026-030-fnb-ordering
+
+# Developer C (Epic Mood AI):
+git checkout -b feat/pb-031-033-mood-ai-recommendations
+
+# Developer D (Epic Profil, Preferensi & Notifikasi):
+git checkout -b feat/pb-048-058-profile-preferences-notifications
+```
 
 ---
 
 ### 📌 SPRINT 3: EPIC PESAN MAKANAN & MINUMAN (FNB) & REKOMENDASI MOOD AI (MOD)
 
 #### 🍿 Epic 3.1: Pesan Makanan & Minuman / F&B (FNB)
-Tujuan: Memungkinkan pengguna memesan camilan & minuman bioskop secara online, memilih metode pengambilan, membayar secara simulasi, dan mendapatkan E-Voucher QR code F&B.
+Tujuan: Memungkinkan penonton memesan camilan & minuman bioskop secara online, memilih metode pengambilan (*counter pick-up* atau antar ke kursi studio), membayar secara simulasi, dan memperoleh E-Voucher QR Code F&B.
 
 1. **PB-026 (Katalog F&B Supabase & Hive Offline Cache):**
-   - **Tabel Sumber:** `public.fnb_items` (sudah ada di `docs/supabase_schema.sql` dengan seed Popcorn, Nachos, Cola, Combo, Hot Dog, Pretzel).
-   - **Model:** Buat `FnbItemModel` di `lib/models/fnb_item_model.dart` (`id`, `name`, `description`, `price`, `category`, `imageUrl`, `isAvailable`).
-   - **Service:** Buat `FnbService` di `lib/services/fnb_service.dart` untuk mengambil data dari Supabase dan simpan ke Hive box `fnb_cache` (TTL 12 jam).
-   - **UI:** Perbarui `lib/views/dashboard/tabs/fnb_tab.dart` dengan filter kategori chip (Semua, Snack, Drink, Combo, Food) dan shimmer loading.
+   - **Tabel Basis Data:** `public.fnb_items` (Kolom: `id`, `name`, `description`, `price`, `category`, `image_url`, `is_available`).
+   - **Seed Data Siap Pakai:** Popcorn Regular/Large, Nachos, Coca-Cola Regular/Large, Air Mineral, Combo 1, Combo 2, Hot Dog, Pretzel.
+   - **Model:** Buat `FnbItemModel` di `lib/models/fnb_item_model.dart` (`fromJson`, `toJson`, `copyWith`, format harga Rupiah).
+   - **Service:** Buat `FnbService` di `lib/services/fnb_service.dart` untuk membaca data dari tabel `public.fnb_items` Supabase dan menyimpannya ke Hive box `fnb_cache` (TTL 12 jam).
+   - **UI:** Perbarui `lib/views/dashboard/tabs/fnb_tab.dart` dengan filter chip kategori (*Semua*, *Snack*, *Drink*, *Combo*, *Food*) serta shimmer skeleton loading.
 
 2. **PB-027 (Keranjang Pesanan F&B / Cart Management):**
-   - **Controller:** Buat `FnbController` di `lib/controllers/fnb_controller.dart` mengelola state `cart = <FnbItemModel, int>{}.obs`.
-   - **Fitur Cart:** Tambah quantity (+), kurangi quantity (-), kosongkan cart, kalkulasi subtotal dan pajak/biaya layanan.
-   - **UI:** Tampilkan floating summary bar di bagian bawah `FnbTab` saat cart tidak kosong (menampilkan jumlah item, total harga, dan tombol "Lihat Keranjang / Checkout").
+   - **Controller:** Buat `FnbController` di `lib/controllers/fnb_controller.dart` mengelola state reaktif `cartItems = <FnbItemModel, int>{}.obs`.
+   - **Fitur Cart:** Tambah quantity (+), kurangi quantity (-), kosongkan cart, kalkulasi subtotal, pajak/biaya layanan, dan grand total.
+   - **UI:** Tampilkan floating summary bar di bagian bawah `FnbTab` saat cart tidak kosong (menampilkan jumlah item, total harga, dan tombol *"Lihat Keranjang / Checkout"*).
 
 3. **PB-028 (Pilihan Bioskop & Metode Pengambilan):**
    - **Alur Pemesanan:** Pengguna memilih bioskop tempat pengambilan (dropdown/picker bioskop dari `CinemaController`).
    - **Metode Pengambilan:**
-     - *Pick-up di Counter Concession* (Antre mandiri dengan kode pengambilan).
-     - *Delivery ke Studio & Kursi* (Hanya aktif jika user memiliki tiket aktif di bioskop tersebut, otomatis mengisi nomor studio dan kursi).
+     - *Pick-up di Counter Concession* (Antre mandiri di counter bioskop dengan kode pengambilan).
+     - *Delivery ke Studio & Kursi* (Hanya aktif jika user memiliki tiket aktif di bioskop tersebut, otomatis mengaitkan nomor studio dan kursi).
 
 4. **PB-029 (Simulasi Pembayaran F&B & E-Voucher QR Code):**
-   - Integrasikan dengan flow `PaymentView` atau layar pembayaran F&B.
+   - Integrasikan dengan modul `PaymentView` atau layar checkout pesanan F&B.
    - Simpan pesanan ke tabel `public.fnb_orders` dan `public.fnb_order_items` di Supabase.
-   - Terbitkan kode pengambilan unik (format: `FNB-XXXXX`) dan E-Voucher QR Code (`qr_flutter`) untuk di-scan petugas counter.
+   - Terbitkan kode pengambilan unik (format: `FNB-XXXXX`) dan E-Voucher QR Code (`qr_flutter`) untuk di-scan petugas bioskop.
 
-5. **PB-030 (Riwayat & Status Pesanan F&B):**
-   - Tampilkan daftar pesanan F&B pengguna di sub-tab "Pesanan Saya" pada `FnbTab`.
+5. **PB-030 (Riwayat & Pelacakan Status Pesanan F&B):**
+   - Tampilkan daftar pesanan F&B pengguna di sub-tab *"Pesanan Saya"* pada `FnbTab`.
    - Status pesanan: `processing` (sedang disiapkan), `ready` (siap diambil di counter), `completed` (sudah diambil).
-   - Simpan cache riwayat pesanan ke Hive agar bisa dibuka offline saat mengambil pesanan di bioskop.
+   - Sediakan tombol simulasi untuk petugas: ubah status dari `processing` -> `ready` -> `completed`.
+   - Simpan cache riwayat pesanan ke Hive box `fnb_orders_cache` agar bisa dibuka offline di bioskop.
 
 ---
 
@@ -154,8 +183,8 @@ Tujuan: Memungkinkan pengguna memesan camilan & minuman bioskop secara online, m
 Tujuan: Mewujudkan slogan utama Cinemate (*"Temukan film sesuai mood-mu"*) melalui fitur rekomendasi film berdasarkan suasana hati/emosi pengguna yang terhubung langsung ke katalog TMDB dan alur booking.
 
 1. **PB-031 (Layar Pemilih Mood Interaktif):**
-   - Buat tombol akses banner/widget di `HomeTab` ("Bingung mau nonton apa? Coba Mood AI ✨").
-   - Layar `MoodPickerView` menampilkan 6 emosi utama dengan ilustrasi, emoji, dan warna tema:
+   - Buat tombol akses banner/widget di `HomeTab` (*"Bingung mau nonton apa? Coba Mood AI ✨"*).
+   - Layar `MoodPickerView` menampilkan 6 emosi utama dengan visual estetik:
      - 😃 **Happy / Gembira:** Film ceria, komedi keluarga, dan animasi.
      - 😢 **Sad / Haru:** Film drama emosional, biografi mengharukan.
      - ❤️ **Romantic / Jatuh Cinta:** Film romansa, percintaan manis, dan rom-com.
@@ -163,51 +192,66 @@ Tujuan: Mewujudkan slogan utama Cinemate (*"Temukan film sesuai mood-mu"*) melal
      - 🧘 **Chill / Rileks:** Petualangan visual santai, dokumenter, fiksi ilmiah ringan.
      - 🥱 **Bored / Bosan & Butuh Hiburan Seru:** Film misteri dengan *plot twist* mengejutkan.
 
-2. **PB-032 (Mood-to-Genre Engine & Filter TMDB):**
+2. **PB-032 (Mood-to-Genre Engine & Filter TMDB Discovery):**
    - Buat `MoodRecommendationService` di `lib/services/mood_service.dart`.
    - Petakan setiap mood ke kombinasi `genre_id` TMDB:
-     - Happy -> Comedy (35), Animation (16), Family (10751).
-     - Sad -> Drama (18).
-     - Romantic -> Romance (10749), Comedy (35).
-     - Thrilled -> Action (28), Horror (27), Thriller (53).
-     - Chill -> Adventure (12), Sci-Fi (878), Fantasy (14).
-     - Bored -> Mystery (9648), Crime (80).
-   - Panggil TMDB endpoint `/discover/movie` dengan filter `with_genres`, `sort_by=popularity.desc`, dan `vote_average.gte=7.0`.
+     - `Happy` $\rightarrow$ Comedy (35), Animation (16), Family (10751).
+     - `Sad` $\rightarrow$ Drama (18).
+     - `Romantic` $\rightarrow$ Romance (10749), Comedy (35).
+     - `Thrilled` $\rightarrow$ Action (28), Horror (27), Thriller (53).
+     - `Chill` $\rightarrow$ Adventure (12), Sci-Fi (878), Fantasy (14).
+     - `Bored` $\rightarrow$ Mystery (9648), Crime (80).
+   - Panggil TMDB endpoint `/discover/movie` via `HttpService` dengan query parameter `with_genres`, `sort_by=popularity.desc`, dan `vote_average.gte=7.0`.
 
-3. **PB-033 (Hasil Rekomendasi & Aksi Direct Booking):**
-   - Tampilkan hasil rekomendasi dalam kartu interaktif (poster, skor rating, sinopsis singkat, alasan AI merekomendasikan film ini).
-   - Tombol **"Pesan Tiket Film Ini"** yang langsung memicu alur **PB-019 (`BookByMovieView`)** untuk film tersebut.
+3. **PB-033 (Hasil Rekomendasi AI & Aksi Direct Booking):**
+   - Tampilkan kartu rekomendasi film dengan:
+     - Badge persentase kecocokan mood (misal: *98% Cocok untuk Mood Bahagia*).
+     - Alasan rekomendasi dari AI Cinemate.
+     - Tombol sticky **"Pesan Tiket Film Ini"** yang langsung memicu alur **PB-019** ([`BookByMovieView`](file:///C:/Users/Pongo/Documents/Praktikkum_Pemrogramman_Mobile/project/Cinemate/lib/views/booking/book_by_movie_view.dart)) untuk film tersebut.
 
 ---
 
-### 📌 SPRINT 4: EPIC PROFIL, PREFERENSI & NOTIFIKASI (PRF & NOT)
+### 📌 SPRINT 4: EPIC PROFIL, PREFERENSI & PENGINGAT NOTIFIKASI (PRF & NOT)
 
 1. **PB-048 (Konversi Mata Uang Dinamis - Currency Preference):**
    - Opsi mata uang di `ProfileTab`: **IDR (Rp)**, **USD ($)**, **SGD (S$)**, **EUR (€)**.
    - Simpan preferensi di `GetStorage` via `StorageService`.
-   - Buat `CurrencyHelper` yang otomatis memformat semua harga tiket dan F&B di seluruh aplikasi.
+   - Buat `CurrencyHelper` yang otomatis memformat semua harga tiket dan F&B di seluruh aplikasi secara reaktif.
 
 2. **PB-049 (Zona Waktu Penayangan - Timezone Preference):**
    - Opsi zona waktu di `ProfileTab`: **WIB (UTC+7)**, **WITA (UTC+8)**, **WIT (UTC+9)**, **GMT/UTC**.
-   - Jadwal tayang film otomatis disesuaikan dan menampilkan penanda zona (contoh: `14:30 WIB` -> `15:30 WITA`).
+   - Jadwal tayang bioskop otomatis disesuaikan dan menampilkan penanda zona (contoh: `14:30 WIB` -> `15:30 WITA`).
 
 3. **PB-050 (Edit Profil Pengguna & Ubah Sandi):**
-   - Layar `EditProfileView`: Ubah nama lengkap dan nomor telepon, simpan ke Supabase `users`.
-   - Layar `ChangePasswordView`: Verifikasi sandi lama, hashing password baru dengan *salt + SHA-256*, simpan ke `users.password_hash`.
+   - Layar `EditProfileView`: Ubah nama lengkap dan nomor telepon, simpan perubahan ke Supabase `users`.
+   - Layar `ChangePasswordView`: Verifikasi sandi lama, hashing sandi baru (*salt + SHA-256*), lalu update kolom `users.password_hash`.
 
 4. **PB-058 (Local Push Notification Pengingat Tiket - H-1 Jam & H-30 Menit):**
-   - Menggunakan package `flutter_local_notifications` (referensi modul praktikum 8).
-   - Saat pembayaran tiket berhasil (PB-021), jadwalkan local notification pengingat:
-     - *Notifikasi 1:* 1 jam sebelum film tayang ("Film Anda dimulai 1 jam lagi!").
-     - *Notifikasi 2:* 30 menit sebelum film tayang ("Segera masuki studio dan siapkan QR Code tiket Anda").
+   - Dependensi: `flutter_local_notifications` (mengacu pada materi praktikum modul 8).
+   - Penanganan permission Android 13+ (`POST_NOTIFICATIONS`).
+   - Jadwalkan pengingat otomatis saat status tiket menjadi `paid`:
+     - *Notifikasi 1:* 1 jam sebelum film tayang (*"Film Anda dimulai 1 jam lagi!"*).
+     - *Notifikasi 2:* 30 menit sebelum film tayang (*"Studio segera dibuka! Siapkan E-Ticket offline Anda"*).
 
 ---
 
-## 📌 Standar Koding & Pengujian Sebelum Commit
-1. Ikuti pola OOP GetX: letakkan logika bisnis di `Controller`, akses data di `Repository`/`Service`, dan UI hanya di `View`.
-2. Selalu jalankan analisis statis sebelum commit:
+## 📌 Standar Koding & Pengujian Sebelum Pull Request (PR)
+
+1. **Arsitektur GetX OOP:**
+   - Pisahkan logika ke `Controller`, data/API ke `Service`, dan antarmuka ke `View`.
+   - Gunakan warna dari `AppColors` (*Dark Cinema Palette: `#0A0A0A`, `#E50914`, `#1A1A2E`, `#FFD700`*).
+2. **Offline-First & Graceful Fallback:**
+   - Setiap pengambilan data online wajib memiliki fallback ke Hive box jika jaringan mati atau API gagal.
+3. **Checklist Wajib Sebelum Commit & Push:**
    ```bash
-   dart analyze lib
+   # 1. Pastikan tidak ada error atau warning:
+   dart analyze lib test
+
+   # 2. Jalankan seluruh unit test (wajib 100% passed):
+   flutter test
+
+   # 3. Format kode:
+   dart format lib test
    ```
-   Pastikan tidak ada error maupun warning yang tertinggal.
-3. Jangan pernah melakukan commit berkas `assets/.env`.
+4. **Keamanan Kredensial:**
+   - Jangan pernah melakukan commit berkas `assets/.env`.
