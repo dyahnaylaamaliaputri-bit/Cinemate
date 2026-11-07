@@ -9,6 +9,7 @@ import '../views/splash/splash_view.dart';
 import '../views/auth/login_view.dart';
 import '../views/auth/register_view.dart';
 import '../views/dashboard/dashboard_view.dart';
+import '../views/movie_detail/movie_detail_view.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -36,6 +37,10 @@ class AppPages {
       name: Routes.dashboard,
       page: () => const DashboardView(),
       binding: DashboardBinding(),
+    ),
+    GetPage(
+      name: Routes.movieDetail,
+      page: () => const MovieDetailView(),
     ),
   ];
 }

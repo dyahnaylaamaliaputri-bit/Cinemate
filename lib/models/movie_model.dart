@@ -55,6 +55,14 @@ class MovieModel {
     return parts.isNotEmpty ? parts[0] : '-';
   }
 
+  /// Durasi film (estimasi realistis bioskop: jam dan menit)
+  String get formattedDuration {
+    final mins = 100 + (id % 45); // antara 100 - 145 menit
+    final hours = mins ~/ 60;
+    final remainingMinutes = mins % 60;
+    return '${hours}j ${remainingMinutes}m';
+  }
+
   /// Nama genre berdasarkan TMDB Genre ID
   List<String> get genreNames {
     return genreIds
