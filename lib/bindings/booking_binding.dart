@@ -1,11 +1,12 @@
 // lib/bindings/booking_binding.dart
-// Binding untuk alur pemesanan tiket bioskop (PB-018, PB-019, PB-020)
+// Binding untuk alur pemesanan tiket bioskop (PB-018, PB-019, PB-020, PB-021)
 
 import 'package:get/get.dart';
 import '../controllers/booking_cinema_controller.dart';
 import '../controllers/booking_movie_controller.dart';
 import '../controllers/booking_seat_controller.dart';
 import '../controllers/order_summary_controller.dart';
+import '../controllers/payment_controller.dart';
 
 class BookByCinemaBinding extends Bindings {
   @override
@@ -32,5 +33,12 @@ class OrderSummaryBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<OrderSummaryController>(() => OrderSummaryController());
+  }
+}
+
+class PaymentBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<PaymentController>(() => PaymentController());
   }
 }

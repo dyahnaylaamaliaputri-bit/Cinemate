@@ -1,5 +1,5 @@
 // lib/models/booking_order_model.dart
-// Model untuk Ringkasan Pesanan (Order Summary) tiket bioskop (PB-020)
+// Model untuk Ringkasan Pesanan (Order Summary) & Pembayaran tiket bioskop (PB-020, PB-021)
 
 import 'cinema_model.dart';
 import 'movie_model.dart';
@@ -13,8 +13,12 @@ class BookingOrderModel {
   final List<String> selectedSeats;
   final int ticketPrice;
   final int serviceFeePerTicket;
+  final int discountAmount;
   final DateTime createdAt;
-  final String status; // 'pending', 'paid', 'cancelled'
+  final String status; // 'pending', 'paid', 'expired', 'cancelled'
+  final String? paymentMethod; // 'BCA VA', 'GoPay', 'QRIS', dll
+  final DateTime? paidAt;
+  final String? paymentReference; // 'PAY-20261107-XXXX'
 
   BookingOrderModel({
     required this.id,
@@ -24,8 +28,12 @@ class BookingOrderModel {
     required this.selectedSeats,
     required this.ticketPrice,
     this.serviceFeePerTicket = 3000,
+    this.discountAmount = 0,
     required this.createdAt,
     this.status = 'pending',
+    this.paymentMethod,
+    this.paidAt,
+    this.paymentReference,
   });
 
   /// Jumlah kursi yang dipesan
@@ -37,8 +45,14 @@ class BookingOrderModel {
   /// Total biaya layanan aplikasi
   int get totalServiceFee => serviceFeePerTicket * seatCount;
 
-  /// Total tagihan keseluruhan yang harus dibayar pengguna
-  int get totalAmount => subtotal + totalServiceFee;
+  /// Total tagihan keseluruhan setelah dikurangi voucher diskon promo
+  int get totalAmount {
+    final raw = subtotal + totalServiceFee - discountAmount;
+    return raw > 0 ? raw : 0;
+  }
+
+  bool get isPaid => status == 'paid';
+  bool get isExpired => status == 'expired';
 
   /// String gabungan label kursi, misal: "C4, C5"
   String get seatsLabel {
@@ -64,6 +78,7 @@ class BookingOrderModel {
 
   String get formattedSubtotal => formatRupiah(subtotal);
   String get formattedServiceFee => formatRupiah(totalServiceFee);
+  String get formattedDiscount => formatRupiah(discountAmount);
   String get formattedTicketPrice => formatRupiah(ticketPrice);
   String get formattedTotalAmount => formatRupiah(totalAmount);
 
@@ -88,6 +103,38 @@ class BookingOrderModel {
     return showtime.showDate;
   }
 
+  BookingOrderModel copyWith({
+    String? id,
+    MovieModel? movie,
+    CinemaModel? cinema,
+    ShowtimeModel? showtime,
+    List<String>? selectedSeats,
+    int? ticketPrice,
+    int? serviceFeePerTicket,
+    int? discountAmount,
+    DateTime? createdAt,
+    String? status,
+    String? paymentMethod,
+    DateTime? paidAt,
+    String? paymentReference,
+  }) {
+    return BookingOrderModel(
+      id: id ?? this.id,
+      movie: movie ?? this.movie,
+      cinema: cinema ?? this.cinema,
+      showtime: showtime ?? this.showtime,
+      selectedSeats: selectedSeats ?? this.selectedSeats,
+      ticketPrice: ticketPrice ?? this.ticketPrice,
+      serviceFeePerTicket: serviceFeePerTicket ?? this.serviceFeePerTicket,
+      discountAmount: discountAmount ?? this.discountAmount,
+      createdAt: createdAt ?? this.createdAt,
+      status: status ?? this.status,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      paidAt: paidAt ?? this.paidAt,
+      paymentReference: paymentReference ?? this.paymentReference,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -97,8 +144,12 @@ class BookingOrderModel {
       'selected_seats': selectedSeats,
       'ticket_price': ticketPrice,
       'service_fee_per_ticket': serviceFeePerTicket,
+      'discount_amount': discountAmount,
       'created_at': createdAt.toIso8601String(),
       'status': status,
+      'payment_method': paymentMethod,
+      'paid_at': paidAt?.toIso8601String(),
+      'payment_reference': paymentReference,
     };
   }
 
@@ -114,10 +165,14 @@ class BookingOrderModel {
           [],
       ticketPrice: json['ticket_price'] as int? ?? 50000,
       serviceFeePerTicket: json['service_fee_per_ticket'] as int? ?? 3000,
+      discountAmount: json['discount_amount'] as int? ?? 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
           : DateTime.now(),
       status: json['status'] as String? ?? 'pending',
+      paymentMethod: json['payment_method'] as String?,
+      paidAt: json['paid_at'] != null ? DateTime.tryParse(json['paid_at'].toString()) : null,
+      paymentReference: json['payment_reference'] as String?,
     );
   }
 }

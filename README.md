@@ -139,7 +139,7 @@ Tujuan: Membangun alur pemesanan tiket bioskop dari pemilihan jadwal hingga pene
    - Pengguna memilih film dari dashboard/detail -> sistem memfilter hanya bioskop yang menayangkan film tersebut -> memilih bioskop, tanggal, & jam.
 3. **PB-020 (Ringkasan Pesanan / Order Summary):** [SELESAI]
    - Menampilkan detail pesanan: judul film, nama bioskop, tanggal, studio, jam, label kursi yang dipilih, rincian harga tiket, biaya layanan, dan total tagihan.
-4. **PB-021 (Simulasi Pembayaran):**
+4. **PB-021 (Simulasi Pembayaran):** [SELESAI]
    - Menyediakan pilihan metode pembayaran simulasi (Virtual Account, E-Wallet dummy, QRIS).
    - Terdapat batas waktu bayar (countdown timer 10 menit).
    - Tombol "Bayar Sekarang" yang mengubah status pesanan menjadi *Paid*.

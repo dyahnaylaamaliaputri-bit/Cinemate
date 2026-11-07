@@ -8,6 +8,7 @@ import '../models/booking_order_model.dart';
 import '../models/cinema_model.dart';
 import '../models/movie_model.dart';
 import '../models/showtime_model.dart';
+import '../routes/app_routes.dart';
 import '../services/storage_service.dart';
 import 'auth_controller.dart';
 
@@ -173,94 +174,8 @@ class OrderSummaryController extends GetxController {
 
   /// Aksi lanjut ke pembayaran (PB-021)
   void proceedToPayment() {
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: Color(0xFF1A1A2E),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.payment_rounded, color: Color(0xFFE50914), size: 28),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Text(
-                    'Siap untuk Pembayaran',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Total yang harus dibayar: $formattedFinalTotalAmount untuk ${order.value.seatCount} kursi (${order.value.seatsLabel}).',
-              style: const TextStyle(color: Color(0xFFB0B0B0), fontSize: 14),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF2E2E4E)),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.info_outline, color: Color(0xFFFFD700), size: 20),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Alur simulasi metode bayar (VA, QRIS, E-Wallet) dan countdown timer akan aktif pada PB-021.',
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFE50914),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                icon: const Icon(Icons.arrow_forward_rounded, color: Colors.white),
-                label: const Text(
-                  'Konfirmasi Pesanan (Menuju PB-021)',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-                onPressed: () {
-                  Get.back();
-                  Get.snackbar(
-                    'Pesanan Disimpan',
-                    'Draft pesanan ${order.value.id} siap dibayar pada PB-021!',
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: const Color(0xFF16213E),
-                    colorText: Colors.white,
-                    icon: const Icon(Icons.check_circle_rounded, color: Color(0xFF4CAF50)),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      isScrollControlled: true,
-    );
+    final updatedOrder = order.value.copyWith(discountAmount: discountAmount.value);
+    order.value = updatedOrder;
+    Get.toNamed(Routes.payment, arguments: updatedOrder);
   }
 }
