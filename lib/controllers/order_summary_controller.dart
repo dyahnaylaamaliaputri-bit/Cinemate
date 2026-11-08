@@ -169,12 +169,15 @@ class OrderSummaryController extends GetxController {
     return total > 0 ? total : 0;
   }
 
-  String get formattedFinalTotalAmount => BookingOrderModel.formatRupiah(finalTotalAmount);
-  String get formattedDiscount => BookingOrderModel.formatRupiah(discountAmount.value);
+  String get formattedFinalTotalAmount =>
+      BookingOrderModel.formatRupiah(finalTotalAmount);
+  String get formattedDiscount =>
+      BookingOrderModel.formatRupiah(discountAmount.value);
 
   /// Aksi lanjut ke pembayaran (PB-021)
   void proceedToPayment() {
-    final updatedOrder = order.value.copyWith(discountAmount: discountAmount.value);
+    final updatedOrder =
+        order.value.copyWith(discountAmount: discountAmount.value);
     order.value = updatedOrder;
     Get.toNamed(Routes.payment, arguments: updatedOrder);
   }

@@ -84,7 +84,8 @@ class CinemaController extends GetxController {
   Future<void> fetchCinemas({bool forceRefresh = false}) async {
     try {
       isLoading.value = true;
-      final result = await _cinemaService.getAllCinemas(forceRefresh: forceRefresh);
+      final result =
+          await _cinemaService.getAllCinemas(forceRefresh: forceRefresh);
       allCinemas.assignAll(result.cinemas);
       isFromCache.value = result.fromCache;
       _updateNearestList();

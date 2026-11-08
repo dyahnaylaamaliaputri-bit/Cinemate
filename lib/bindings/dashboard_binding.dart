@@ -1,11 +1,13 @@
 // lib/bindings/dashboard_binding.dart
-// Binding untuk DashboardView dan sub-layar di dalamnya (PB-011)
+// Binding untuk DashboardView dan sub-layar di dalamnya (PB-011, PB-026, PB-031)
 
 import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
 import '../controllers/cinema_controller.dart';
 import '../controllers/dashboard_controller.dart';
 import '../controllers/movie_controller.dart';
+import '../controllers/fnb_controller.dart';
+import '../controllers/mood_controller.dart';
 
 class DashboardBinding extends Bindings {
   @override
@@ -16,5 +18,7 @@ class DashboardBinding extends Bindings {
     Get.lazyPut<DashboardController>(() => DashboardController());
     Get.lazyPut<MovieController>(() => MovieController());
     Get.lazyPut<CinemaController>(() => CinemaController());
+    Get.lazyPut<FnbController>(() => FnbController());
+    Get.lazyPut<MoodController>(() => MoodController());
   }
 }

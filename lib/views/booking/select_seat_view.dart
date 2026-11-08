@@ -18,7 +18,8 @@ class SelectSeatView extends GetView<BookingSeatController> {
         backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+              color: Colors.white, size: 20),
           onPressed: () => Get.back(),
         ),
         title: Column(
@@ -57,7 +58,8 @@ class SelectSeatView extends GetView<BookingSeatController> {
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 child: Column(
                   children: [
                     // Layar Bioskop (Curved Screen)
@@ -96,7 +98,8 @@ class SelectSeatView extends GetView<BookingSeatController> {
         children: [
           Row(
             children: [
-              const Icon(Icons.calendar_today_rounded, size: 14, color: AppColors.gold),
+              const Icon(Icons.calendar_today_rounded,
+                  size: 14, color: AppColors.gold),
               const SizedBox(width: 6),
               Text(
                 '${controller.showtime.showDate} • ${controller.showtime.showTime} WIB',
@@ -113,7 +116,8 @@ class SelectSeatView extends GetView<BookingSeatController> {
             decoration: BoxDecoration(
               color: AppColors.primaryDark.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+              border:
+                  Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
             ),
             child: Text(
               controller.showtime.experience,
@@ -268,7 +272,8 @@ class SelectSeatView extends GetView<BookingSeatController> {
         ),
         child: Center(
           child: isReserved
-              ? const Icon(Icons.close_rounded, size: 13, color: AppColors.textDisabled)
+              ? const Icon(Icons.close_rounded,
+                  size: 13, color: AppColors.textDisabled)
               : Text(
                   '${seat.column}',
                   style: TextStyle(
@@ -295,14 +300,18 @@ class SelectSeatView extends GetView<BookingSeatController> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildLegendItem('Tersedia', AppColors.card, AppColors.border),
-          _buildLegendItem('Dipilih', AppColors.primary, AppColors.primaryLight),
-          _buildLegendItem('Terisi', const Color(0xFF1F1F2E), Colors.transparent, hasIcon: true),
+          _buildLegendItem(
+              'Dipilih', AppColors.primary, AppColors.primaryLight),
+          _buildLegendItem(
+              'Terisi', const Color(0xFF1F1F2E), Colors.transparent,
+              hasIcon: true),
         ],
       ),
     );
   }
 
-  Widget _buildLegendItem(String label, Color color, Color border, {bool hasIcon = false}) {
+  Widget _buildLegendItem(String label, Color color, Color border,
+      {bool hasIcon = false}) {
     return Row(
       children: [
         Container(
@@ -314,7 +323,8 @@ class SelectSeatView extends GetView<BookingSeatController> {
             border: Border.all(color: border),
           ),
           child: hasIcon
-              ? const Icon(Icons.close_rounded, size: 12, color: AppColors.textDisabled)
+              ? const Icon(Icons.close_rounded,
+                  size: 12, color: AppColors.textDisabled)
               : null,
         ),
         const SizedBox(width: 8),
@@ -359,9 +369,12 @@ class SelectSeatView extends GetView<BookingSeatController> {
                             ? 'Kursi (${controller.selectedSeats.length}): ${controller.selectedSeatsLabel}'
                             : 'Pilih minimal 1 kursi bioskop',
                         style: TextStyle(
-                          color: hasSelected ? Colors.white : AppColors.textDisabled,
+                          color: hasSelected
+                              ? Colors.white
+                              : AppColors.textDisabled,
                           fontSize: 13,
-                          fontWeight: hasSelected ? FontWeight.bold : FontWeight.normal,
+                          fontWeight:
+                              hasSelected ? FontWeight.bold : FontWeight.normal,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -372,7 +385,9 @@ class SelectSeatView extends GetView<BookingSeatController> {
                             ? controller.formattedSubtotal
                             : 'Harga @ ${controller.showtime.formattedPrice}',
                         style: TextStyle(
-                          color: hasSelected ? AppColors.gold : AppColors.textSecondary,
+                          color: hasSelected
+                              ? AppColors.gold
+                              : AppColors.textSecondary,
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
@@ -382,9 +397,12 @@ class SelectSeatView extends GetView<BookingSeatController> {
                 ),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: hasSelected ? AppColors.primary : AppColors.card,
-                    foregroundColor: hasSelected ? Colors.white : AppColors.textDisabled,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    backgroundColor:
+                        hasSelected ? AppColors.primary : AppColors.card,
+                    foregroundColor:
+                        hasSelected ? Colors.white : AppColors.textDisabled,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -395,7 +413,8 @@ class SelectSeatView extends GetView<BookingSeatController> {
                     'Ringkasan Pesanan',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                   ),
-                  onPressed: hasSelected ? controller.proceedToOrderSummary : null,
+                  onPressed:
+                      hasSelected ? controller.proceedToOrderSummary : null,
                 ),
               ],
             ),

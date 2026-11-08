@@ -3,8 +3,8 @@
 
 enum SeatStatus {
   available, // Tersedia untuk dipilih
-  selected,  // Sedang dipilih pengguna
-  reserved,  // Sudah dipesan pengguna lain
+  selected, // Sedang dipilih pengguna
+  reserved, // Sudah dipesan pengguna lain
 }
 
 enum SeatType {

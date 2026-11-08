@@ -27,7 +27,8 @@ class MovieDetailView extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: AppColors.background,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary),
+            icon: const Icon(Icons.arrow_back_ios_new,
+                color: AppColors.textPrimary),
             onPressed: () => Navigator.pop(context),
           ),
           title: const Text('Detail Film'),
@@ -56,7 +57,8 @@ class MovieDetailView extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: Colors.black.withValues(alpha: 0.6),
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 16),
+                  icon: const Icon(Icons.arrow_back_ios_new,
+                      color: Colors.white, size: 16),
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
@@ -67,7 +69,8 @@ class MovieDetailView extends StatelessWidget {
                 child: CircleAvatar(
                   backgroundColor: Colors.black.withValues(alpha: 0.6),
                   child: IconButton(
-                    icon: const Icon(Icons.bookmark_border_rounded, color: Colors.white),
+                    icon: const Icon(Icons.bookmark_border_rounded,
+                        color: Colors.white),
                     onPressed: () {
                       Get.snackbar(
                         'Tersimpan',
@@ -90,7 +93,8 @@ class MovieDetailView extends StatelessWidget {
                     errorBuilder: (_, __, ___) => Container(
                       color: AppColors.card,
                       child: const Center(
-                        child: Icon(Icons.movie_outlined, size: 60, color: AppColors.textDisabled),
+                        child: Icon(Icons.movie_outlined,
+                            size: 60, color: AppColors.textDisabled),
                       ),
                     ),
                   ),
@@ -141,7 +145,8 @@ class MovieDetailView extends StatelessWidget {
                               movie.posterUrl,
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => const Center(
-                                child: Icon(Icons.movie_outlined, color: AppColors.textDisabled),
+                                child: Icon(Icons.movie_outlined,
+                                    color: AppColors.textDisabled),
                               ),
                             ),
                           ),
@@ -169,7 +174,8 @@ class MovieDetailView extends StatelessWidget {
                             // Rating Bintang Emas
                             Row(
                               children: [
-                                const Icon(Icons.star_rounded, color: AppColors.gold, size: 20),
+                                const Icon(Icons.star_rounded,
+                                    color: AppColors.gold, size: 20),
                                 const SizedBox(width: 4),
                                 Text(
                                   movie.formattedRating,
@@ -183,7 +189,8 @@ class MovieDetailView extends StatelessWidget {
                                 Text(
                                   '/ 10',
                                   style: TextStyle(
-                                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                                    color: AppColors.textSecondary
+                                        .withValues(alpha: 0.7),
                                     fontSize: 12,
                                   ),
                                 ),
@@ -204,7 +211,8 @@ class MovieDetailView extends StatelessWidget {
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: AppColors.surface,
                                     borderRadius: BorderRadius.circular(6),
@@ -212,7 +220,9 @@ class MovieDetailView extends StatelessWidget {
                                   ),
                                   child: Row(
                                     children: [
-                                      const Icon(Icons.timer_outlined, color: AppColors.textSecondary, size: 13),
+                                      const Icon(Icons.timer_outlined,
+                                          color: AppColors.textSecondary,
+                                          size: 13),
                                       const SizedBox(width: 4),
                                       Text(
                                         movie.formattedDuration,
@@ -227,7 +237,8 @@ class MovieDetailView extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 8),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: AppColors.surface,
                                     borderRadius: BorderRadius.circular(6),
@@ -235,7 +246,9 @@ class MovieDetailView extends StatelessWidget {
                                   ),
                                   child: Row(
                                     children: [
-                                      const Icon(Icons.calendar_today_rounded, color: AppColors.textSecondary, size: 12),
+                                      const Icon(Icons.calendar_today_rounded,
+                                          color: AppColors.textSecondary,
+                                          size: 12),
                                       const SizedBox(width: 4),
                                       Text(
                                         movie.releaseYear,
@@ -264,7 +277,8 @@ class MovieDetailView extends StatelessWidget {
                     runSpacing: 8,
                     children: movie.genreNames.map((genre) {
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
                           color: AppColors.card,
                           borderRadius: BorderRadius.circular(20),
@@ -310,7 +324,9 @@ class MovieDetailView extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    movie.overview.isNotEmpty ? movie.overview : 'Sinopsis film belum tersedia.',
+                    movie.overview.isNotEmpty
+                        ? movie.overview
+                        : 'Sinopsis film belum tersedia.',
                     style: const TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 14,
@@ -332,7 +348,8 @@ class MovieDetailView extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _buildStatItem('Popularitas', movie.popularity.toStringAsFixed(0)),
+                        _buildStatItem(
+                            'Popularitas', movie.popularity.toStringAsFixed(0)),
                         _buildStatItem('Bahasa', 'Indonesia / En'),
                         _buildStatItem('Format', '2D / IMAX'),
                       ],
@@ -352,7 +369,8 @@ class MovieDetailView extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          border: const Border(top: BorderSide(color: AppColors.divider, width: 1)),
+          border:
+              const Border(top: BorderSide(color: AppColors.divider, width: 1)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.5),
@@ -371,7 +389,8 @@ class MovieDetailView extends StatelessWidget {
                 children: const [
                   Text(
                     'Harga Tiket',
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                    style:
+                        TextStyle(color: AppColors.textSecondary, fontSize: 11),
                   ),
                   SizedBox(height: 2),
                   Text(

@@ -10,21 +10,28 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('PaymentMethodModel Tests (PB-021)', () {
-    test('PaymentMethodModel should provide predefined VA, E-Wallet, and QRIS methods', () {
+    test(
+        'PaymentMethodModel should provide predefined VA, E-Wallet, and QRIS methods',
+        () {
       final methods = PaymentMethodModel.predefinedMethods;
 
       expect(methods, isNotEmpty);
 
-      final vaList = methods.where((m) => m.category == PaymentCategory.virtualAccount).toList();
+      final vaList = methods
+          .where((m) => m.category == PaymentCategory.virtualAccount)
+          .toList();
       expect(vaList.length, greaterThanOrEqualTo(4)); // BCA, Mandiri, BRI, BNI
       expect(vaList.any((m) => m.name.contains('BCA')), true);
       expect(vaList.any((m) => m.accountNumber != null), true);
 
-      final eWalletList = methods.where((m) => m.category == PaymentCategory.eWallet).toList();
-      expect(eWalletList.length, greaterThanOrEqualTo(4)); // GoPay, OVO, DANA, ShopeePay
+      final eWalletList =
+          methods.where((m) => m.category == PaymentCategory.eWallet).toList();
+      expect(eWalletList.length,
+          greaterThanOrEqualTo(4)); // GoPay, OVO, DANA, ShopeePay
       expect(eWalletList.any((m) => m.name == 'GoPay'), true);
 
-      final qrisList = methods.where((m) => m.category == PaymentCategory.qris).toList();
+      final qrisList =
+          methods.where((m) => m.category == PaymentCategory.qris).toList();
       expect(qrisList.length, 1);
       expect(qrisList.first.name, contains('QRIS'));
     });
@@ -65,7 +72,9 @@ void main() {
       availableSeats: 48,
     );
 
-    test('Order should transition from pending to paid and record payment details', () {
+    test(
+        'Order should transition from pending to paid and record payment details',
+        () {
       final pendingOrder = BookingOrderModel(
         id: 'ORD-PENDING-001',
         movie: movie,

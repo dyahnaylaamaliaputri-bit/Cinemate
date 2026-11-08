@@ -17,6 +17,9 @@ import '../views/auth/login_view.dart';
 import '../views/auth/register_view.dart';
 import '../views/dashboard/dashboard_view.dart';
 import '../views/movie_detail/movie_detail_view.dart';
+import '../views/fnb/fnb_checkout_view.dart';
+import '../views/fnb/fnb_order_detail_view.dart';
+import '../views/mood/mood_picker_view.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -78,6 +81,18 @@ class AppPages {
       name: Routes.ticketDetail,
       page: () => const TicketDetailView(),
       binding: TicketDetailBinding(),
+    ),
+    GetPage(
+      name: Routes.fnbCheckout,
+      page: () => const FnbCheckoutView(),
+    ),
+    GetPage(
+      name: Routes.fnbOrderDetail,
+      page: () => const FnbOrderDetailView(),
+    ),
+    GetPage(
+      name: Routes.moodPicker,
+      page: () => const MoodPickerView(),
     ),
   ];
 }

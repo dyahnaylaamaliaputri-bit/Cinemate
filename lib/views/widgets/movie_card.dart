@@ -67,7 +67,8 @@ class MovieCard extends StatelessWidget {
                   top: 8,
                   right: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                     decoration: BoxDecoration(
                       color: Colors.black.withAlpha(200),
                       borderRadius: BorderRadius.circular(8),
@@ -80,7 +81,9 @@ class MovieCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          isUpcoming ? Icons.calendar_today_rounded : Icons.star_rounded,
+                          isUpcoming
+                              ? Icons.calendar_today_rounded
+                              : Icons.star_rounded,
                           color: isUpcoming ? AppColors.info : AppColors.gold,
                           size: 12,
                         ),

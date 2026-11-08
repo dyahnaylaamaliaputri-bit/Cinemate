@@ -10,12 +10,14 @@ class Validators {
       return 'Email tidak boleh kosong';
     }
     final trimmed = value.trim();
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
+    final emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
     if (!emailRegex.hasMatch(trimmed)) {
       return 'Format email tidak valid';
     }
     return null;
   }
+
   static String? email(String? value) => validateEmail(value);
 
   // ── Password ──────────────────────────────────────────────────────────────
@@ -34,6 +36,7 @@ class Validators {
     }
     return null;
   }
+
   static String? password(String? value) => validatePassword(value);
 
   // ── Konfirmasi Password ───────────────────────────────────────────────────
@@ -46,6 +49,7 @@ class Validators {
     }
     return null;
   }
+
   static String? confirmPassword(String? value, String password) =>
       validateConfirmPassword(value, password);
 
@@ -60,6 +64,7 @@ class Validators {
     }
     return null;
   }
+
   static String? fullName(String? value) => validateFullName(value);
 
   // ── Phone ─────────────────────────────────────────────────────────────────
@@ -73,6 +78,7 @@ class Validators {
     }
     return null;
   }
+
   static String? phone(String? value) => validatePhone(value);
 
   // ── Required Field ────────────────────────────────────────────────────────
@@ -82,6 +88,7 @@ class Validators {
     }
     return null;
   }
+
   static String? required(String? value, {String fieldName = 'Field'}) =>
       validateRequired(value, fieldName: fieldName);
 }

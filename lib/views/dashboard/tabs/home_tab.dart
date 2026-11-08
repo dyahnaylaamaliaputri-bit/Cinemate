@@ -93,7 +93,8 @@ class _HomeTabState extends State<HomeTab> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none_rounded, color: AppColors.textPrimary),
+            icon: const Icon(Icons.notifications_none_rounded,
+                color: AppColors.textPrimary),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -115,7 +116,8 @@ class _HomeTabState extends State<HomeTab> {
           ]);
         },
         child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics()),
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +127,9 @@ class _HomeTabState extends State<HomeTab> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Obx(() {
                   final user = _authCtrl.currentUser.value;
-                  final name = user?.fullName.isNotEmpty == true ? user!.fullName : 'Pengguna';
+                  final name = user?.fullName.isNotEmpty == true
+                      ? user!.fullName
+                      : 'Pengguna';
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -156,7 +160,9 @@ class _HomeTabState extends State<HomeTab> {
               // INDIKATOR MODE OFFLINE & HIVE CACHE (PB-013)
               // =============================================================
               Obx(() {
-                if (!_movieCtrl.isOfflineMode.value) return const SizedBox.shrink();
+                if (!_movieCtrl.isOfflineMode.value) {
+                  return const SizedBox.shrink();
+                }
 
                 final cached = _movieCtrl.lastCacheTime.value;
                 final timeStr = cached != null
@@ -164,8 +170,10 @@ class _HomeTabState extends State<HomeTab> {
                     : 'Baru saja';
 
                 return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
                     color: AppColors.card,
                     borderRadius: BorderRadius.circular(14),
@@ -209,7 +217,8 @@ class _HomeTabState extends State<HomeTab> {
                                 ),
                                 const SizedBox(width: 6),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: AppColors.surface,
                                     borderRadius: BorderRadius.circular(4),
@@ -237,9 +246,11 @@ class _HomeTabState extends State<HomeTab> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.refresh_rounded, color: AppColors.warning, size: 20),
+                        icon: const Icon(Icons.refresh_rounded,
+                            color: AppColors.warning, size: 20),
                         tooltip: 'Muat Ulang',
-                        onPressed: () => _movieCtrl.fetchAllMovies(forceRefresh: true),
+                        onPressed: () =>
+                            _movieCtrl.fetchAllMovies(forceRefresh: true),
                       ),
                     ],
                   ),
@@ -266,7 +277,8 @@ class _HomeTabState extends State<HomeTab> {
                       child: PageView.builder(
                         controller: _pageController,
                         itemCount: banners.length,
-                        onPageChanged: (idx) => _movieCtrl.onBannerPageChanged(idx),
+                        onPageChanged: (idx) =>
+                            _movieCtrl.onBannerPageChanged(idx),
                         itemBuilder: (context, index) {
                           final movie = banners[index];
                           return Padding(
@@ -283,14 +295,17 @@ class _HomeTabState extends State<HomeTab> {
                       children: List.generate(
                         banners.length,
                         (index) => Obx(() {
-                          final isSelected = _movieCtrl.bannerIndex.value == index;
+                          final isSelected =
+                              _movieCtrl.bannerIndex.value == index;
                           return AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
                             margin: const EdgeInsets.symmetric(horizontal: 4),
                             height: 6,
                             width: isSelected ? 22 : 6,
                             decoration: BoxDecoration(
-                              color: isSelected ? AppColors.primary : AppColors.border,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.border,
                               borderRadius: BorderRadius.circular(3),
                             ),
                           );
@@ -301,7 +316,14 @@ class _HomeTabState extends State<HomeTab> {
                 );
               }),
 
-              const SizedBox(height: 26),
+              const SizedBox(height: 20),
+
+              // =============================================================
+              // BANNER REKOMENDASI MOOD AI (PB-031)
+              // =============================================================
+              _buildMoodAiBanner(context),
+
+              const SizedBox(height: 24),
 
               // =============================================================
               // 2. SEDANG TAYANG / NOW PLAYING (PB-012)
@@ -397,7 +419,8 @@ class _HomeTabState extends State<HomeTab> {
                   final lat = _cinemaCtrl.userLat.value;
                   final lng = _cinemaCtrl.userLng.value;
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(10),
@@ -425,7 +448,8 @@ class _HomeTabState extends State<HomeTab> {
                         ),
                         const SizedBox(width: 6),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: AppColors.card,
                             borderRadius: BorderRadius.circular(4),
@@ -458,7 +482,8 @@ class _HomeTabState extends State<HomeTab> {
                 final nearest = _cinemaCtrl.nearestCinemas;
                 if (nearest.isEmpty) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -469,7 +494,8 @@ class _HomeTabState extends State<HomeTab> {
                       child: const Center(
                         child: Text(
                           'Tidak ada bioskop yang ditemukan di sekitar lokasi ini.',
-                          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                          style: TextStyle(
+                              color: AppColors.textSecondary, fontSize: 13),
                         ),
                       ),
                     ),
@@ -511,7 +537,8 @@ class _HomeTabState extends State<HomeTab> {
                 errorBuilder: (_, __, ___) => Container(
                   color: AppColors.card,
                   child: const Center(
-                    child: Icon(Icons.movie_outlined, size: 48, color: AppColors.textDisabled),
+                    child: Icon(Icons.movie_outlined,
+                        size: 48, color: AppColors.textDisabled),
                   ),
                 ),
               ),
@@ -547,7 +574,8 @@ class _HomeTabState extends State<HomeTab> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
                           borderRadius: BorderRadius.circular(6),
@@ -565,7 +593,8 @@ class _HomeTabState extends State<HomeTab> {
                       const SizedBox(width: 8),
                       Row(
                         children: [
-                          const Icon(Icons.star_rounded, color: AppColors.gold, size: 14),
+                          const Icon(Icons.star_rounded,
+                              color: AppColors.gold, size: 14),
                           const SizedBox(width: 3),
                           Text(
                             movie.formattedRating,
@@ -693,97 +722,214 @@ class _HomeTabState extends State<HomeTab> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.border,
-                    borderRadius: BorderRadius.circular(2),
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppColors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Pilih Titik Lokasi Anda (Simulasi LBS)',
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 16),
+                const Text(
+                  'Pilih Titik Lokasi Anda (Simulasi LBS)',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Jarak ke semua bioskop dihitung ulang seketika menggunakan rumus Haversine.',
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 12,
+                const SizedBox(height: 4),
+                const Text(
+                  'Jarak ke semua bioskop dihitung ulang seketika menggunakan rumus Haversine.',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              ...CinemaController.presets.map((preset) {
-                return Obx(() {
-                  final isSelected =
-                      _cinemaCtrl.selectedLocationName.value == preset.name;
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primary.withValues(alpha: 0.2)
-                            : AppColors.card,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isSelected ? AppColors.primary : AppColors.border,
+                const SizedBox(height: 16),
+                ...CinemaController.presets.map((preset) {
+                  return Obx(() {
+                    final isSelected =
+                        _cinemaCtrl.selectedLocationName.value == preset.name;
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? AppColors.primary.withValues(alpha: 0.2)
+                              : AppColors.card,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.border,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.place_rounded,
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.textSecondary,
+                          size: 20,
                         ),
                       ),
-                      child: Icon(
-                        Icons.place_rounded,
-                        color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                        size: 20,
-                      ),
-                    ),
-                    title: Text(
-                      preset.name,
-                      style: TextStyle(
-                        color: isSelected ? AppColors.primaryLight : AppColors.textPrimary,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                        fontSize: 14,
-                      ),
-                    ),
-                    subtitle: Text(
-                      '${preset.description} (${preset.latitude}, ${preset.longitude})',
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 11,
-                      ),
-                    ),
-                    trailing: isSelected
-                        ? const Icon(Icons.check_circle_rounded, color: AppColors.primary)
-                        : null,
-                    onTap: () {
-                      _cinemaCtrl.setLocation(
+                      title: Text(
                         preset.name,
-                        preset.latitude,
-                        preset.longitude,
-                      );
-                      Navigator.pop(ctx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Lokasi diubah ke: ${preset.name}'),
-                          duration: const Duration(seconds: 2),
+                        style: TextStyle(
+                          color: isSelected
+                              ? AppColors.primaryLight
+                              : AppColors.textPrimary,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.w500,
+                          fontSize: 14,
                         ),
-                      );
-                    },
-                  );
-                });
-              }),
-            ],
+                      ),
+                      subtitle: Text(
+                        '${preset.description} (${preset.latitude}, ${preset.longitude})',
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 11,
+                        ),
+                      ),
+                      trailing: isSelected
+                          ? const Icon(Icons.check_circle_rounded,
+                              color: AppColors.primary)
+                          : null,
+                      onTap: () {
+                        _cinemaCtrl.setLocation(
+                          preset.name,
+                          preset.latitude,
+                          preset.longitude,
+                        );
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Lokasi diubah ke: ${preset.name}'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                    );
+                  });
+                }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Banner Rekomendasi Film Berbasis Mood AI (PB-031)
+  Widget _buildMoodAiBanner(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2E0854), Color(0xFF180B2C)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFF8E2DE2).withValues(alpha: 0.5),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF8E2DE2).withValues(alpha: 0.25),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => Get.toNamed(Routes.moodPicker),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF8E2DE2).withValues(alpha: 0.4),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const Text('✨', style: TextStyle(fontSize: 26)),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            'Mood AI Recommendation',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF00B09B),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'AI',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Bingung mau nonton apa? Cek rekomendasi film yang sesuai dengan suasana hatimu!',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 12,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Color(0xFFB18CFF),
+                  size: 16,
+                ),
+              ],
+            ),
           ),
         ),
-      );
-    },
+      ),
     );
   }
 

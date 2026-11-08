@@ -14,7 +14,8 @@ class SupabaseService {
   /// Inisialisasi Supabase dari .env atau default constant
   static Future<void> initialize() async {
     final url = dotenv.env['SUPABASE_URL'] ?? AppConstants.defaultSupabaseUrl;
-    final anonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? AppConstants.defaultSupabaseAnonKey;
+    final anonKey =
+        dotenv.env['SUPABASE_ANON_KEY'] ?? AppConstants.defaultSupabaseAnonKey;
 
     await Supabase.initialize(
       url: url,

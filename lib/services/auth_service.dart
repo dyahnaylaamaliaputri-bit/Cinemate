@@ -82,11 +82,15 @@ class AuthService {
     final passwordHash = '$salt:${_hashPassword(password, salt)}';
 
     // Insert user
-    final row = await _db.from('users').insert({
-      'email': email.toLowerCase().trim(),
-      'password_hash': passwordHash,
-      'full_name': fullName.trim(),
-    }).select().single();
+    final row = await _db
+        .from('users')
+        .insert({
+          'email': email.toLowerCase().trim(),
+          'password_hash': passwordHash,
+          'full_name': fullName.trim(),
+        })
+        .select()
+        .single();
 
     return UserModel.fromMap(row);
   }
@@ -182,11 +186,8 @@ class AuthService {
       return null;
     }
 
-    final userRow = await _db
-        .from('users')
-        .select()
-        .eq('id', userId)
-        .maybeSingle();
+    final userRow =
+        await _db.from('users').select().eq('id', userId).maybeSingle();
 
     if (userRow == null) {
       await _storage.clearSession();

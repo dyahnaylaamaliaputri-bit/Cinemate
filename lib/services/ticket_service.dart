@@ -87,7 +87,8 @@ class TicketService {
     // 1. Simpan ke Hive cache lokal (PB-023, PB-024)
     try {
       await _storage.addTicketToCache(ticket.toJson());
-      debugPrint('[TicketService] Berhasil menyimpan tiket ${ticket.bookingCode} ke Hive cache.');
+      debugPrint(
+          '[TicketService] Berhasil menyimpan tiket ${ticket.bookingCode} ke Hive cache.');
     } catch (e) {
       debugPrint('[TicketService] Hive caching error: $e');
     }
@@ -120,10 +121,12 @@ class TicketService {
           if (seatsPayload.isNotEmpty) {
             await client.from('booking_seats').insert(seatsPayload);
           }
-          debugPrint('[TicketService] Berhasil menyimpan tiket ${ticket.bookingCode} ke Supabase.');
+          debugPrint(
+              '[TicketService] Berhasil menyimpan tiket ${ticket.bookingCode} ke Supabase.');
         }
       } catch (e) {
-        debugPrint('[TicketService] Supabase insert warning (offline/mock mode): $e');
+        debugPrint(
+            '[TicketService] Supabase insert warning (offline/mock mode): $e');
       }
     }
 
@@ -131,13 +134,16 @@ class TicketService {
   }
 
   /// Mengambil semua tiket milik pengguna dari Supabase / Hive cache
-  Future<List<TicketModel>> getUserTickets({String? userId, bool forceRefresh = false}) async {
-    final meta = await getUserTicketsWithMeta(userId: userId, forceRefresh: forceRefresh);
+  Future<List<TicketModel>> getUserTickets(
+      {String? userId, bool forceRefresh = false}) async {
+    final meta = await getUserTicketsWithMeta(
+        userId: userId, forceRefresh: forceRefresh);
     return meta.tickets;
   }
 
   /// Mengambil semua tiket beserta indikasi offline dan waktu cache (PB-024)
-  Future<({List<TicketModel> tickets, bool isOffline, DateTime? cachedAt})> getUserTicketsWithMeta({
+  Future<({List<TicketModel> tickets, bool isOffline, DateTime? cachedAt})>
+      getUserTicketsWithMeta({
     String? userId,
     bool forceRefresh = false,
   }) async {
@@ -146,7 +152,8 @@ class TicketService {
       try {
         final cached = await _storage.getCachedTicketsWithMeta();
         if (cached.data != null && cached.data!.isNotEmpty) {
-          final list = cached.data!.map((e) => TicketModel.fromJson(e)).toList();
+          final list =
+              cached.data!.map((e) => TicketModel.fromJson(e)).toList();
           return (tickets: list, isOffline: true, cachedAt: cached.timestamp);
         }
       } catch (e) {
@@ -189,7 +196,9 @@ class TicketService {
               totalPrice: row['total_price'] as int? ?? 50000,
               qrData: row['qr_data']?.toString() ?? '',
               status: row['status']?.toString() ?? 'paid',
-              createdAt: DateTime.tryParse(row['created_at']?.toString() ?? '') ?? DateTime.now(),
+              createdAt:
+                  DateTime.tryParse(row['created_at']?.toString() ?? '') ??
+                      DateTime.now(),
             );
           }).toList();
 
@@ -222,7 +231,8 @@ class TicketService {
     required String newStatus,
   }) async {
     final cached = await _storage.getCachedTickets() ?? [];
-    final index = cached.indexWhere((t) => t['id'] == ticketId || t['booking_code'] == ticketId);
+    final index = cached.indexWhere(
+        (t) => t['id'] == ticketId || t['booking_code'] == ticketId);
     TicketModel? updatedTicket;
 
     if (index >= 0) {
@@ -231,7 +241,8 @@ class TicketService {
       cached[index] = map;
       await _storage.cacheTickets(cached);
       updatedTicket = TicketModel.fromJson(map);
-      debugPrint('[TicketService] Status tiket $ticketId berhasil diubah ke $newStatus di Hive cache.');
+      debugPrint(
+          '[TicketService] Status tiket $ticketId berhasil diubah ke $newStatus di Hive cache.');
     }
 
     // Coba update juga ke Supabase jika online
@@ -240,8 +251,7 @@ class TicketService {
       try {
         await client
             .from('bookings')
-            .update({'status': newStatus})
-            .eq('id', ticketId);
+            .update({'status': newStatus}).eq('id', ticketId);
       } catch (e) {
         debugPrint('[TicketService] Supabase update warning: $e');
       }
@@ -251,14 +261,18 @@ class TicketService {
   }
 
   /// Memfilter tiket yang masih aktif (jadwal belum lewat & status bukan used/expired)
-  Future<List<TicketModel>> getActiveTickets({String? userId, bool forceRefresh = false}) async {
-    final all = await getUserTickets(userId: userId, forceRefresh: forceRefresh);
+  Future<List<TicketModel>> getActiveTickets(
+      {String? userId, bool forceRefresh = false}) async {
+    final all =
+        await getUserTickets(userId: userId, forceRefresh: forceRefresh);
     return all.where((t) => t.isTicketActive).toList();
   }
 
   /// Memfilter riwayat tiket (jadwal sudah lewat atau status used/expired/cancelled)
-  Future<List<TicketModel>> getHistoryTickets({String? userId, bool forceRefresh = false}) async {
-    final all = await getUserTickets(userId: userId, forceRefresh: forceRefresh);
+  Future<List<TicketModel>> getHistoryTickets(
+      {String? userId, bool forceRefresh = false}) async {
+    final all =
+        await getUserTickets(userId: userId, forceRefresh: forceRefresh);
     return all.where((t) => t.isTicketHistory).toList();
   }
 }

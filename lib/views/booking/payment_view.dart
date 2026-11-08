@@ -19,7 +19,8 @@ class PaymentView extends GetView<PaymentController> {
         backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+              color: Colors.white, size: 20),
           onPressed: () => Get.back(),
         ),
         title: const Column(
@@ -126,7 +127,8 @@ class PaymentView extends GetView<PaymentController> {
               decoration: BoxDecoration(
                 color: AppColors.card,
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: AppColors.gold.withValues(alpha: 0.4)),
+                border:
+                    Border.all(color: AppColors.gold.withValues(alpha: 0.4)),
               ),
               child: Text(
                 timer,
@@ -173,7 +175,8 @@ class PaymentView extends GetView<PaymentController> {
                           color: AppColors.textDisabled,
                         ),
                       )
-                    : const Icon(Icons.movie_creation_rounded, color: AppColors.textDisabled),
+                    : const Icon(Icons.movie_creation_rounded,
+                        color: AppColors.textDisabled),
               ),
             ),
             const SizedBox(width: 12),
@@ -194,14 +197,18 @@ class PaymentView extends GetView<PaymentController> {
                   const SizedBox(height: 3),
                   Text(
                     '${order.cinema.name} • ${order.showtime.hallName}',
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                    style: const TextStyle(
+                        color: AppColors.textSecondary, fontSize: 11),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     'Kursi: ${order.seatsLabel} (${order.seatCount} Tiket)',
-                    style: const TextStyle(color: AppColors.primaryLight, fontSize: 11, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                        color: AppColors.primaryLight,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -212,7 +219,8 @@ class PaymentView extends GetView<PaymentController> {
               children: [
                 const Text(
                   'Total Tagihan',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                  style:
+                      TextStyle(color: AppColors.textSecondary, fontSize: 11),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -237,17 +245,21 @@ class PaymentView extends GetView<PaymentController> {
       final current = controller.selectedCategory.value;
       return Row(
         children: [
-          _buildCategoryChip('Virtual Account', Icons.account_balance_rounded, PaymentCategory.virtualAccount, current),
+          _buildCategoryChip('Virtual Account', Icons.account_balance_rounded,
+              PaymentCategory.virtualAccount, current),
           const SizedBox(width: 8),
-          _buildCategoryChip('E-Wallet', Icons.account_balance_wallet_rounded, PaymentCategory.eWallet, current),
+          _buildCategoryChip('E-Wallet', Icons.account_balance_wallet_rounded,
+              PaymentCategory.eWallet, current),
           const SizedBox(width: 8),
-          _buildCategoryChip('QRIS', Icons.qr_code_scanner_rounded, PaymentCategory.qris, current),
+          _buildCategoryChip('QRIS', Icons.qr_code_scanner_rounded,
+              PaymentCategory.qris, current),
         ],
       );
     });
   }
 
-  Widget _buildCategoryChip(String label, IconData icon, PaymentCategory category, PaymentCategory active) {
+  Widget _buildCategoryChip(String label, IconData icon,
+      PaymentCategory category, PaymentCategory active) {
     final isSelected = active == category;
     return Expanded(
       child: InkWell(
@@ -257,7 +269,9 @@ class PaymentView extends GetView<PaymentController> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primaryDark.withValues(alpha: 0.3) : AppColors.card,
+            color: isSelected
+                ? AppColors.primaryDark.withValues(alpha: 0.3)
+                : AppColors.card,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: isSelected ? AppColors.primaryLight : AppColors.border,
@@ -266,7 +280,11 @@ class PaymentView extends GetView<PaymentController> {
           ),
           child: Column(
             children: [
-              Icon(icon, color: isSelected ? AppColors.primaryLight : AppColors.textSecondary, size: 18),
+              Icon(icon,
+                  color: isSelected
+                      ? AppColors.primaryLight
+                      : AppColors.textSecondary,
+                  size: 18),
               const SizedBox(height: 4),
               Text(
                 label,
@@ -287,7 +305,9 @@ class PaymentView extends GetView<PaymentController> {
 
   /// 1. Section Virtual Account
   Widget _buildVirtualAccountSection() {
-    final vaMethods = controller.allMethods.where((m) => m.category == PaymentCategory.virtualAccount).toList();
+    final vaMethods = controller.allMethods
+        .where((m) => m.category == PaymentCategory.virtualAccount)
+        .toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -300,15 +320,21 @@ class PaymentView extends GetView<PaymentController> {
           ),
           child: Column(
             children: vaMethods.map((method) {
-              final isSelected = controller.selectedMethod.value.id == method.id;
+              final isSelected =
+                  controller.selectedMethod.value.id == method.id;
               return InkWell(
                 borderRadius: BorderRadius.circular(14),
                 onTap: () => controller.selectMethod(method),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.card.withValues(alpha: 0.8) : Colors.transparent,
-                    border: Border(bottom: BorderSide(color: AppColors.divider.withValues(alpha: 0.4))),
+                    color: isSelected
+                        ? AppColors.card.withValues(alpha: 0.8)
+                        : Colors.transparent,
+                    border: Border(
+                        bottom: BorderSide(
+                            color: AppColors.divider.withValues(alpha: 0.4))),
                   ),
                   child: Row(
                     children: [
@@ -318,7 +344,9 @@ class PaymentView extends GetView<PaymentController> {
                           color: AppColors.cardLight,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(method.icon, color: isSelected ? AppColors.gold : Colors.white70, size: 20),
+                        child: Icon(method.icon,
+                            color: isSelected ? AppColors.gold : Colors.white70,
+                            size: 20),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -328,22 +356,31 @@ class PaymentView extends GetView<PaymentController> {
                             Text(
                               method.name,
                               style: TextStyle(
-                                color: isSelected ? Colors.white : AppColors.textSecondary,
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppColors.textSecondary,
                                 fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w500,
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               method.description,
-                              style: const TextStyle(color: AppColors.textDisabled, fontSize: 11),
+                              style: const TextStyle(
+                                  color: AppColors.textDisabled, fontSize: 11),
                             ),
                           ],
                         ),
                       ),
                       Icon(
-                        isSelected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
-                        color: isSelected ? AppColors.primaryLight : AppColors.textDisabled,
+                        isSelected
+                            ? Icons.radio_button_checked_rounded
+                            : Icons.radio_button_off_rounded,
+                        color: isSelected
+                            ? AppColors.primaryLight
+                            : AppColors.textDisabled,
                         size: 20,
                       ),
                     ],
@@ -367,13 +404,16 @@ class PaymentView extends GetView<PaymentController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Nomor Virtual Account', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+              const Text('Nomor Virtual Account',
+                  style:
+                      TextStyle(color: AppColors.textSecondary, fontSize: 12)),
               const SizedBox(height: 6),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    controller.selectedMethod.value.accountNumber ?? '8277 0812 3456 7890',
+                    controller.selectedMethod.value.accountNumber ??
+                        '8277 0812 3456 7890',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 17,
@@ -383,16 +423,22 @@ class PaymentView extends GetView<PaymentController> {
                   ),
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryDark.withValues(alpha: 0.3),
+                      backgroundColor:
+                          AppColors.primaryDark.withValues(alpha: 0.3),
                       foregroundColor: AppColors.primaryLight,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                       side: const BorderSide(color: AppColors.primary),
                     ),
                     icon: const Icon(Icons.copy_rounded, size: 14),
-                    label: const Text('Salin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                    label: const Text('Salin',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 11)),
                     onPressed: () => controller.copyToClipboard(
-                      controller.selectedMethod.value.accountNumber ?? '8277 0812 3456 7890',
+                      controller.selectedMethod.value.accountNumber ??
+                          '8277 0812 3456 7890',
                     ),
                   ),
                 ],
@@ -404,14 +450,17 @@ class PaymentView extends GetView<PaymentController> {
         const SizedBox(height: 16),
 
         // Petunjuk Pembayaran
-        _buildInstructionsAccordion(controller.selectedMethod.value.instructions),
+        _buildInstructionsAccordion(
+            controller.selectedMethod.value.instructions),
       ],
     );
   }
 
   /// 2. Section E-Wallet
   Widget _buildEWalletSection() {
-    final eWalletMethods = controller.allMethods.where((m) => m.category == PaymentCategory.eWallet).toList();
+    final eWalletMethods = controller.allMethods
+        .where((m) => m.category == PaymentCategory.eWallet)
+        .toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -433,26 +482,35 @@ class PaymentView extends GetView<PaymentController> {
               borderRadius: BorderRadius.circular(12),
               onTap: () => controller.selectMethod(method),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primaryDark.withValues(alpha: 0.25) : AppColors.surface,
+                  color: isSelected
+                      ? AppColors.primaryDark.withValues(alpha: 0.25)
+                      : AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSelected ? AppColors.primaryLight : AppColors.border,
+                    color:
+                        isSelected ? AppColors.primaryLight : AppColors.border,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
                 child: Row(
                   children: [
-                    Icon(method.icon, color: isSelected ? AppColors.gold : Colors.white70, size: 22),
+                    Icon(method.icon,
+                        color: isSelected ? AppColors.gold : Colors.white70,
+                        size: 22),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         method.name,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : AppColors.textSecondary,
+                          color: isSelected
+                              ? Colors.white
+                              : AppColors.textSecondary,
                           fontSize: 13,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -478,7 +536,10 @@ class PaymentView extends GetView<PaymentController> {
             children: [
               Text(
                 'Nomor Akun ${controller.selectedMethod.value.name}',
-                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               TextField(
@@ -486,19 +547,25 @@ class PaymentView extends GetView<PaymentController> {
                 keyboardType: TextInputType.phone,
                 style: const TextStyle(color: Colors.white, fontSize: 14),
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.phone_android_rounded, color: AppColors.gold, size: 20),
+                  prefixIcon: const Icon(Icons.phone_android_rounded,
+                      color: AppColors.gold, size: 20),
                   filled: true,
                   fillColor: AppColors.card,
                   hintText: '08xx-xxxx-xxxx',
-                  hintStyle: const TextStyle(color: AppColors.textDisabled, fontSize: 13),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                  hintStyle: const TextStyle(
+                      color: AppColors.textDisabled, fontSize: 13),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none),
                 ),
               ),
               const SizedBox(height: 8),
               const Row(
                 children: [
-                  Icon(Icons.shield_outlined, color: AppColors.success, size: 14),
+                  Icon(Icons.shield_outlined,
+                      color: AppColors.success, size: 14),
                   SizedBox(width: 6),
                   Text(
                     'Simulasi 1-Tap bayar instan tanpa OTP riil',
@@ -512,7 +579,8 @@ class PaymentView extends GetView<PaymentController> {
 
         const SizedBox(height: 16),
 
-        _buildInstructionsAccordion(controller.selectedMethod.value.instructions),
+        _buildInstructionsAccordion(
+            controller.selectedMethod.value.instructions),
       ],
     );
   }
@@ -538,19 +606,27 @@ class PaymentView extends GetView<PaymentController> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Text(
                   'QRIS',
-                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 2),
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14,
+                      letterSpacing: 2),
                 ),
               ),
               const Text(
                 'CINEMATE INDONESIA',
-                style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -607,7 +683,8 @@ class PaymentView extends GetView<PaymentController> {
           const Divider(color: AppColors.divider, height: 1),
           const SizedBox(height: 14),
 
-          _buildInstructionsAccordion(controller.selectedMethod.value.instructions),
+          _buildInstructionsAccordion(
+              controller.selectedMethod.value.instructions),
         ],
       ),
     );
@@ -627,10 +704,12 @@ class PaymentView extends GetView<PaymentController> {
         child: ExpansionTile(
           initiallyExpanded: true,
           tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
-          leading: const Icon(Icons.info_outline_rounded, color: AppColors.gold, size: 18),
+          leading: const Icon(Icons.info_outline_rounded,
+              color: AppColors.gold, size: 18),
           title: const Text(
             'Petunjuk Pembayaran',
-            style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
           ),
           children: [
             Padding(
@@ -644,12 +723,16 @@ class PaymentView extends GetView<PaymentController> {
                       children: [
                         Text(
                           '${entry.key + 1}. ',
-                          style: const TextStyle(color: AppColors.gold, fontSize: 12, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              color: AppColors.gold,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold),
                         ),
                         Expanded(
                           child: Text(
                             entry.value,
-                            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                            style: const TextStyle(
+                                color: AppColors.textSecondary, fontSize: 12),
                           ),
                         ),
                       ],
@@ -690,7 +773,8 @@ class PaymentView extends GetView<PaymentController> {
               children: [
                 const Text(
                   'Total Tagihan',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                  style:
+                      TextStyle(color: AppColors.textSecondary, fontSize: 12),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -707,8 +791,10 @@ class PaymentView extends GetView<PaymentController> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 elevation: 4,
               ),
               onPressed: isProcessing ? null : controller.payNow,
@@ -716,7 +802,8 @@ class PaymentView extends GetView<PaymentController> {
                   ? const SizedBox(
                       width: 22,
                       height: 22,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2.5),
                     )
                   : const Row(
                       mainAxisSize: MainAxisSize.min,
@@ -725,7 +812,8 @@ class PaymentView extends GetView<PaymentController> {
                         SizedBox(width: 8),
                         Text(
                           'Bayar Sekarang',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                       ],
                     ),

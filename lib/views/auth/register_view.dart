@@ -63,7 +63,8 @@ class _RegisterViewState extends State<RegisterView> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back_ios_new,
+              color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         elevation: 0,

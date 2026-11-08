@@ -115,7 +115,8 @@ class AppTheme {
           borderSide: const BorderSide(color: AppColors.error, width: 2),
         ),
         errorStyle: const TextStyle(color: AppColors.error, fontSize: 12),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.card,
@@ -141,19 +142,29 @@ class AppTheme {
         thickness: 1,
       ),
       textTheme: const TextTheme(
-        displayLarge: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900),
-        displayMedium: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
-        displaySmall: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-        headlineLarge: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-        headlineMedium: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-        headlineSmall: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
-        titleLarge: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-        titleMedium: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
-        titleSmall: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+        displayLarge: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w900),
+        displayMedium: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w800),
+        displaySmall: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w700),
+        headlineLarge: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w700),
+        headlineMedium: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w700),
+        headlineSmall: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+        titleLarge: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w700),
+        titleMedium: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+        titleSmall: TextStyle(
+            color: AppColors.textSecondary, fontWeight: FontWeight.w500),
         bodyLarge: TextStyle(color: AppColors.textPrimary),
         bodyMedium: TextStyle(color: AppColors.textSecondary),
         bodySmall: TextStyle(color: AppColors.textSecondary),
-        labelLarge: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+        labelLarge: TextStyle(
+            color: AppColors.textPrimary, fontWeight: FontWeight.w600),
         labelMedium: TextStyle(color: AppColors.textSecondary),
         labelSmall: TextStyle(color: AppColors.textDisabled),
       ),

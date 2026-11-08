@@ -43,7 +43,9 @@ class ProfileTab extends StatelessWidget {
             // Kartu Profil User
             Obx(() {
               final user = authCtrl.currentUser.value;
-              final name = user?.fullName.isNotEmpty == true ? user!.fullName : 'Pengguna Cinemate';
+              final name = user?.fullName.isNotEmpty == true
+                  ? user!.fullName
+                  : 'Pengguna Cinemate';
               final email = user?.email ?? '-';
 
               return Container(
@@ -91,14 +93,18 @@ class ProfileTab extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
                               color: AppColors.surface,
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Text(
                               'Member Cinemate',
-                              style: TextStyle(color: AppColors.gold, fontSize: 11, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                  color: AppColors.gold,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
@@ -164,7 +170,8 @@ class ProfileTab extends StatelessWidget {
                 foregroundColor: AppColors.primary,
                 side: const BorderSide(color: AppColors.primary, width: 1.5),
                 minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
 
@@ -210,7 +217,10 @@ class ProfileTab extends StatelessWidget {
       leading: Icon(icon, color: AppColors.gold, size: 22),
       title: Text(
         title,
-        style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w600),
+        style: const TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 14,
+            fontWeight: FontWeight.w600),
       ),
       trailing: Text(
         subtitle,

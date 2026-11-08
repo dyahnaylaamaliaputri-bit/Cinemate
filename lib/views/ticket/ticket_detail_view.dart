@@ -19,7 +19,8 @@ class TicketDetailView extends GetView<TicketDetailController> {
         backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+              color: Colors.white, size: 20),
           onPressed: () => Get.back(),
         ),
         title: const Column(
@@ -45,7 +46,8 @@ class TicketDetailView extends GetView<TicketDetailController> {
             final isTicketActive = controller.ticket.value.isTicketActive;
             if (!isTicketActive) return const SizedBox.shrink();
             return IconButton(
-              icon: const Icon(Icons.sensor_occupied_rounded, color: AppColors.gold),
+              icon: const Icon(Icons.sensor_occupied_rounded,
+                  color: AppColors.gold),
               tooltip: 'Simulasi Check-in Studio (PB-025)',
               onPressed: () => _showCheckInDialog(context),
             );
@@ -73,16 +75,19 @@ class TicketDetailView extends GetView<TicketDetailController> {
               // Badge Mode Offline Ready (PB-024)
               Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.success.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.success.withValues(alpha: 0.4)),
+                  border: Border.all(
+                      color: AppColors.success.withValues(alpha: 0.4)),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.offline_pin_rounded, color: AppColors.success, size: 16),
+                    Icon(Icons.offline_pin_rounded,
+                        color: AppColors.success, size: 16),
                     SizedBox(width: 8),
                     Flexible(
                       child: Text(
@@ -115,12 +120,15 @@ class TicketDetailView extends GetView<TicketDetailController> {
                           foregroundColor: Colors.white,
                           side: const BorderSide(color: AppColors.border),
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
                         onPressed: () {
-                          Get.until((route) => route.settings.name == Routes.dashboard);
+                          Get.until((route) =>
+                              route.settings.name == Routes.dashboard);
                         },
-                        child: const Text('Ke Beranda', style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: const Text('Ke Beranda',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -130,11 +138,15 @@ class TicketDetailView extends GetView<TicketDetailController> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                               ),
                               icon: const Icon(Icons.refresh_rounded, size: 18),
-                              label: const Text('Pesan Lagi', style: TextStyle(fontWeight: FontWeight.bold)),
+                              label: const Text('Pesan Lagi',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                               onPressed: () {
                                 Get.toNamed(Routes.bookByCinema);
                               },
@@ -143,11 +155,16 @@ class TicketDetailView extends GetView<TicketDetailController> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                               ),
-                              icon: const Icon(Icons.download_rounded, size: 18),
-                              label: const Text('Unduh PDF', style: TextStyle(fontWeight: FontWeight.bold)),
+                              icon:
+                                  const Icon(Icons.download_rounded, size: 18),
+                              label: const Text('Unduh PDF',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                               onPressed: () {
                                 Get.snackbar(
                                   'Unduh Berhasil',
@@ -155,7 +172,8 @@ class TicketDetailView extends GetView<TicketDetailController> {
                                   snackPosition: SnackPosition.BOTTOM,
                                   backgroundColor: AppColors.card,
                                   colorText: Colors.white,
-                                  icon: const Icon(Icons.check_circle_rounded, color: AppColors.success),
+                                  icon: const Icon(Icons.check_circle_rounded,
+                                      color: AppColors.success),
                                 );
                               },
                             ),
@@ -181,7 +199,11 @@ class TicketDetailView extends GetView<TicketDetailController> {
           children: [
             Icon(Icons.qr_code_scanner_rounded, color: AppColors.gold),
             SizedBox(width: 10),
-            Text('Simulasi Check-in', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            Text('Simulasi Check-in',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold)),
           ],
         ),
         content: Text(
@@ -197,7 +219,8 @@ class TicketDetailView extends GetView<TicketDetailController> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
             onPressed: () {
               Get.back();
@@ -242,7 +265,8 @@ class TicketDetailView extends GetView<TicketDetailController> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.movie_rounded, color: AppColors.primaryLight, size: 18),
+                      const Icon(Icons.movie_rounded,
+                          color: AppColors.primaryLight, size: 18),
                       const SizedBox(width: 8),
                       Text(
                         ticket.cinemaName,
@@ -255,11 +279,13 @@ class TicketDetailView extends GetView<TicketDetailController> {
                     ],
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: AppColors.primaryDark.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.5)),
+                      border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.5)),
                     ),
                     child: Text(
                       ticket.experience,
@@ -297,7 +323,8 @@ class TicketDetailView extends GetView<TicketDetailController> {
                                 size: 32,
                               ),
                             )
-                          : const Icon(Icons.movie_creation_rounded, color: AppColors.textDisabled),
+                          : const Icon(Icons.movie_creation_rounded,
+                              color: AppColors.textDisabled),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -318,16 +345,19 @@ class TicketDetailView extends GetView<TicketDetailController> {
                         const SizedBox(height: 6),
                         Text(
                           ticket.cinemaAddress,
-                          style: const TextStyle(color: AppColors.textDisabled, fontSize: 11),
+                          style: const TextStyle(
+                              color: AppColors.textDisabled, fontSize: 11),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 8),
                         Row(
                           children: [
-                            _buildInfoChip(Icons.meeting_room_rounded, ticket.hallName),
+                            _buildInfoChip(
+                                Icons.meeting_room_rounded, ticket.hallName),
                             const SizedBox(width: 8),
-                            _buildInfoChip(Icons.event_seat_rounded, 'Kursi: ${ticket.seatsLabel}'),
+                            _buildInfoChip(Icons.event_seat_rounded,
+                                'Kursi: ${ticket.seatsLabel}'),
                           ],
                         ),
                       ],
@@ -351,33 +381,54 @@ class TicketDetailView extends GetView<TicketDetailController> {
                 children: [
                   Column(
                     children: [
-                      const Text('TANGGAL', style: TextStyle(color: AppColors.textDisabled, fontSize: 10, letterSpacing: 1)),
+                      const Text('TANGGAL',
+                          style: TextStyle(
+                              color: AppColors.textDisabled,
+                              fontSize: 10,
+                              letterSpacing: 1)),
                       const SizedBox(height: 4),
                       Text(
                         ticket.showDate,
-                        style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                   Container(width: 1, height: 26, color: AppColors.divider),
                   Column(
                     children: [
-                      const Text('JAM TAYANG', style: TextStyle(color: AppColors.textDisabled, fontSize: 10, letterSpacing: 1)),
+                      const Text('JAM TAYANG',
+                          style: TextStyle(
+                              color: AppColors.textDisabled,
+                              fontSize: 10,
+                              letterSpacing: 1)),
                       const SizedBox(height: 4),
                       Text(
                         '${ticket.showTime} WIB',
-                        style: const TextStyle(color: AppColors.gold, fontSize: 13, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            color: AppColors.gold,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                   Container(width: 1, height: 26, color: AppColors.divider),
                   Column(
                     children: [
-                      const Text('TOTAL TIKET', style: TextStyle(color: AppColors.textDisabled, fontSize: 10, letterSpacing: 1)),
+                      const Text('TOTAL TIKET',
+                          style: TextStyle(
+                              color: AppColors.textDisabled,
+                              fontSize: 10,
+                              letterSpacing: 1)),
                       const SizedBox(height: 4),
                       Text(
                         '${ticket.seatCount} Kursi',
-                        style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -432,20 +483,26 @@ class TicketDetailView extends GetView<TicketDetailController> {
                       ),
                       if (isHistory)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2E2E3E).withValues(alpha: 0.95),
+                            color:
+                                const Color(0xFF2E2E3E).withValues(alpha: 0.95),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: AppColors.border),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 16),
+                              const Icon(Icons.check_circle_rounded,
+                                  color: AppColors.success, size: 16),
                               const SizedBox(width: 6),
                               Text(
                                 ticket.historyStatusLabel.toUpperCase(),
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12),
                               ),
                             ],
                           ),
@@ -480,7 +537,8 @@ class TicketDetailView extends GetView<TicketDetailController> {
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        icon: const Icon(Icons.copy_rounded, color: AppColors.primaryLight, size: 18),
+                        icon: const Icon(Icons.copy_rounded,
+                            color: AppColors.primaryLight, size: 18),
                         onPressed: controller.copyBookingCode,
                         tooltip: 'Salin Kode Booking',
                       ),
@@ -492,7 +550,8 @@ class TicketDetailView extends GetView<TicketDetailController> {
                     isHistory
                         ? 'Tiket ini telah digunakan untuk menonton atau masa berlakunya telah berakhir.'
                         : 'Pindai kode QR ini pada gerbang masuk bioskop untuk cetak tiket fisik atau langsung masuk studio.',
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                    style: const TextStyle(
+                        color: AppColors.textSecondary, fontSize: 11),
                     textAlign: TextAlign.center,
                   ),
 
@@ -504,10 +563,15 @@ class TicketDetailView extends GetView<TicketDetailController> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Total Pembayaran', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                      const Text('Total Pembayaran',
+                          style: TextStyle(
+                              color: AppColors.textSecondary, fontSize: 12)),
                       Text(
                         ticket.formattedPrice,
-                        style: const TextStyle(color: AppColors.gold, fontSize: 15, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            color: AppColors.gold,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -515,18 +579,31 @@ class TicketDetailView extends GetView<TicketDetailController> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Status Tiket', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                      const Text('Status Tiket',
+                          style: TextStyle(
+                              color: AppColors.textSecondary, fontSize: 12)),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: (isHistory ? AppColors.textDisabled : AppColors.success).withValues(alpha: 0.15),
+                          color: (isHistory
+                                  ? AppColors.textDisabled
+                                  : AppColors.success)
+                              .withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: isHistory ? AppColors.textDisabled : AppColors.success),
+                          border: Border.all(
+                              color: isHistory
+                                  ? AppColors.textDisabled
+                                  : AppColors.success),
                         ),
                         child: Text(
-                          isHistory ? ticket.historyStatusLabel.toUpperCase() : ticket.status.toUpperCase(),
+                          isHistory
+                              ? ticket.historyStatusLabel.toUpperCase()
+                              : ticket.status.toUpperCase(),
                           style: TextStyle(
-                            color: isHistory ? AppColors.textDisabled : AppColors.success,
+                            color: isHistory
+                                ? AppColors.textDisabled
+                                : AppColors.success,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -556,7 +633,11 @@ class TicketDetailView extends GetView<TicketDetailController> {
         children: [
           Icon(icon, color: AppColors.gold, size: 12),
           const SizedBox(width: 4),
-          Text(text, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+          Text(text,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold)),
         ],
       ),
     );

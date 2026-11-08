@@ -39,7 +39,9 @@ void main() {
       expect(cinema.imageUrl, 'https://example.com/cinema.jpg');
     });
 
-    test('calculateDistanceFrom should compute accurate distance in km using Haversine formula', () {
+    test(
+        'calculateDistanceFrom should compute accurate distance in km using Haversine formula',
+        () {
       final cinema = CinemaModel(
         id: '1',
         name: 'Metro Cinema Senayan',
@@ -59,7 +61,9 @@ void main() {
       expect(cinemaWithDist.formattedDistance, contains('km'));
     });
 
-    test('getNearestCinemas should sort by distance ascending and return top 3 cinemas', () {
+    test(
+        'getNearestCinemas should sort by distance ascending and return top 3 cinemas',
+        () {
       final service = CinemaService();
 
       final cinemas = [
@@ -114,15 +118,19 @@ void main() {
       expect(nearest[0].distanceKm, lessThan(0.01));
 
       // Jarak bioskop berikutnya harus lebih jauh atau sama
-      expect(nearest[1].distanceKm!, greaterThanOrEqualTo(nearest[0].distanceKm!));
-      expect(nearest[2].distanceKm!, greaterThanOrEqualTo(nearest[1].distanceKm!));
+      expect(
+          nearest[1].distanceKm!, greaterThanOrEqualTo(nearest[0].distanceKm!));
+      expect(
+          nearest[2].distanceKm!, greaterThanOrEqualTo(nearest[1].distanceKm!));
 
       // Depok dan Kelapa Gading tidak boleh masuk top 3 karena lebih jauh
       final names = nearest.map((c) => c.name).toList();
       expect(names.contains('Bintang Cinema Depok'), isFalse);
     });
 
-    test('getNearestCinemas when in Depok should prioritize Bintang Cinema Depok as #1', () {
+    test(
+        'getNearestCinemas when in Depok should prioritize Bintang Cinema Depok as #1',
+        () {
       final service = CinemaService();
 
       final cinemas = [

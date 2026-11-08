@@ -83,15 +83,12 @@ class CinemaService {
 
     // 2. Fetch online dari Supabase database
     try {
-      final response = await _supabase.client
-          .from('cinemas')
-          .select()
-          .order('name');
+      final response =
+          await _supabase.client.from('cinemas').select().order('name');
 
       if (response.isNotEmpty) {
-        final jsonList = response
-            .map((e) => Map<String, dynamic>.from(e))
-            .toList();
+        final jsonList =
+            response.map((e) => Map<String, dynamic>.from(e)).toList();
 
         // Simpan ke Hive cache
         await _storage.cacheCinemas(jsonList);
@@ -115,7 +112,8 @@ class CinemaService {
     }
 
     // 4. Fallback terakhir: seed data lokal
-    final fallbackList = seedCinemas.map((e) => CinemaModel.fromJson(e)).toList();
+    final fallbackList =
+        seedCinemas.map((e) => CinemaModel.fromJson(e)).toList();
     return (cinemas: fallbackList, fromCache: true);
   }
 

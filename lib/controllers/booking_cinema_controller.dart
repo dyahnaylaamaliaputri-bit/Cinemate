@@ -84,7 +84,8 @@ class BookByCinemaController extends GetxController {
     if (selectedCinema.value == null) return;
     try {
       isLoading.value = true;
-      final list = await _showtimeService.getPlayingMoviesForCinema(selectedCinema.value!.id);
+      final list = await _showtimeService
+          .getPlayingMoviesForCinema(selectedCinema.value!.id);
       moviesAtCinema.assignAll(list);
 
       // Pilih initial movie jika ada, atau default ke film pertama

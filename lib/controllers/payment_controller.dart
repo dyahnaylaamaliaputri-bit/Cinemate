@@ -128,12 +128,17 @@ class PaymentController extends GetxController {
         canPop: false,
         child: AlertDialog(
           backgroundColor: const Color(0xFF1A1A2E),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Row(
             children: [
               Icon(Icons.timer_off_rounded, color: Color(0xFFE53935)),
               SizedBox(width: 10),
-              Text('Waktu Habis', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Waktu Habis',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold)),
             ],
           ),
           content: const Text(
@@ -144,12 +149,14 @@ class PaymentController extends GetxController {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFE50914),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
               ),
               onPressed: () {
                 Get.until((route) => route.settings.name == Routes.dashboard);
               },
-              child: const Text('Kembali ke Dashboard', style: TextStyle(color: Colors.white)),
+              child: const Text('Kembali ke Dashboard',
+                  style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -195,7 +202,8 @@ class PaymentController extends GetxController {
     // Simulasi jeda pemrosesan jaringan perbankan / gateway (1.5 detik)
     await Future.delayed(const Duration(milliseconds: 1500));
 
-    final ref = 'PAY-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
+    final ref =
+        'PAY-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
     final updated = order.value.copyWith(
       status: 'paid',
       paymentMethod: selectedMethod.value.name,
@@ -207,7 +215,8 @@ class PaymentController extends GetxController {
 
     // Simpan ke Supabase & Hive via TicketService (PB-022, PB-023)
     final userId = await StorageService().getUserId() ?? 'usr-local';
-    final ticket = await TicketService().createBooking(order: updated, userId: userId);
+    final ticket =
+        await TicketService().createBooking(order: updated, userId: userId);
     createdTicket.value = ticket;
 
     // Sinkronkan ke TicketsController jika terdaftar
@@ -246,7 +255,8 @@ class PaymentController extends GetxController {
                 border: Border.all(color: const Color(0xFF4CAF50), width: 2),
               ),
               child: const Center(
-                child: Icon(Icons.check_rounded, color: Color(0xFF4CAF50), size: 40),
+                child: Icon(Icons.check_rounded,
+                    color: Color(0xFF4CAF50), size: 40),
               ),
             ),
             const SizedBox(height: 16),
@@ -276,17 +286,22 @@ class PaymentController extends GetxController {
               ),
               child: Column(
                 children: [
-                  _buildReceiptRow('No. Referensi', order.value.paymentReference ?? '-'),
+                  _buildReceiptRow(
+                      'No. Referensi', order.value.paymentReference ?? '-'),
                   const SizedBox(height: 8),
                   _buildReceiptRow('Film', order.value.movie.title),
                   const SizedBox(height: 8),
                   _buildReceiptRow('Bioskop', order.value.cinema.name),
                   const SizedBox(height: 8),
-                  _buildReceiptRow('Kursi (${order.value.seatCount})', order.value.seatsLabel),
+                  _buildReceiptRow('Kursi (${order.value.seatCount})',
+                      order.value.seatsLabel),
                   const SizedBox(height: 8),
-                  _buildReceiptRow('Metode Bayar', order.value.paymentMethod ?? '-'),
+                  _buildReceiptRow(
+                      'Metode Bayar', order.value.paymentMethod ?? '-'),
                   const Divider(color: Color(0xFF2A2A3E), height: 16),
-                  _buildReceiptRow('Total Dibayar', order.value.formattedTotalAmount, isTotal: true),
+                  _buildReceiptRow(
+                      'Total Dibayar', order.value.formattedTotalAmount,
+                      isTotal: true),
                 ],
               ),
             ),
@@ -301,12 +316,15 @@ class PaymentController extends GetxController {
                       foregroundColor: Colors.white,
                       side: const BorderSide(color: Color(0xFF2E2E4E)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () {
-                      Get.until((route) => route.settings.name == Routes.dashboard);
+                      Get.until(
+                          (route) => route.settings.name == Routes.dashboard);
                     },
-                    child: const Text('Ke Beranda', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: const Text('Ke Beranda',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -317,18 +335,21 @@ class PaymentController extends GetxController {
                       backgroundColor: const Color(0xFFE50914),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                       elevation: 4,
                     ),
                     icon: const Icon(Icons.qr_code_2_rounded, size: 20),
                     label: const Text(
                       'Lihat E-Ticket (PB-022)',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                     ),
                     onPressed: () {
                       Get.back(); // tutup modal
                       if (createdTicket.value != null) {
-                        Get.toNamed(Routes.ticketDetail, arguments: createdTicket.value);
+                        Get.toNamed(Routes.ticketDetail,
+                            arguments: createdTicket.value);
                       } else {
                         Get.toNamed(Routes.ticketDetail);
                       }
@@ -350,7 +371,8 @@ class PaymentController extends GetxController {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFFB0B0B0), fontSize: 12)),
+        Text(label,
+            style: const TextStyle(color: Color(0xFFB0B0B0), fontSize: 12)),
         Text(
           value,
           style: TextStyle(

@@ -167,10 +167,28 @@ class TicketModel {
         final day = int.parse(parts[2]);
         final dt = DateTime(year, month, day);
 
-        const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+        const days = [
+          'Senin',
+          'Selasa',
+          'Rabu',
+          'Kamis',
+          'Jumat',
+          'Sabtu',
+          'Minggu'
+        ];
         const months = [
-          'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-          'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+          'Januari',
+          'Februari',
+          'Maret',
+          'April',
+          'Mei',
+          'Juni',
+          'Juli',
+          'Agustus',
+          'September',
+          'Oktober',
+          'November',
+          'Desember'
         ];
         return '${days[dt.weekday - 1]}, $day ${months[month - 1]} $year';
       }
@@ -261,7 +279,9 @@ class TicketModel {
       bookingCode: json['booking_code']?.toString() ?? 'CNM-00000',
       userId: json['user_id']?.toString() ?? '',
       showtimeId: json['showtime_id']?.toString() ?? '',
-      movieId: json['movie_id'] is int ? json['movie_id'] as int : int.tryParse(json['movie_id']?.toString() ?? '0') ?? 0,
+      movieId: json['movie_id'] is int
+          ? json['movie_id'] as int
+          : int.tryParse(json['movie_id']?.toString() ?? '0') ?? 0,
       movieTitle: json['movie_title']?.toString() ?? 'Untitled Movie',
       posterPath: json['poster_path']?.toString(),
       backdropPath: json['backdrop_path']?.toString(),

@@ -85,7 +85,8 @@ class MovieModel {
       overview: json['overview'] as String? ?? '',
       posterPath: json['poster_path'] as String?,
       backdropPath: json['backdrop_path'] as String?,
-      releaseDate: json['release_date'] as String? ?? json['first_air_date'] as String?,
+      releaseDate:
+          json['release_date'] as String? ?? json['first_air_date'] as String?,
       voteAverage: (json['vote_average'] as num?)?.toDouble() ?? 0.0,
       voteCount: json['vote_count'] as int? ?? 0,
       genreIds: (json['genre_ids'] as List<dynamic>?)

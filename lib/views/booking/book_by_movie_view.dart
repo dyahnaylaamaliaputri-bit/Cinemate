@@ -48,7 +48,8 @@ class _BookByMovieViewState extends State<BookByMovieView> {
         backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+              color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
@@ -86,12 +87,15 @@ class _BookByMovieViewState extends State<BookByMovieView> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.movie_outlined, size: 64, color: AppColors.textDisabled),
+                const Icon(Icons.movie_outlined,
+                    size: 64, color: AppColors.textDisabled),
                 const SizedBox(height: 16),
-                const Text('Belum ada film yang dipilih', style: TextStyle(color: AppColors.textSecondary)),
+                const Text('Belum ada film yang dipilih',
+                    style: TextStyle(color: AppColors.textSecondary)),
                 const SizedBox(height: 12),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary),
                   onPressed: () => _showMoviePicker(context),
                   child: const Text('Pilih Film Sekarang'),
                 ),
@@ -225,7 +229,8 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                         width: 72,
                         height: 102,
                         color: AppColors.surface,
-                        child: const Icon(Icons.movie, color: AppColors.textDisabled),
+                        child: const Icon(Icons.movie,
+                            color: AppColors.textDisabled),
                       ),
                     ),
                   ),
@@ -247,7 +252,8 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            const Icon(Icons.star_rounded, color: AppColors.gold, size: 16),
+                            const Icon(Icons.star_rounded,
+                                color: AppColors.gold, size: 16),
                             const SizedBox(width: 3),
                             Text(
                               movie.formattedRating,
@@ -260,14 +266,16 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                             const SizedBox(width: 10),
                             Text(
                               '${movie.releaseYear} • ${movie.formattedDuration}',
-                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                              style: const TextStyle(
+                                  color: AppColors.textSecondary, fontSize: 12),
                             ),
                           ],
                         ),
                         const SizedBox(height: 4),
                         Text(
                           movie.genreString,
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          style: const TextStyle(
+                              color: AppColors.textSecondary, fontSize: 12),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -279,11 +287,13 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                             borderRadius: BorderRadius.circular(6),
                             onTap: () => _showMoviePicker(context),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4, vertical: 2),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: const [
-                                  Icon(Icons.swap_horiz_rounded, size: 16, color: AppColors.primaryLight),
+                                  Icon(Icons.swap_horiz_rounded,
+                                      size: 16, color: AppColors.primaryLight),
                                   SizedBox(width: 4),
                                   Text(
                                     'Ganti Film',
@@ -341,9 +351,10 @@ class _BookByMovieViewState extends State<BookByMovieView> {
             itemBuilder: (context, index) {
               final date = controller.availableDates[index];
               return Obx(() {
-                final isSelected = controller.selectedDate.value.year == date.year &&
-                    controller.selectedDate.value.month == date.month &&
-                    controller.selectedDate.value.day == date.day;
+                final isSelected =
+                    controller.selectedDate.value.year == date.year &&
+                        controller.selectedDate.value.month == date.month &&
+                        controller.selectedDate.value.day == date.day;
 
                 final dayLabel = _formatDayLabel(date, index);
                 final dayNumber = date.day.toString();
@@ -359,13 +370,16 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                       color: isSelected ? AppColors.primary : AppColors.card,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                        color: isSelected ? AppColors.primaryLight : AppColors.border,
+                        color: isSelected
+                            ? AppColors.primaryLight
+                            : AppColors.border,
                         width: isSelected ? 1.5 : 1.0,
                       ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: AppColors.primary.withValues(alpha: 0.35),
+                                color:
+                                    AppColors.primary.withValues(alpha: 0.35),
                                 blurRadius: 8,
                                 offset: const Offset(0, 3),
                               ),
@@ -378,7 +392,9 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                         Text(
                           dayLabel,
                           style: TextStyle(
-                            color: isSelected ? Colors.white : AppColors.textSecondary,
+                            color: isSelected
+                                ? Colors.white
+                                : AppColors.textSecondary,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -387,7 +403,9 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                         Text(
                           dayNumber,
                           style: TextStyle(
-                            color: isSelected ? Colors.white : AppColors.textPrimary,
+                            color: isSelected
+                                ? Colors.white
+                                : AppColors.textPrimary,
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
                           ),
@@ -395,7 +413,9 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                         Text(
                           monthName,
                           style: TextStyle(
-                            color: isSelected ? Colors.white.withValues(alpha: 0.9) : AppColors.textDisabled,
+                            color: isSelected
+                                ? Colors.white.withValues(alpha: 0.9)
+                                : AppColors.textDisabled,
                             fontSize: 10,
                           ),
                         ),
@@ -439,7 +459,8 @@ class _BookByMovieViewState extends State<BookByMovieView> {
           final cinema = cinemas[index];
           return Obx(() {
             final isExpanded = controller.expandedCinemaId.value == cinema.id;
-            final isCinemaSelected = controller.selectedCinema.value?.id == cinema.id;
+            final isCinemaSelected =
+                controller.selectedCinema.value?.id == cinema.id;
             final showtimes = controller.cinemaShowtimes[cinema.id] ?? [];
 
             return AnimatedContainer(
@@ -503,12 +524,15 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                                     ),
                                     if (cinema.distanceKm != null)
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 2),
                                         decoration: BoxDecoration(
                                           color: AppColors.surface,
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           border: Border.all(
-                                            color: AppColors.primaryLight.withValues(alpha: 0.3),
+                                            color: AppColors.primaryLight
+                                                .withValues(alpha: 0.3),
                                           ),
                                         ),
                                         child: Text(
@@ -525,7 +549,9 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                                 const SizedBox(height: 3),
                                 Text(
                                   cinema.address,
-                                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                                  style: const TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 12),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -534,7 +560,9 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                           ),
                           const SizedBox(width: 8),
                           Icon(
-                            isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                            isExpanded
+                                ? Icons.keyboard_arrow_up_rounded
+                                : Icons.keyboard_arrow_down_rounded,
                             color: AppColors.textSecondary,
                           ),
                         ],
@@ -559,11 +587,13 @@ class _BookByMovieViewState extends State<BookByMovieView> {
     });
   }
 
-  Widget _buildCinemaShowtimesBody(CinemaModel cinema, List<ShowtimeModel> showtimes) {
+  Widget _buildCinemaShowtimesBody(
+      CinemaModel cinema, List<ShowtimeModel> showtimes) {
     if (controller.isLoadingShowtimes.value) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 16),
-        child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        child:
+            Center(child: CircularProgressIndicator(color: AppColors.primary)),
       );
     }
 
@@ -571,7 +601,8 @@ class _BookByMovieViewState extends State<BookByMovieView> {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(12),
-          child: Text('Tidak ada jadwal pada tanggal ini.', style: TextStyle(color: AppColors.textSecondary)),
+          child: Text('Tidak ada jadwal pada tanggal ini.',
+              style: TextStyle(color: AppColors.textSecondary)),
         ),
       );
     }
@@ -605,7 +636,8 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                 children: [
                   Row(
                     children: [
-                      Icon(_getExperienceIcon(expName), size: 16, color: AppColors.primaryLight),
+                      Icon(_getExperienceIcon(expName),
+                          size: 16, color: AppColors.primaryLight),
                       const SizedBox(width: 6),
                       Text(
                         expName,
@@ -633,24 +665,30 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                 runSpacing: 8,
                 children: list.map((st) {
                   return Obx(() {
-                    final isSelected = controller.selectedShowtime.value?.id == st.id;
+                    final isSelected =
+                        controller.selectedShowtime.value?.id == st.id;
                     return InkWell(
                       borderRadius: BorderRadius.circular(8),
                       onTap: () => controller.selectShowtime(cinema, st),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 7),
                         decoration: BoxDecoration(
-                          color: isSelected ? AppColors.primary : AppColors.card,
+                          color:
+                              isSelected ? AppColors.primary : AppColors.card,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: isSelected ? AppColors.primaryLight : AppColors.border,
+                            color: isSelected
+                                ? AppColors.primaryLight
+                                : AppColors.border,
                             width: isSelected ? 1.4 : 1.0,
                           ),
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: AppColors.primary.withValues(alpha: 0.3),
+                                    color: AppColors.primary
+                                        .withValues(alpha: 0.3),
                                     blurRadius: 6,
                                     offset: const Offset(0, 2),
                                   ),
@@ -663,7 +701,9 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                             Text(
                               st.showTime,
                               style: TextStyle(
-                                color: isSelected ? Colors.white : AppColors.textPrimary,
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppColors.textPrimary,
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -672,7 +712,9 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                             Text(
                               '${st.availableSeats} kursi',
                               style: TextStyle(
-                                color: isSelected ? Colors.white.withValues(alpha: 0.8) : AppColors.textDisabled,
+                                color: isSelected
+                                    ? Colors.white.withValues(alpha: 0.8)
+                                    : AppColors.textDisabled,
                                 fontSize: 9,
                               ),
                             ),
@@ -722,7 +764,9 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                   Text(
                     cinema != null ? cinema.name : 'Pilih Bioskop & Jam Tayang',
                     style: TextStyle(
-                      color: cinema != null ? AppColors.textPrimary : AppColors.textDisabled,
+                      color: cinema != null
+                          ? AppColors.textPrimary
+                          : AppColors.textDisabled,
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
@@ -731,9 +775,12 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    st != null ? '${st.experience} • ${st.showTime} WIB (${st.formattedPrice})' : 'Silakan pilih jadwal tayang',
+                    st != null
+                        ? '${st.experience} • ${st.showTime} WIB (${st.formattedPrice})'
+                        : 'Silakan pilih jadwal tayang',
                     style: TextStyle(
-                      color: st != null ? AppColors.gold : AppColors.textDisabled,
+                      color:
+                          st != null ? AppColors.gold : AppColors.textDisabled,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
@@ -746,9 +793,12 @@ class _BookByMovieViewState extends State<BookByMovieView> {
             const SizedBox(width: 12),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: canProceed ? AppColors.primary : AppColors.card,
-                foregroundColor: canProceed ? Colors.white : AppColors.textDisabled,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                backgroundColor:
+                    canProceed ? AppColors.primary : AppColors.card,
+                foregroundColor:
+                    canProceed ? Colors.white : AppColors.textDisabled,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -813,12 +863,14 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                 const SizedBox(height: 4),
                 const Text(
                   'Pilih film Now Playing untuk melihat bioskop yang menayangkannya.',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                  style:
+                      TextStyle(color: AppColors.textSecondary, fontSize: 12),
                 ),
                 const SizedBox(height: 14),
                 ...controller.allMovies.map((m) {
                   return Obx(() {
-                    final isSelected = controller.selectedMovie.value?.id == m.id;
+                    final isSelected =
+                        controller.selectedMovie.value?.id == m.id;
                     return ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: ClipRRect(
@@ -839,18 +891,23 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                       title: Text(
                         m.title,
                         style: TextStyle(
-                          color: isSelected ? AppColors.primaryLight : AppColors.textPrimary,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                          color: isSelected
+                              ? AppColors.primaryLight
+                              : AppColors.textPrimary,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.w500,
                         ),
                       ),
                       subtitle: Text(
                         '★ ${m.formattedRating} • ${m.genreString}',
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                        style: const TextStyle(
+                            color: AppColors.textSecondary, fontSize: 11),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       trailing: isSelected
-                          ? const Icon(Icons.check_circle_rounded, color: AppColors.primary)
+                          ? const Icon(Icons.check_circle_rounded,
+                              color: AppColors.primary)
                           : null,
                       onTap: () {
                         controller.changeMovie(m);
@@ -867,7 +924,8 @@ class _BookByMovieViewState extends State<BookByMovieView> {
     );
   }
 
-  void _showBookingSummaryConfirmation(BuildContext context, CinemaModel cinema, ShowtimeModel st) {
+  void _showBookingSummaryConfirmation(
+      BuildContext context, CinemaModel cinema, ShowtimeModel st) {
     final movie = controller.selectedMovie.value!;
     showModalBottomSheet(
       context: context,
@@ -906,7 +964,8 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                         width: 50,
                         height: 70,
                         color: AppColors.card,
-                        child: const Icon(Icons.movie, color: AppColors.textDisabled),
+                        child: const Icon(Icons.movie,
+                            color: AppColors.textDisabled),
                       ),
                     ),
                   ),
@@ -928,12 +987,14 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                         const SizedBox(height: 3),
                         Text(
                           cinema.name,
-                          style: const TextStyle(color: AppColors.primaryLight, fontSize: 13),
+                          style: const TextStyle(
+                              color: AppColors.primaryLight, fontSize: 13),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           '${st.hallName} (${st.experience})',
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          style: const TextStyle(
+                              color: AppColors.textSecondary, fontSize: 12),
                         ),
                       ],
                     ),
@@ -958,10 +1019,14 @@ class _BookByMovieViewState extends State<BookByMovieView> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  icon: const Icon(Icons.event_seat_rounded, color: Colors.white),
+                  icon:
+                      const Icon(Icons.event_seat_rounded, color: Colors.white),
                   label: const Text(
                     'Konfirmasi & Pilih Kursi (PB-020)',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14),
                   ),
                   onPressed: () {
                     Navigator.pop(ctx);
@@ -989,8 +1054,14 @@ class _BookByMovieViewState extends State<BookByMovieView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
-          Text(value, style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13)),
+          Text(label,
+              style: const TextStyle(
+                  color: AppColors.textSecondary, fontSize: 13)),
+          Text(value,
+              style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13)),
         ],
       ),
     );
@@ -1010,7 +1081,20 @@ class _BookByMovieViewState extends State<BookByMovieView> {
   }
 
   String _monthName(int month) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Agu',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des'
+    ];
     return months[month - 1];
   }
 }

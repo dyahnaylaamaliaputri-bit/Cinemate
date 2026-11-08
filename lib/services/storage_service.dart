@@ -106,12 +106,12 @@ class StorageService {
   set timezonePref(String v) => _prefs.write('timezone_pref', v);
 
   // Notification settings (PB-058)
-  bool get notifBooking  => _prefs.read<bool>('notif_booking')  ?? true;
+  bool get notifBooking => _prefs.read<bool>('notif_booking') ?? true;
   bool get notifReminder => _prefs.read<bool>('notif_reminder') ?? true;
-  bool get notifPromo    => _prefs.read<bool>('notif_promo')    ?? true;
-  set notifBooking(bool v)  => _prefs.write('notif_booking',  v);
+  bool get notifPromo => _prefs.read<bool>('notif_promo') ?? true;
+  set notifBooking(bool v) => _prefs.write('notif_booking', v);
   set notifReminder(bool v) => _prefs.write('notif_reminder', v);
-  set notifPromo(bool v)    => _prefs.write('notif_promo',    v);
+  set notifPromo(bool v) => _prefs.write('notif_promo', v);
 
   // ================================================================
   // HIVE — Cache data film dengan penanda waktu / TTL 6 jam (PB-013)
@@ -127,7 +127,8 @@ class StorageService {
   }
 
   /// Menyimpan list film ke Hive box 'movies_cache' dengan timestamp milidetik
-  Future<void> cacheMovies(String key, List<Map<String, dynamic>> moviesJson) async {
+  Future<void> cacheMovies(
+      String key, List<Map<String, dynamic>> moviesJson) async {
     final box = await _openBox(AppConstants.boxMovies);
     await box.put(key, {
       'timestamp': DateTime.now().millisecondsSinceEpoch,
@@ -137,7 +138,12 @@ class StorageService {
 
   /// Mengambil list film dari Hive cache jika ada.
   /// Menghitung apakah cache masih berada dalam batas TTL 6 jam.
-  Future<({List<Map<String, dynamic>>? data, bool isExpired, DateTime? timestamp})> getCachedMovies(String key) async {
+  Future<
+      ({
+        List<Map<String, dynamic>>? data,
+        bool isExpired,
+        DateTime? timestamp
+      })> getCachedMovies(String key) async {
     final box = await _openBox(AppConstants.boxMovies);
     final cached = box.get(key);
     if (cached == null || cached is! Map) {
@@ -152,9 +158,8 @@ class StorageService {
       return (data: null, isExpired: true, timestamp: cachedTime);
     }
 
-    final dataList = rawData
-        .map((e) => Map<String, dynamic>.from(e as Map))
-        .toList();
+    final dataList =
+        rawData.map((e) => Map<String, dynamic>.from(e as Map)).toList();
     final difference = DateTime.now().difference(cachedTime);
     final isExpired = difference.inHours >= movieCacheTtlHours;
 
@@ -189,9 +194,7 @@ class StorageService {
     final rawData = cached['data'];
     if (rawData is! List) return null;
 
-    return rawData
-        .map((e) => Map<String, dynamic>.from(e as Map))
-        .toList();
+    return rawData.map((e) => Map<String, dynamic>.from(e as Map)).toList();
   }
 
   /// Menghapus cache bioskop di Hive
@@ -217,7 +220,8 @@ class StorageService {
   Future<void> addTicketToCache(Map<String, dynamic> ticketJson) async {
     final current = await getCachedTickets() ?? [];
     // Cek apakah tiket sudah ada (update atau tambahkan di awal list)
-    final existingIndex = current.indexWhere((t) => t['id'] == ticketJson['id']);
+    final existingIndex =
+        current.indexWhere((t) => t['id'] == ticketJson['id']);
     if (existingIndex >= 0) {
       current[existingIndex] = ticketJson;
     } else {
@@ -233,7 +237,8 @@ class StorageService {
   }
 
   /// Mengambil tiket beserta metadata timestamp cache (PB-024)
-  Future<({List<Map<String, dynamic>>? data, DateTime? timestamp})> getCachedTicketsWithMeta() async {
+  Future<({List<Map<String, dynamic>>? data, DateTime? timestamp})>
+      getCachedTicketsWithMeta() async {
     final box = await _openBox(AppConstants.boxTickets);
     final cached = box.get('user_tickets');
     if (cached == null || cached is! Map) return (data: null, timestamp: null);
@@ -243,9 +248,8 @@ class StorageService {
     final rawData = cached['data'];
     if (rawData is! List) return (data: null, timestamp: cachedTime);
 
-    final list = rawData
-        .map((e) => Map<String, dynamic>.from(e as Map))
-        .toList();
+    final list =
+        rawData.map((e) => Map<String, dynamic>.from(e as Map)).toList();
     return (data: list, timestamp: cachedTime);
   }
 

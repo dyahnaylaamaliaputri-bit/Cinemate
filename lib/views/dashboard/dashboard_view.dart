@@ -121,7 +121,8 @@ class DashboardView extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(dialogContext); // Menutup dialog dengan Navigator.pop
+              Navigator.pop(
+                  dialogContext); // Menutup dialog dengan Navigator.pop
               await ctrl.logout();
               if (context.mounted) {
                 // Menggunakan Navigator.pushNamedAndRemoveUntil untuk membersihkan stack rute

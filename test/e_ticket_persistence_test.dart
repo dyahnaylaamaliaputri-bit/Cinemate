@@ -27,7 +27,8 @@ void main() {
   });
 
   group('TicketModel Tests (PB-022)', () {
-    test('TicketModel should parse json and compute formatted fields correctly', () {
+    test('TicketModel should parse json and compute formatted fields correctly',
+        () {
       final json = {
         'id': 'tkt-uuid-1',
         'booking_code': 'CNM-84920',
@@ -62,7 +63,8 @@ void main() {
       expect(ticket.isUsed, false);
       expect(ticket.isExpired, false);
       expect(ticket.formattedShowDate, contains('7 November 2026'));
-      expect(ticket.posterUrl, contains('https://image.tmdb.org/t/p/w500/poster.jpg'));
+      expect(ticket.posterUrl,
+          contains('https://image.tmdb.org/t/p/w500/poster.jpg'));
     });
 
     test('TicketModel serialization roundtrip', () {
@@ -98,7 +100,8 @@ void main() {
   });
 
   group('TicketService Booking & Hive Persistence Tests (PB-023)', () {
-    test('generateBookingCode should return format CNM-XXXXX with 5 digits', () {
+    test('generateBookingCode should return format CNM-XXXXX with 5 digits',
+        () {
       final code = TicketService.generateBookingCode();
       expect(code, startsWith('CNM-'));
       expect(code.length, 9); // 'CNM-' (4) + 5 digit = 9
@@ -108,11 +111,14 @@ void main() {
     });
 
     test('generateQrPayload should format qr payload string properly', () {
-      final payload = TicketService.generateQrPayload('CNM-99999', 'Dune 2', '2026-11-07', '19:00', ['A1', 'A2']);
+      final payload = TicketService.generateQrPayload(
+          'CNM-99999', 'Dune 2', '2026-11-07', '19:00', ['A1', 'A2']);
       expect(payload, 'CINEMATE:CNM-99999:2026-11-07:19:00:A1,A2');
     });
 
-    test('createBooking should persist ticket to Hive cache and be retrievable offline', () async {
+    test(
+        'createBooking should persist ticket to Hive cache and be retrievable offline',
+        () async {
       final service = TicketService();
 
       final movie = MovieModel(
@@ -138,7 +144,7 @@ void main() {
         cinemaId: 'cin-1',
         movieId: 533535,
         movieTitle: 'Deadpool & Wolverine',
-        showDate: '2026-11-07',
+        showDate: '2026-12-25',
         showTime: '14:00',
         hallName: 'Studio 1',
         experience: 'Regular 2D',
@@ -160,7 +166,8 @@ void main() {
         paymentMethod: 'QRIS',
       );
 
-      final created = await service.createBooking(order: order, userId: 'usr-unit-test');
+      final created =
+          await service.createBooking(order: order, userId: 'usr-unit-test');
 
       expect(created.bookingCode, startsWith('CNM-'));
       expect(created.movieTitle, 'Deadpool & Wolverine');

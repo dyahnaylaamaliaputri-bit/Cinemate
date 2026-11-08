@@ -33,7 +33,13 @@ class MovieService {
 
   /// Mengambil daftar film yang sedang tayang (Now Playing)
   /// Mengembalikan record: `(movies: list, fromCache: bool, isExpired: bool, timestamp: DateTime?)`
-  Future<({List<MovieModel> movies, bool fromCache, bool isExpired, DateTime? timestamp})> getNowPlaying({
+  Future<
+      ({
+        List<MovieModel> movies,
+        bool fromCache,
+        bool isExpired,
+        DateTime? timestamp
+      })> getNowPlaying({
     int page = 1,
     bool forceRefresh = false,
   }) async {
@@ -44,7 +50,12 @@ class MovieService {
       final cached = await _storage.getCachedMovies(cacheKey);
       if (cached.data != null && !cached.isExpired && cached.data!.isNotEmpty) {
         final list = cached.data!.map((e) => MovieModel.fromJson(e)).toList();
-        return (movies: list, fromCache: true, isExpired: false, timestamp: cached.timestamp);
+        return (
+          movies: list,
+          fromCache: true,
+          isExpired: false,
+          timestamp: cached.timestamp
+        );
       }
     }
 
@@ -69,11 +80,18 @@ class MovieService {
           final list = results.map((e) => MovieModel.fromJson(e)).toList();
 
           // Simpan ke Hive box 'movies_cache' dengan timestamp baru (TTL 6 jam)
-          await _storage.cacheMovies(cacheKey, list.map((m) => m.toJson()).toList());
-          return (movies: list, fromCache: false, isExpired: false, timestamp: DateTime.now());
+          await _storage.cacheMovies(
+              cacheKey, list.map((m) => m.toJson()).toList());
+          return (
+            movies: list,
+            fromCache: false,
+            isExpired: false,
+            timestamp: DateTime.now()
+          );
         }
       } catch (e) {
-        debugPrint('[MovieService] Error API Now Playing ($e), beralih ke cache Hive...');
+        debugPrint(
+            '[MovieService] Error API Now Playing ($e), beralih ke cache Hive...');
       }
     }
 
@@ -90,7 +108,8 @@ class MovieService {
     }
 
     // 4. Jika cache Hive pertama kali masih kosong, simpan mock data dan kembalikan
-    await _storage.cacheMovies(cacheKey, _mockNowPlaying.map((m) => m.toJson()).toList());
+    await _storage.cacheMovies(
+        cacheKey, _mockNowPlaying.map((m) => m.toJson()).toList());
     return (
       movies: _mockNowPlaying,
       fromCache: true,
@@ -104,7 +123,13 @@ class MovieService {
   // =========================================================================
 
   /// Mengambil daftar film yang akan segera tayang (Coming Soon / Upcoming)
-  Future<({List<MovieModel> movies, bool fromCache, bool isExpired, DateTime? timestamp})> getUpcoming({
+  Future<
+      ({
+        List<MovieModel> movies,
+        bool fromCache,
+        bool isExpired,
+        DateTime? timestamp
+      })> getUpcoming({
     int page = 1,
     bool forceRefresh = false,
   }) async {
@@ -115,7 +140,12 @@ class MovieService {
       final cached = await _storage.getCachedMovies(cacheKey);
       if (cached.data != null && !cached.isExpired && cached.data!.isNotEmpty) {
         final list = cached.data!.map((e) => MovieModel.fromJson(e)).toList();
-        return (movies: list, fromCache: true, isExpired: false, timestamp: cached.timestamp);
+        return (
+          movies: list,
+          fromCache: true,
+          isExpired: false,
+          timestamp: cached.timestamp
+        );
       }
     }
 
@@ -140,11 +170,18 @@ class MovieService {
           final list = results.map((e) => MovieModel.fromJson(e)).toList();
 
           // Simpan ke Hive box 'movies_cache' dengan timestamp baru (TTL 6 jam)
-          await _storage.cacheMovies(cacheKey, list.map((m) => m.toJson()).toList());
-          return (movies: list, fromCache: false, isExpired: false, timestamp: DateTime.now());
+          await _storage.cacheMovies(
+              cacheKey, list.map((m) => m.toJson()).toList());
+          return (
+            movies: list,
+            fromCache: false,
+            isExpired: false,
+            timestamp: DateTime.now()
+          );
         }
       } catch (e) {
-        debugPrint('[MovieService] Error API Upcoming ($e), beralih ke cache Hive...');
+        debugPrint(
+            '[MovieService] Error API Upcoming ($e), beralih ke cache Hive...');
       }
     }
 
@@ -161,7 +198,8 @@ class MovieService {
     }
 
     // 4. Simpan mock data ke cache dan kembalikan
-    await _storage.cacheMovies(cacheKey, _mockUpcoming.map((m) => m.toJson()).toList());
+    await _storage.cacheMovies(
+        cacheKey, _mockUpcoming.map((m) => m.toJson()).toList());
     return (
       movies: _mockUpcoming,
       fromCache: true,
@@ -194,7 +232,8 @@ class MovieService {
         ..sort((a, b) => b.popularity.compareTo(a.popularity));
       final topBanners = sorted.take(5).toList();
 
-      await _storage.cacheMovies(cacheKey, topBanners.map((m) => m.toJson()).toList());
+      await _storage.cacheMovies(
+          cacheKey, topBanners.map((m) => m.toJson()).toList());
       return (movies: topBanners, fromCache: nowPlayingRes.fromCache);
     }
 
@@ -211,7 +250,8 @@ class MovieService {
     const MovieModel(
       id: 693134,
       title: 'Dune: Part Two',
-      overview: 'Paul Atreides bersatu dengan Chani dan Fremen untuk membalas dendam terhadap para konspirator yang menghancurkan keluarganya.',
+      overview:
+          'Paul Atreides bersatu dengan Chani dan Fremen untuk membalas dendam terhadap para konspirator yang menghancurkan keluarganya.',
       posterPath: '/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg',
       backdropPath: '/xOMo8BRK7PfcJv9JCnx7s5200bm.jpg',
       releaseDate: '2024-03-01',
@@ -223,7 +263,8 @@ class MovieService {
     const MovieModel(
       id: 533535,
       title: 'Deadpool & Wolverine',
-      overview: 'Wade Wilson yang lesu kembali beraksi saat TVA merekrutnya untuk melindungi garis waktu bersama Wolverine yang enggan.',
+      overview:
+          'Wade Wilson yang lesu kembali beraksi saat TVA merekrutnya untuk melindungi garis waktu bersama Wolverine yang enggan.',
       posterPath: '/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg',
       backdropPath: '/yDHYTjA3R0jFYba16jBB1jv8v2C.jpg',
       releaseDate: '2024-07-26',
@@ -235,7 +276,8 @@ class MovieService {
     const MovieModel(
       id: 1022789,
       title: 'Inside Out 2',
-      overview: 'Riley kini beranjak remaja dan Ruang Kendali emosinya mengalami perombakan mendadak untuk menyambut emosi-emosi baru.',
+      overview:
+          'Riley kini beranjak remaja dan Ruang Kendali emosinya mengalami perombakan mendadak untuk menyambut emosi-emosi baru.',
       posterPath: '/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg',
       backdropPath: '/p5ozvmdgsmbWe0H8wf4NelljhBs.jpg',
       releaseDate: '2024-06-14',
@@ -247,7 +289,8 @@ class MovieService {
     const MovieModel(
       id: 519182,
       title: 'Despicable Me 4',
-      overview: 'Gru menghadapi musuh baru Maxime Le Mal dan pacarnya Valentina, memaksa seluruh keluarga Gru untuk melarikan diri.',
+      overview:
+          'Gru menghadapi musuh baru Maxime Le Mal dan pacarnya Valentina, memaksa seluruh keluarga Gru untuk melarikan diri.',
       posterPath: '/wWba3TaojhK7NdycRhoQpsG0FaH.jpg',
       backdropPath: '/lgkGYSyJsGtz6q7OpeaGTUhHbAc.jpg',
       releaseDate: '2024-07-03',
@@ -259,7 +302,8 @@ class MovieService {
     const MovieModel(
       id: 573435,
       title: 'Bad Boys: Ride or Die',
-      overview: 'Detektif Mike Lowrey dan Marcus Burnett kembali beraksi saat kapten mereka difitnah, membuat mereka menjadi buronan.',
+      overview:
+          'Detektif Mike Lowrey dan Marcus Burnett kembali beraksi saat kapten mereka difitnah, membuat mereka menjadi buronan.',
       posterPath: '/nP6RliHjxsz4irTKsxe8FRhKZYl.jpg',
       backdropPath: '/ga4OLm4qLxO1GyF4hk00V98G9QG.jpg',
       releaseDate: '2024-06-07',
@@ -274,7 +318,8 @@ class MovieService {
     const MovieModel(
       id: 558449,
       title: 'Gladiator II',
-      overview: 'Bertahun-tahun setelah menyaksikan kematian Maximus di tangan pamannya, Lucius harus memasuki Colosseum untuk memperjuangkan masa depan Roma.',
+      overview:
+          'Bertahun-tahun setelah menyaksikan kematian Maximus di tangan pamannya, Lucius harus memasuki Colosseum untuk memperjuangkan masa depan Roma.',
       posterPath: '/2cxhvwyEwRlysAmRH4iodkvo0z5.jpg',
       backdropPath: '/euYIwmwkmz95mnEx7vBM0MqzEDn.jpg',
       releaseDate: '2024-11-22',
@@ -286,7 +331,8 @@ class MovieService {
     const MovieModel(
       id: 402431,
       title: 'Wicked',
-      overview: 'Kisah Elphaba, wanita muda berkulit hijau yang disalahpahami, dan Glinda, wanita populer penuh keistimewaan di Negeri Oz.',
+      overview:
+          'Kisah Elphaba, wanita muda berkulit hijau yang disalahpahami, dan Glinda, wanita populer penuh keistimewaan di Negeri Oz.',
       posterPath: '/dfa6kK3yP1N99WfJ7eX85L5m89q.jpg',
       backdropPath: '/uKB22E5kyQE9wf4GEZe9oMcflvg.jpg',
       releaseDate: '2024-11-27',
@@ -298,7 +344,8 @@ class MovieService {
     const MovieModel(
       id: 1241982,
       title: 'Moana 2',
-      overview: 'Moana menerima panggilan mendadak dari leluhurnya untuk berlayar ke perairan jauh Oseania dalam petualangan berbahaya.',
+      overview:
+          'Moana menerima panggilan mendadak dari leluhurnya untuk berlayar ke perairan jauh Oseania dalam petualangan berbahaya.',
       posterPath: '/4YZpsylmjHbqeWzjKpUEF8gcLUV.jpg',
       backdropPath: '/tElnmtQ6yz1PjN1kePNl8yMSb59.jpg',
       releaseDate: '2024-11-27',
@@ -310,7 +357,8 @@ class MovieService {
     const MovieModel(
       id: 933260,
       title: 'The Substance',
-      overview: 'Seorang selebritas yang menua memutuskan untuk menggunakan obat pasar gelap misterius yang dapat mereplikasi sel untuk menciptakan versi dirinya yang lebih muda.',
+      overview:
+          'Seorang selebritas yang menua memutuskan untuk menggunakan obat pasar gelap misterius yang dapat mereplikasi sel untuk menciptakan versi dirinya yang lebih muda.',
       posterPath: '/lqoMzCcZY59p0k8j3zIic3c0nS7.jpg',
       backdropPath: '/7h6r9WcQ3pZ1G9B3dZ2W4x5z8a9.jpg',
       releaseDate: '2024-10-31',

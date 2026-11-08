@@ -61,7 +61,8 @@ class HttpService {
           ? const Duration(seconds: _llmTimeout)
           : const Duration(seconds: _defaultTimeout),
     );
-    return _dio.post<T>(url, data: data, queryParameters: queryParameters, options: opts);
+    return _dio.post<T>(url,
+        data: data, queryParameters: queryParameters, options: opts);
   }
 
   /// Membangun URL gambar TMDB

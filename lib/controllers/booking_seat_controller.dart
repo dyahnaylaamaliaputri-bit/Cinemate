@@ -97,7 +97,9 @@ class BookingSeatController extends GetxController {
         final id = '$r$c';
         // Simulasikan sekitar 15-25% kursi terisi
         final hash = (seed + id.hashCode).abs();
-        if (hash % 5 == 0 && reservedSet.length < (showtime.totalSeats - showtime.availableSeats)) {
+        if (hash % 5 == 0 &&
+            reservedSet.length <
+                (showtime.totalSeats - showtime.availableSeats)) {
           reservedSet.add(id);
         }
       }
@@ -174,7 +176,8 @@ class BookingSeatController extends GetxController {
       return;
     }
 
-    final orderId = 'ORD-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
+    final orderId =
+        'ORD-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
     final order = BookingOrderModel(
       id: orderId,
       movie: movie,

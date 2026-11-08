@@ -92,10 +92,28 @@ class BookingOrderModel {
         final day = int.parse(parts[2]);
         final dt = DateTime(year, month, day);
 
-        const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+        const days = [
+          'Senin',
+          'Selasa',
+          'Rabu',
+          'Kamis',
+          'Jumat',
+          'Sabtu',
+          'Minggu'
+        ];
         const months = [
-          'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-          'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+          'Januari',
+          'Februari',
+          'Maret',
+          'April',
+          'Mei',
+          'Juni',
+          'Juli',
+          'Agustus',
+          'September',
+          'Oktober',
+          'November',
+          'Desember'
         ];
         return '${days[dt.weekday - 1]}, $day ${months[month - 1]} $year';
       }
@@ -156,9 +174,12 @@ class BookingOrderModel {
   factory BookingOrderModel.fromJson(Map<String, dynamic> json) {
     return BookingOrderModel(
       id: json['id'] as String? ?? 'ORD-000',
-      movie: MovieModel.fromJson(Map<String, dynamic>.from(json['movie'] as Map)),
-      cinema: CinemaModel.fromJson(Map<String, dynamic>.from(json['cinema'] as Map)),
-      showtime: ShowtimeModel.fromJson(Map<String, dynamic>.from(json['showtime'] as Map)),
+      movie:
+          MovieModel.fromJson(Map<String, dynamic>.from(json['movie'] as Map)),
+      cinema: CinemaModel.fromJson(
+          Map<String, dynamic>.from(json['cinema'] as Map)),
+      showtime: ShowtimeModel.fromJson(
+          Map<String, dynamic>.from(json['showtime'] as Map)),
       selectedSeats: (json['selected_seats'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
@@ -171,7 +192,9 @@ class BookingOrderModel {
           : DateTime.now(),
       status: json['status'] as String? ?? 'pending',
       paymentMethod: json['payment_method'] as String?,
-      paidAt: json['paid_at'] != null ? DateTime.tryParse(json['paid_at'].toString()) : null,
+      paidAt: json['paid_at'] != null
+          ? DateTime.tryParse(json['paid_at'].toString())
+          : null,
       paymentReference: json['payment_reference'] as String?,
     );
   }

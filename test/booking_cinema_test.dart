@@ -25,7 +25,8 @@ void main() {
   });
 
   group('ShowtimeModel & Booked by Cinema Tests (PB-018)', () {
-    test('ShowtimeModel should deserialize json and format price correctly', () {
+    test('ShowtimeModel should deserialize json and format price correctly',
+        () {
       final json = {
         'id': 'st-1',
         'cinema_id': 'cin-1',
@@ -50,7 +51,9 @@ void main() {
       expect(showtime.experience, 'Regular 2D');
     });
 
-    test('ShowtimeService should return multi-studio showtimes (Regular, IMAX, Premiere)', () async {
+    test(
+        'ShowtimeService should return multi-studio showtimes (Regular, IMAX, Premiere)',
+        () async {
       final service = ShowtimeService();
 
       final showtimes = await service.getShowtimes(
@@ -70,15 +73,18 @@ void main() {
 
       // Verifikasi harga studio
       final regular = showtimes.firstWhere((s) => s.experience == 'Regular 2D');
-      final imax = showtimes.firstWhere((s) => s.experience == 'IMAX with Laser');
-      final premiere = showtimes.firstWhere((s) => s.experience == 'The Premiere');
+      final imax =
+          showtimes.firstWhere((s) => s.experience == 'IMAX with Laser');
+      final premiere =
+          showtimes.firstWhere((s) => s.experience == 'The Premiere');
 
       expect(regular.price, 50000);
       expect(imax.price, 75000);
       expect(premiere.price, 100000);
     });
 
-    test('CinemaModel and MovieModel should integrate with booking showtimes', () {
+    test('CinemaModel and MovieModel should integrate with booking showtimes',
+        () {
       const cinema = CinemaModel(
         id: 'cin-senayan',
         name: 'Metro Cinema Senayan',
@@ -104,7 +110,9 @@ void main() {
       expect(movie.title, 'Deadpool & Wolverine');
     });
 
-    test('ShowtimeService getCinemasForMovie should return cinemas sorted by proximity (PB-019)', () async {
+    test(
+        'ShowtimeService getCinemasForMovie should return cinemas sorted by proximity (PB-019)',
+        () async {
       final service = ShowtimeService();
 
       final cinemas = await service.getCinemasForMovie(

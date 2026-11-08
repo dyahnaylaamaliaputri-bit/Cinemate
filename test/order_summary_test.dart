@@ -10,7 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('SeatModel Tests (PB-020)', () {
-    test('SeatModel should parse json and check availability status properly', () {
+    test('SeatModel should parse json and check availability status properly',
+        () {
       final seatAvailable = SeatModel(
         id: 'A1',
         row: 'A',
@@ -88,7 +89,9 @@ void main() {
       availableSeats: 48,
     );
 
-    test('BookingOrderModel should accurately compute subtotal, service fee, and total amount', () {
+    test(
+        'BookingOrderModel should accurately compute subtotal, service fee, and total amount',
+        () {
       final order = BookingOrderModel(
         id: 'ORD-2026-001',
         movie: movie,

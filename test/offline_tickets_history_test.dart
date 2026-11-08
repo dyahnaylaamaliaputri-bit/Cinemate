@@ -63,7 +63,9 @@ void main() {
       expect(dt.minute, 30);
     });
 
-    test('isTicketActive should be true for future showtime and false for past/used showtime', () {
+    test(
+        'isTicketActive should be true for future showtime and false for past/used showtime',
+        () {
       final futureTicket = TicketModel(
         id: 'tkt-future',
         bookingCode: 'CNM-88888',
@@ -188,11 +190,14 @@ void main() {
 
       // Verifikasi pembacaan ulang dari Hive cache
       final cachedAfter = await storage.getCachedTickets();
-      final updatedInCache = cachedAfter!.firstWhere((t) => t['id'] == 'tkt-update-1');
+      final updatedInCache =
+          cachedAfter!.firstWhere((t) => t['id'] == 'tkt-update-1');
       expect(updatedInCache['status'], 'used');
     });
 
-    test('getUserTicketsWithMeta should return offline indicator and cachedAt timestamp', () async {
+    test(
+        'getUserTicketsWithMeta should return offline indicator and cachedAt timestamp',
+        () async {
       final result = await ticketService.getUserTicketsWithMeta();
       expect(result.tickets, isNotEmpty);
       expect(result.isOffline, isTrue);
@@ -201,7 +206,8 @@ void main() {
   });
 
   group('TicketsController PB-025 Separation & Search Tests', () {
-    test('TicketsController should separate active tickets and history tickets', () async {
+    test('TicketsController should separate active tickets and history tickets',
+        () async {
       // Siapkan 1 tiket aktif di masa depan dan 1 tiket lampau
       final active = TicketModel(
         id: 'tkt-ctrl-active',

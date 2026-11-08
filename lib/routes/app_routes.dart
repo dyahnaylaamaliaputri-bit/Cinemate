@@ -5,18 +5,21 @@
 abstract class Routes {
   Routes._();
 
-  static const splash    = '/';
-  static const login     = '/login';
-  static const register  = '/register';
+  static const splash = '/';
+  static const login = '/login';
+  static const register = '/register';
   static const dashboard = '/dashboard';
-  static const profile   = '/profile';
-  static const tickets   = '/tickets';
-  static const fnb       = '/fnb';
+  static const profile = '/profile';
+  static const tickets = '/tickets';
+  static const fnb = '/fnb';
   static const movieDetail = '/movie-detail';
   static const bookByCinema = '/book-by-cinema';
-  static const bookByMovie  = '/book-by-movie';
-  static const selectSeat   = '/select-seat';
+  static const bookByMovie = '/book-by-movie';
+  static const selectSeat = '/select-seat';
   static const orderSummary = '/order-summary';
-  static const payment      = '/payment';
+  static const payment = '/payment';
   static const ticketDetail = '/ticket-detail';
+  static const fnbCheckout = '/fnb-checkout';
+  static const fnbOrderDetail = '/fnb-order-detail';
+  static const moodPicker = '/mood-picker';
 }

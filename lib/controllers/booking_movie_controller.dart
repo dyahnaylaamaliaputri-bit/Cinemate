@@ -113,7 +113,8 @@ class BookByMovieController extends GetxController {
       cinemas.assignAll(list);
 
       if (list.isNotEmpty) {
-        expandedCinemaId.value = list.first.id; // buka bioskop terdekat #1 secara default
+        expandedCinemaId.value =
+            list.first.id; // buka bioskop terdekat #1 secara default
       }
 
       await loadShowtimesForAllCinemas();
@@ -190,5 +191,6 @@ class BookByMovieController extends GetxController {
   }
 
   /// Apakah pengguna siap lanjut ke alur pemilihan kursi
-  bool get canProceed => selectedShowtime.value != null && selectedCinema.value != null;
+  bool get canProceed =>
+      selectedShowtime.value != null && selectedCinema.value != null;
 }

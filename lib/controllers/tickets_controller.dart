@@ -104,8 +104,10 @@ class TicketsController extends GetxController {
 
       if (updated != null) {
         // Pindahkan dari aktif ke riwayat
-        activeTickets.removeWhere((t) => t.id == ticket.id || t.bookingCode == ticket.bookingCode);
-        historyTickets.removeWhere((t) => t.id == ticket.id || t.bookingCode == ticket.bookingCode);
+        activeTickets.removeWhere(
+            (t) => t.id == ticket.id || t.bookingCode == ticket.bookingCode);
+        historyTickets.removeWhere(
+            (t) => t.id == ticket.id || t.bookingCode == ticket.bookingCode);
         historyTickets.insert(0, updated);
 
         Get.snackbar(
@@ -115,7 +117,8 @@ class TicketsController extends GetxController {
           backgroundColor: AppColors.card,
           colorText: Colors.white,
           duration: const Duration(seconds: 3),
-          icon: const Icon(Icons.check_circle_rounded, color: AppColors.success),
+          icon:
+              const Icon(Icons.check_circle_rounded, color: AppColors.success),
         );
       }
     } catch (e) {

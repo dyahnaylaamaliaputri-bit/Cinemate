@@ -30,7 +30,9 @@ class CinemaCard extends StatelessWidget {
         color: AppColors.card,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isTop ? AppColors.primary.withValues(alpha: 0.4) : AppColors.border,
+          color: isTop
+              ? AppColors.primary.withValues(alpha: 0.4)
+              : AppColors.border,
           width: isTop ? 1.4 : 1.0,
         ),
         boxShadow: isTop
@@ -59,7 +61,8 @@ class CinemaCard extends StatelessWidget {
                   children: [
                     // Badge Terdekat
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: isTop
                             ? AppColors.primary.withValues(alpha: 0.2)
@@ -76,13 +79,17 @@ class CinemaCard extends StatelessWidget {
                           Icon(
                             isTop ? Icons.star_rounded : Icons.place_rounded,
                             size: 13,
-                            color: isTop ? AppColors.gold : AppColors.textSecondary,
+                            color: isTop
+                                ? AppColors.gold
+                                : AppColors.textSecondary,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             isTop ? '#1 Terdekat' : '#$rank Terdekat',
                             style: TextStyle(
-                              color: isTop ? AppColors.gold : AppColors.textSecondary,
+                              color: isTop
+                                  ? AppColors.gold
+                                  : AppColors.textSecondary,
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
                             ),
@@ -93,7 +100,8 @@ class CinemaCard extends StatelessWidget {
 
                     // Pill Jarak (km)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(20),
@@ -202,7 +210,8 @@ class CinemaCard extends StatelessWidget {
                         runSpacing: 4,
                         children: cinema.facilities.take(2).map((fac) {
                           return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: AppColors.surface,
                               borderRadius: BorderRadius.circular(4),
@@ -223,9 +232,11 @@ class CinemaCard extends StatelessWidget {
                     // Action: Lihat Jadwal
                     InkWell(
                       borderRadius: BorderRadius.circular(6),
-                      onTap: () => Get.toNamed(Routes.bookByCinema, arguments: cinema),
+                      onTap: () =>
+                          Get.toNamed(Routes.bookByCinema, arguments: cinema),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 2),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: const [
@@ -378,7 +389,8 @@ class CinemaCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  icon: const Icon(Icons.confirmation_num_outlined, color: Colors.white),
+                  icon: const Icon(Icons.confirmation_num_outlined,
+                      color: Colors.white),
                   label: const Text(
                     'Pilih Jadwal Tayang di Bioskop Ini',
                     style: TextStyle(

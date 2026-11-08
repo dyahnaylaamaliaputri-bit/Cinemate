@@ -100,7 +100,8 @@ class _LoginViewState extends State<LoginView> {
 
     if (success && mounted) {
       // Menggunakan Navigator.pushNamedAndRemoveUntil untuk membersihkan stack
-      Navigator.pushNamedAndRemoveUntil(context, Routes.dashboard, (route) => false);
+      Navigator.pushNamedAndRemoveUntil(
+          context, Routes.dashboard, (route) => false);
       return;
     }
 
@@ -247,9 +248,10 @@ class _LoginViewState extends State<LoginView> {
 
                     // Login button
                     Obx(() => ElevatedButton(
-                          onPressed: (_ctrl.isLoading.value || _ctrl.isLockedOut)
-                              ? null
-                              : _submit,
+                          onPressed:
+                              (_ctrl.isLoading.value || _ctrl.isLockedOut)
+                                  ? null
+                                  : _submit,
                           child: _ctrl.isLoading.value
                               ? const SizedBox(
                                   height: 20,
@@ -275,7 +277,8 @@ class _LoginViewState extends State<LoginView> {
                     style: TextStyle(color: AppColors.textSecondary),
                   ),
                   TextButton(
-                    onPressed: () => Navigator.pushNamed(context, Routes.register),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, Routes.register),
                     child: const Text(
                       'Daftar',
                       style: TextStyle(

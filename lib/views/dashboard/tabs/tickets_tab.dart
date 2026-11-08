@@ -15,7 +15,8 @@ class TicketsTab extends StatefulWidget {
   State<TicketsTab> createState() => _TicketsTabState();
 }
 
-class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateMixin {
+class _TicketsTabState extends State<TicketsTab>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TicketsController _controller = Get.put(TicketsController());
   final TextEditingController _searchCtrl = TextEditingController();
@@ -62,7 +63,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
           indicatorWeight: 3,
           labelColor: AppColors.primaryLight,
           unselectedLabelColor: AppColors.textSecondary,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          labelStyle:
+              const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           tabs: [
             Obx(() => Tab(
                   text: 'Tiket Aktif (${_controller.activeTickets.length})',
@@ -135,7 +137,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
       ),
       child: Row(
         children: [
-          const Icon(Icons.offline_bolt_rounded, color: AppColors.gold, size: 20),
+          const Icon(Icons.offline_bolt_rounded,
+              color: AppColors.gold, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -161,7 +164,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: AppColors.gold, size: 18),
+            icon: const Icon(Icons.refresh_rounded,
+                color: AppColors.gold, size: 18),
             tooltip: 'Segarkan Cache',
             onPressed: () => _controller.loadTickets(forceRefresh: true),
           ),
@@ -180,11 +184,14 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
         style: const TextStyle(color: Colors.white, fontSize: 13),
         decoration: InputDecoration(
           hintText: 'Cari tiket (judul film, bioskop, atau kode booking)...',
-          hintStyle: const TextStyle(color: AppColors.textDisabled, fontSize: 12),
-          prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textDisabled, size: 20),
+          hintStyle:
+              const TextStyle(color: AppColors.textDisabled, fontSize: 12),
+          prefixIcon: const Icon(Icons.search_rounded,
+              color: AppColors.textDisabled, size: 20),
           suffixIcon: _controller.searchQuery.value.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear_rounded, color: Colors.white70, size: 18),
+                  icon: const Icon(Icons.clear_rounded,
+                      color: Colors.white70, size: 18),
                   onPressed: () {
                     _searchCtrl.clear();
                     _controller.updateSearch('');
@@ -193,7 +200,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
               : null,
           filled: true,
           fillColor: AppColors.surface,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: AppColors.border),
@@ -255,7 +263,9 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
         itemCount: tickets.length,
         itemBuilder: (context, index) {
           final ticket = tickets[index];
-          return isActiveTab ? _buildActiveTicketCard(ticket) : _buildHistoryTicketCard(ticket);
+          return isActiveTab
+              ? _buildActiveTicketCard(ticket)
+              : _buildHistoryTicketCard(ticket);
         },
       ),
     );
@@ -303,7 +313,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                                 color: AppColors.textDisabled,
                               ),
                             )
-                          : const Icon(Icons.movie_creation_rounded, color: AppColors.textDisabled),
+                          : const Icon(Icons.movie_creation_rounded,
+                              color: AppColors.textDisabled),
                     ),
                   ),
 
@@ -318,11 +329,15 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: AppColors.primaryDark.withValues(alpha: 0.25),
+                                color: AppColors.primaryDark
+                                    .withValues(alpha: 0.25),
                                 borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+                                border: Border.all(
+                                    color: AppColors.primary
+                                        .withValues(alpha: 0.4)),
                               ),
                               child: Text(
                                 ticket.experience,
@@ -358,12 +373,14 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                         const SizedBox(height: 4),
                         Text(
                           '${ticket.cinemaName} • ${ticket.hallName}',
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                          style: const TextStyle(
+                              color: AppColors.textSecondary, fontSize: 11),
                         ),
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            const Icon(Icons.access_time_rounded, color: AppColors.gold, size: 12),
+                            const Icon(Icons.access_time_rounded,
+                                color: AppColors.gold, size: 12),
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
@@ -396,12 +413,16 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                   Expanded(
                     child: Row(
                       children: [
-                        const Icon(Icons.event_seat_rounded, color: Colors.white70, size: 15),
+                        const Icon(Icons.event_seat_rounded,
+                            color: Colors.white70, size: 15),
                         const SizedBox(width: 4),
                         Flexible(
                           child: Text(
                             'Kursi: ${ticket.seatsLabel} (${ticket.seatCount} Tiket)',
-                            style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -417,7 +438,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                         onTap: () => _controller.markTicketAsUsed(ticket),
                         borderRadius: BorderRadius.circular(6),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 3),
                           decoration: BoxDecoration(
                             color: const Color(0xFF1E293B),
                             borderRadius: BorderRadius.circular(6),
@@ -425,9 +447,12 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                           ),
                           child: const Row(
                             children: [
-                              Icon(Icons.sensors_rounded, color: Colors.white70, size: 13),
+                              Icon(Icons.sensors_rounded,
+                                  color: Colors.white70, size: 13),
                               SizedBox(width: 4),
-                              Text('Check-in', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                              Text('Check-in',
+                                  style: TextStyle(
+                                      color: Colors.white70, fontSize: 11)),
                             ],
                           ),
                         ),
@@ -435,7 +460,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                       const SizedBox(width: 6),
                       Row(
                         children: [
-                          const Icon(Icons.qr_code_2_rounded, color: AppColors.primaryLight, size: 15),
+                          const Icon(Icons.qr_code_2_rounded,
+                              color: AppColors.primaryLight, size: 15),
                           const SizedBox(width: 3),
                           Text(
                             'QR',
@@ -445,7 +471,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const Icon(Icons.chevron_right_rounded, color: AppColors.primaryLight, size: 15),
+                          const Icon(Icons.chevron_right_rounded,
+                              color: AppColors.primaryLight, size: 15),
                         ],
                       ),
                     ],
@@ -496,7 +523,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                                   color: AppColors.textDisabled,
                                 ),
                               )
-                            : const Icon(Icons.movie_creation_rounded, color: AppColors.textDisabled),
+                            : const Icon(Icons.movie_creation_rounded,
+                                color: AppColors.textDisabled),
                       ),
                     ),
                   ),
@@ -512,16 +540,19 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF1E293B),
                                 borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: const Color(0xFF334155)),
+                                border:
+                                    Border.all(color: const Color(0xFF334155)),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.check_circle_outline_rounded, color: AppColors.success, size: 12),
+                                  const Icon(Icons.check_circle_outline_rounded,
+                                      color: AppColors.success, size: 12),
                                   const SizedBox(width: 4),
                                   Text(
                                     ticket.historyStatusLabel,
@@ -559,12 +590,14 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                         const SizedBox(height: 4),
                         Text(
                           '${ticket.cinemaName} • ${ticket.hallName}',
-                          style: const TextStyle(color: AppColors.textDisabled, fontSize: 11),
+                          style: const TextStyle(
+                              color: AppColors.textDisabled, fontSize: 11),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           '${ticket.showDate} • ${ticket.showTime} WIB',
-                          style: const TextStyle(color: AppColors.textDisabled, fontSize: 11),
+                          style: const TextStyle(
+                              color: AppColors.textDisabled, fontSize: 11),
                         ),
                       ],
                     ),
@@ -582,7 +615,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                 children: [
                   Text(
                     'Kursi: ${ticket.seatsLabel} • ${ticket.formattedPrice}',
-                    style: const TextStyle(color: AppColors.textDisabled, fontSize: 11),
+                    style: const TextStyle(
+                        color: AppColors.textDisabled, fontSize: 11),
                   ),
                   Row(
                     children: [
@@ -591,17 +625,24 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                         onTap: () => Get.toNamed(Routes.bookByCinema),
                         borderRadius: BorderRadius.circular(6),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+                            border: Border.all(
+                                color:
+                                    AppColors.primary.withValues(alpha: 0.4)),
                           ),
                           child: const Row(
                             children: [
-                              Icon(Icons.refresh_rounded, color: AppColors.primaryLight, size: 14),
+                              Icon(Icons.refresh_rounded,
+                                  color: AppColors.primaryLight, size: 14),
                               SizedBox(width: 4),
-                              Text('Pesan Lagi', style: TextStyle(color: AppColors.primaryLight, fontSize: 11)),
+                              Text('Pesan Lagi',
+                                  style: TextStyle(
+                                      color: AppColors.primaryLight,
+                                      fontSize: 11)),
                             ],
                           ),
                         ),
@@ -617,7 +658,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Icon(Icons.chevron_right_rounded, color: Colors.white70, size: 16),
+                          Icon(Icons.chevron_right_rounded,
+                              color: Colors.white70, size: 16),
                         ],
                       ),
                     ],
@@ -679,7 +721,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -687,7 +730,8 @@ class _TicketsTabState extends State<TicketsTab> with SingleTickerProviderStateM
                 icon: const Icon(Icons.local_activity_rounded, size: 18),
                 label: Text(
                   actionLabel,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 13),
                 ),
                 onPressed: onAction,
               ),
