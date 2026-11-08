@@ -121,39 +121,73 @@ docs/
 
 ---
 
-## 🎯 TUGAS SELANJUTNYA (SPRINT 4)
+## 🎯 TUGAS SELANJUTNYA UNTUK ANGGOTA TIM (2 PB)
 
-### 📌 SPRINT 4: EPIC PROFIL, PREFERENSI & PENGINGAT NOTIFIKASI (PRF & NOT)
-
-1. **PB-048 (Konversi Mata Uang Dinamis - Currency Preference):**
-   - Opsi mata uang di `ProfileTab`: **IDR (Rp)**, **USD ($)**, **SGD (S$)**, **EUR (€)**.
-   - Simpan preferensi di `GetStorage` via `StorageService`.
-   - Buat `CurrencyHelper` yang otomatis memformat semua harga tiket dan F&B di seluruh aplikasi secara reaktif.
-
-2. **PB-049 (Zona Waktu Penayangan - Timezone Preference):**
-   - Opsi zona waktu di `ProfileTab`: **WIB (UTC+7)**, **WITA (UTC+8)**, **WIT (UTC+9)**, **GMT/UTC**.
-   - Jadwal tayang bioskop otomatis disesuaikan dan menampilkan penanda zona (contoh: `14:30 WIB` -> `15:30 WITA`).
-
-3. **PB-050 (Edit Profil Pengguna & Ubah Sandi):**
-   - Layar `EditProfileView`: Ubah nama lengkap dan nomor telepon, simpan perubahan ke Supabase `users`.
-   - Layar `ChangePasswordView`: Verifikasi sandi lama, hashing sandi baru (*salt + SHA-256*), lalu update kolom `users.password_hash`.
-
-4. **PB-058 (Local Push Notification Pengingat Tiket - H-1 Jam & H-30 Menit):**
-   - Dependensi: `flutter_local_notifications` (mengacu pada materi praktikum modul 8).
-   - Penanganan permission Android 13+ (`POST_NOTIFICATIONS`).
-   - Jadwalkan pengingat otomatis saat status tiket menjadi `paid`:
-     - *Notifikasi 1:* 1 jam sebelum film tayang (*"Film Anda dimulai 1 jam lagi!"*).
-     - *Notifikasi 2:* 30 menit sebelum film tayang (*"Studio segera dibuka! Siapkan E-Ticket offline Anda"*).
+> **Pesan untuk Rekan Tim:**  
+> Halo! Pengerjaan **Sprint 3 (PB 5 - Pemesanan F&B dan PB 6 - Rekomendasi Mood AI)** sudah rampung 100% dan seluruh 41 unit test sudah lolos pengujian.  
+> Untuk giliran kamu selanjutnya, silakan kerjakan **2 Product Backlog** pada **Sprint 4 (Epic Profil & Preferensi Regional)**: **PB-048 (Konversi Mata Uang)** dan **PB-049 (Penyesuaian Zona Waktu)**.  
+> Panduan implementasi, kriteria keberterimaan (*acceptance criteria*), dan file terkait sudah disiapkan di bawah ini:
 
 ---
 
-## 📌 Standar Koding & Pengujian Sebelum Pull Request (PR)
+### 🌿 Panduan Branching Git
+Silakan tarik update terbaru dari `main` dan buat branch baru:
+```bash
+git pull origin main
+git checkout -b feat/pb-048-049-currency-timezone
+```
+
+---
+
+### 💵 1. PB-048: Konversi Mata Uang Dinamis (Currency Preference & Conversion)
+- **Tujuan:** Pengguna dapat mengubah mata uang tampilan di seluruh aplikasi (tiket bioskop, jajanan F&B, dan ringkasan pembayaran) secara instan dan reaktif.
+- **Mata Uang yang Didukung:**
+  1. **IDR (Rp)** — Rupiah Indonesia *(Default kurs: 1.0)*
+  2. **USD ($)** — Dollar Amerika Serikat *(Contoh kurs konversi: 1 USD = Rp 16.000)*
+  3. **SGD (S$)** — Dollar Singapura *(Contoh kurs konversi: 1 SGD = Rp 12.000)*
+  4. **EUR (€)** — Euro Uni Eropa *(Contoh kurs konversi: 1 EUR = Rp 17.500)*
+- **Penyimpanan Preferensi (GetStorage):**
+  - Simpan preferensi pengguna ke `GetStorage` melalui `StorageService` dengan key `'currency_preference'` (default: `'IDR'`).
+- **File & Komponen yang Dibuat / Dimodifikasi:**
+  - `lib/utils/currency_helper.dart` (Buat helper baru yang reaktif dengan Rx string, method `formatPrice(int priceInIdr)`, `formatTicketPrice(...)`, dan `convertFromIdr(...)`).
+  - `lib/views/dashboard/tabs/profile_tab.dart` (Tambahkan kartu/modal "Pilihan Mata Uang" dengan radio button atau selection modal).
+  - Integrasikan helper harga ke:
+    - Katalog F&B: `lib/views/dashboard/tabs/fnb_tab.dart`
+    - Checkout F&B: `lib/views/fnb/fnb_checkout_view.dart`
+    - Booking Tiket: `lib/views/booking/order_summary_view.dart` & `lib/views/booking/book_by_cinema_view.dart`
+- **Pengujian Unit Baru:**
+  - Buat `test/currency_conversion_test.dart` untuk memverifikasi kalkulasi konversi IDR ke USD, SGD, EUR, serta format simbolnya.
+
+---
+
+### ⏰ 2. PB-049: Penyesuaian Zona Waktu Penayangan Film (Timezone Preference & Shift)
+- **Tujuan:** Menyesuaikan jadwal penayangan bioskop di seluruh aplikasi sesuai zona waktu lokal yang dipilih pengguna.
+- **Zona Waktu yang Didukung:**
+  1. **WIB (UTC+7)** — Waktu Indonesia Barat *(Default zona bioskop)*
+  2. **WITA (UTC+8)** — Waktu Indonesia Tengah *(+1 jam dari waktu tayang default)*
+  3. **WIT (UTC+9)** — Waktu Indonesia Timur *(+2 jam dari waktu tayang default)*
+  4. **UTC (GMT+0)** — Greenwich Mean Time *(-7 jam dari waktu tayang default)*
+- **Penyimpanan Preferensi (GetStorage):**
+  - Simpan preferensi zona waktu pengguna ke `GetStorage` melalui `StorageService` dengan key `'timezone_preference'` (default: `'WIB'`).
+- **File & Komponen yang Dibuat / Dimodifikasi:**
+  - `lib/utils/timezone_helper.dart` (Buat helper konversi jam penayangan bioskop dan penambahan label zona, misal: `14:00 WIB` $\rightarrow$ `15:00 WITA` jika pengguna memilih WITA).
+  - `lib/views/dashboard/tabs/profile_tab.dart` (Tambahkan kartu/modal "Pilihan Zona Waktu").
+  - Integrasikan helper jam tayang ke:
+    - Jadwal bioskop: `lib/views/booking/book_by_cinema_view.dart` & `lib/views/booking/book_by_movie_view.dart`
+    - Detail E-Ticket: `lib/views/ticket/ticket_detail_view.dart`
+    - Riwayat Tiket: `lib/views/dashboard/tabs/tickets_tab.dart`
+- **Pengujian Unit Baru:**
+  - Buat `test/timezone_format_test.dart` untuk memverifikasi pergeseran jam penayangan dari WIB ke WITA, WIT, dan UTC.
+
+---
+
+### 📌 Standar Koding & Pengujian Sebelum Pull Request (PR)
 
 1. **Arsitektur GetX OOP:**
-   - Pisahkan logika ke `Controller`, data/API ke `Service`, dan antarmuka ke `View`.
+   - Pisahkan logika ke `Controller`, data/helper ke `Utils`/`Service`, dan antarmuka ke `View`.
    - Gunakan warna dari `AppColors` (*Dark Cinema Palette: `#0A0A0A`, `#E50914`, `#1A1A2E`, `#FFD700`*).
 2. **Offline-First & Graceful Fallback:**
-   - Setiap pengambilan data online wajib memiliki fallback ke Hive box jika jaringan mati atau API gagal.
+   - Preferensi tersimpan di storage lokal sehingga saat aplikasi dibuka kembali dalam mode offline, pilihan mata uang dan zona waktu tetap persisten.
 3. **Checklist Wajib Sebelum Commit & Push:**
    ```bash
    # 1. Pastikan tidak ada error atau warning:
