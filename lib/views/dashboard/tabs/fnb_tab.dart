@@ -7,6 +7,7 @@ import '../../../controllers/fnb_controller.dart';
 import '../../../models/fnb_item_model.dart';
 import '../../../routes/app_routes.dart';
 import '../../../utils/app_colors.dart';
+import '../../widgets/shimmer_loading.dart';
 
 class FnbTab extends StatefulWidget {
   const FnbTab({super.key});
@@ -163,46 +164,148 @@ class _FnbTabState extends State<FnbTab> with SingleTickerProviderStateMixin {
       onRefresh: () => fnbCtrl.fetchFnbCatalog(forceRefresh: true),
       child: Column(
         children: [
+          // Banner Offline-First Hive Cache (PB-026)
+          Obx(() {
+            final cached = fnbCtrl.lastCacheTime.value;
+            final timeStr = cached != null
+                ? '${cached.hour.toString().padLeft(2, '0')}:${cached.minute.toString().padLeft(2, '0')} WIB'
+                : 'Tersimpan';
+
+            return Container(
+              margin: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1F1C12),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                    color: AppColors.gold.withValues(alpha: 0.4), width: 1),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppColors.gold.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.offline_bolt_rounded,
+                      color: AppColors.gold,
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Text(
+                              'Katalog F&B Offline-First',
+                              style: TextStyle(
+                                color: AppColors.gold,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 1.5),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                'Hive Local Cache',
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${fnbCtrl.items.length} menu tersimpan di Hive ($timeStr). Tanpa koneksi database online.',
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh_rounded,
+                        color: AppColors.gold, size: 18),
+                    tooltip: 'Segarkan Cache Hive',
+                    onPressed: () =>
+                        fnbCtrl.fetchFnbCatalog(forceRefresh: true),
+                  ),
+                ],
+              ),
+            );
+          }),
+
           // Search & Filter Bar
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: TextField(
-              onChanged: fnbCtrl.setSearchQuery,
-              style:
-                  const TextStyle(color: AppColors.textPrimary, fontSize: 14),
-              decoration: InputDecoration(
-                isDense: true,
-                hintText: 'Cari popcorn, minuman, combo...',
-                hintStyle: const TextStyle(
-                    color: AppColors.textSecondary, fontSize: 13),
-                prefixIcon: const Icon(Icons.search,
-                    color: AppColors.textSecondary, size: 20),
-                filled: true,
-                fillColor: AppColors.card,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.border),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.border),
-                ),
-              ),
-            ),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+            child: Obx(() => TextField(
+                  controller: fnbCtrl.searchController,
+                  onChanged: fnbCtrl.setSearchQuery,
+                  style: const TextStyle(
+                      color: AppColors.textPrimary, fontSize: 14),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    hintText: 'Cari popcorn, nachos, cola, combo...',
+                    hintStyle: const TextStyle(
+                        color: AppColors.textSecondary, fontSize: 13),
+                    prefixIcon: const Icon(Icons.search,
+                        color: AppColors.textSecondary, size: 20),
+                    suffixIcon: fnbCtrl.searchQuery.value.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.close_rounded,
+                                color: AppColors.textSecondary, size: 18),
+                            onPressed: fnbCtrl.clearSearch,
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: AppColors.card,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.primary),
+                    ),
+                  ),
+                )),
           ),
 
-          // Category Chips
+          // Category Filter Chips
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Obx(() => Row(
                   children: categories.map((cat) {
                     final isSelected = fnbCtrl.selectedCategory.value == cat;
+                    final count = fnbCtrl.getCategoryCount(cat);
+                    final label = count > 0 ? '$cat ($count)' : cat;
+
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: FilterChip(
                         selected: isSelected,
-                        label: Text(cat),
+                        label: Text(label),
                         labelStyle: TextStyle(
                           color: isSelected
                               ? Colors.white
@@ -230,25 +333,65 @@ class _FnbTabState extends State<FnbTab> with SingleTickerProviderStateMixin {
 
           const SizedBox(height: 6),
 
-          // Items List
+          // Items List with Skeleton Shimmer (PB-026)
           Expanded(
             child: Obx(() {
               if (fnbCtrl.isLoading.value) {
-                return const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary));
+                return const FnbListSkeleton();
               }
 
               if (fnbCtrl.filteredItems.isEmpty) {
                 return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.no_meals_rounded,
-                          size: 48, color: AppColors.textSecondary),
-                      const SizedBox(height: 12),
-                      const Text('Tidak ada menu ditemukan',
-                          style: TextStyle(color: AppColors.textSecondary)),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.fastfood_outlined,
+                              size: 48, color: AppColors.textSecondary),
+                        ),
+                        const SizedBox(height: 14),
+                        const Text(
+                          'Menu Tidak Ditemukan',
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          fnbCtrl.searchQuery.value.isNotEmpty
+                              ? 'Tidak ada menu yang cocok dengan "${fnbCtrl.searchQuery.value}".'
+                              : 'Tidak ada menu pada kategori ${fnbCtrl.selectedCategory.value}.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              color: AppColors.textSecondary, fontSize: 13),
+                        ),
+                        const SizedBox(height: 16),
+                        OutlinedButton.icon(
+                          onPressed: () {
+                            fnbCtrl.clearSearch();
+                            fnbCtrl.setCategory('Semua');
+                          },
+                          icon: const Icon(Icons.refresh_rounded, size: 16),
+                          label: const Text('Reset Pencarian & Filter'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.primary,
+                            side: const BorderSide(color: AppColors.primary),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }
@@ -323,7 +466,24 @@ class _FnbTabState extends State<FnbTab> with SingleTickerProviderStateMixin {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      item.categoryLabel,
+                      style: const TextStyle(
+                        color: AppColors.gold,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
                   Text(
                     item.description,
                     maxLines: 2,

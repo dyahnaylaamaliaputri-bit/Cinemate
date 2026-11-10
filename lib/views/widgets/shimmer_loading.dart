@@ -168,3 +168,49 @@ class CinemaListSkeleton extends StatelessWidget {
     );
   }
 }
+
+/// Skeleton untuk daftar menu F&B (PB-026)
+class FnbListSkeleton extends StatelessWidget {
+  const FnbListSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      itemCount: 5,
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemBuilder: (_, __) => Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const ShimmerBox(width: 68, height: 68, borderRadius: 12),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  ShimmerBox(width: 140, height: 16, borderRadius: 4),
+                  SizedBox(height: 6),
+                  ShimmerBox(width: 200, height: 12, borderRadius: 4),
+                  SizedBox(height: 6),
+                  ShimmerBox(width: 160, height: 12, borderRadius: 4),
+                  SizedBox(height: 8),
+                  ShimmerBox(width: 80, height: 14, borderRadius: 4),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            const ShimmerBox(width: 64, height: 32, borderRadius: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}

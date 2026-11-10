@@ -27,6 +27,9 @@ class FnbController extends GetxController {
   final selectedCategory = 'Semua'.obs;
   final searchQuery = ''.obs;
   final isLoading = false.obs;
+  final lastCacheTime = Rx<DateTime?>(null);
+  final isOfflineMode = true.obs;
+  final searchController = TextEditingController();
 
   // ── State Keranjang (Cart) ────────────────────────────────────────────────
   // Map dari FnbItemModel.id -> quantity
@@ -61,12 +64,31 @@ class FnbController extends GetxController {
     try {
       final result = await _service.getFnbItems(forceRefresh: forceRefresh);
       items.assignAll(result);
+      lastCacheTime.value = await _service.getLastCacheTime();
       applyFilter();
     } catch (e) {
       debugPrint('[FnbController] Error fetching catalog: $e');
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void clearSearch() {
+    searchController.clear();
+    searchQuery.value = '';
+    applyFilter();
+  }
+
+  int getCategoryCount(String category) {
+    if (category == 'Semua') return items.length;
+    final cat = category.toLowerCase();
+    return items.where((it) {
+      if (cat == 'snack') return it.category == 'snack';
+      if (cat == 'minuman' || cat == 'drink') return it.category == 'drink';
+      if (cat == 'combo') return it.category == 'combo';
+      if (cat == 'makanan' || cat == 'food') return it.category == 'food';
+      return it.category == cat;
+    }).length;
   }
 
   Future<void> loadCinemas() async {
@@ -337,5 +359,11 @@ class FnbController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
     }
+  }
+
+  @override
+  void onClose() {
+    searchController.dispose();
+    super.onClose();
   }
 }

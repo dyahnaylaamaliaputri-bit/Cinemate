@@ -75,7 +75,7 @@ docs/
 - [x] **PB-025 (Daftar Tiket Aktif, Riwayat, & Simulasi Check-in):** Tab `TicketsTab` dengan pemisahan otomatis tiket aktif (jadwal belum lewat) dan riwayat tiket (sudah ditonton / lewat), pencarian live (*search by title, booking code, cinema*), countdown waktu tayang ("Dimulai dalam X jam/menit"), serta tombol simulasi check-in petugas yang memperbarui status tiket secara real-time di Supabase dan Hive.
 
 ### 5. Epic Pesan Makanan & Minuman / F&B (FNB — PB 5)
-- [x] **PB-026 (Katalog F&B Supabase & Hive Offline Cache):** `FnbItemModel`, `FnbService` terintegrasi Supabase `fnb_items` & fallback offline Hive cache (`fnb_cache`), sub-tab katalog dengan filter kategori interaktif (*Semua*, *Snack*, *Minuman*, *Paket Combo*, *Makanan Berat*) dan pencarian live.
+- [x] **PB-026 (Katalog F&B Offline-First & Hive Cache — Tanpa Supabase):** Model `FnbItemModel` dengan 12 varian menu lengkap, `FnbService` berbasis Hive box `fnb_cache` (100% offline-first murni tanpa ketergantungan Supabase), banner indikator status Hive cache & timestamp sinkronisasi, filter chip kategori dinamis (*Semua*, *Snack*, *Minuman*, *Paket Combo*, *Makanan Berat*) dengan counter kuantitas menu, pencarian real-time dengan tombol clear, shimmer skeleton loading (`FnbListSkeleton`), dan penanganan empty state saat pencarian tidak ditemukan.
 - [x] **PB-027 (Keranjang Pesanan F&B / Reactive Cart Management):** `FnbController` mengelola keranjang reaktif, penambahan/pengurangan item, catatan khusus per menu, subtotal, biaya layanan, dan floating summary checkout bar di bagian bawah layar.
 - [x] **PB-028 (Pilihan Bioskop & Metode Pengambilan):** `FnbCheckoutView` mendukung pemilihan bioskop concession dan 2 metode pengambilan: *Ambil di Counter Concession* atau *Antar ke Studio & Kursi* (otomatis membaca data studio dan kursi).
 - [x] **PB-029 (Simulasi Pembayaran & E-Voucher QR Code F&B):** Integrasi transaksi ke tabel Supabase `fnb_orders` & `fnb_order_items`, penerbitan kode pickup 5 digit (`FNB-XXXXX`), serta QR Code E-Voucher (`qr_flutter`) untuk verifikasi staf bioskop.
@@ -109,7 +109,7 @@ docs/
    ```bash
    flutter pub get
    ```
-5. **Jalankan pengujian unit (Semua 41 Unit Test Wajib Passed):**
+5. **Jalankan pengujian unit (Semua 44 Unit Test Wajib Passed):**
    ```bash
    flutter test
    ```

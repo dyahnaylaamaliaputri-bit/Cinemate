@@ -1,12 +1,12 @@
 // lib/services/fnb_service.dart
-// Service untuk manajemen Makanan & Minuman (F&B), integrasi Supabase & Hive cache (PB-026, PB-028, PB-029, PB-030)
+// Service untuk manajemen Makanan & Minuman (F&B) berbasis Hive Offline Cache (PB-026)
+// Catatan: Dirancang 100% offline-first tanpa ketergantungan koneksi Supabase.
 
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/fnb_item_model.dart';
 import '../models/fnb_order_model.dart';
-import 'supabase_service.dart';
 
 class FnbService {
   FnbService._internal();
@@ -33,11 +33,12 @@ class FnbService {
     return await Hive.openBox(boxFnbOrders);
   }
 
-  /// Ambil katalog F&B dengan strategi Cache-First / Fallback (PB-026)
+  /// Ambil katalog F&B dari Hive Local Storage (PB-026 Offline-First)
+  /// Jika cache kosong atau forceRefresh = true, otomatis inisialisasi dari seed katalog
   Future<List<FnbItemModel>> getFnbItems({bool forceRefresh = false}) async {
     final box = await _getFnbBox();
 
-    // 1. Cek cache Hive jika tidak force refresh
+    // 1. Cek cache Hive jika tidak diminta force refresh
     if (!forceRefresh && box.containsKey('items')) {
       try {
         final cachedRaw = box.get('items');
@@ -45,41 +46,50 @@ class FnbService {
           final items = cachedRaw.map((e) {
             return FnbItemModel.fromJson(Map<String, dynamic>.from(e as Map));
           }).toList();
-          if (items.isNotEmpty) return items;
+          if (items.isNotEmpty) {
+            debugPrint(
+                '[FnbService] Berhasil memuat ${items.length} menu F&B dari Hive cache.');
+            return items;
+          }
         }
       } catch (e) {
-        debugPrint('[FnbService] Error reading Hive cache: $e');
+        debugPrint('[FnbService] Gagal membaca Hive cache: $e');
       }
     }
 
-    // 2. Coba ambil dari Supabase
+    // 2. Inisialisasi / perbarui cache lokal Hive dari seed data bawaan
+    final seed = FnbItemModel.seedItems;
     try {
-      final client = SupabaseService().client;
-      final response = await client
-          .from('fnb_items')
-          .select()
-          .order('category', ascending: true);
+      await box.put('items', seed.map((i) => i.toJson()).toList());
+      await box.put(keyFnbTimestamp, DateTime.now().toIso8601String());
+      debugPrint(
+          '[FnbService] Hive cache F&B diinisialisasi dengan ${seed.length} menu.');
+    } catch (e) {
+      debugPrint('[FnbService] Error menyimpan seed ke Hive: $e');
+    }
 
-      if (response.isNotEmpty) {
-        final items = (response as List)
-            .map((e) =>
-                FnbItemModel.fromJson(Map<String, dynamic>.from(e as Map)))
-            .toList();
+    return seed;
+  }
 
-        // Simpan ke Hive cache
-        await box.put('items', items.map((i) => i.toJson()).toList());
-        await box.put(keyFnbTimestamp, DateTime.now().toIso8601String());
-        return items;
+  /// Waktu terakhir kali data katalog F&B diperbarui di Hive
+  Future<DateTime?> getLastCacheTime() async {
+    try {
+      final box = await _getFnbBox();
+      final raw = box.get(keyFnbTimestamp);
+      if (raw is String) {
+        return DateTime.tryParse(raw);
       }
     } catch (e) {
-      debugPrint(
-          '[FnbService] Supabase fetch error (fallback to seed/cache): $e');
+      debugPrint('[FnbService] Error membaca timestamp cache: $e');
     }
+    return null;
+  }
 
-    // 3. Fallback: gunakan seed data bawaan
-    final seed = FnbItemModel.seedItems;
-    await box.put('items', seed.map((i) => i.toJson()).toList());
-    return seed;
+  /// Hapus cache katalog F&B (untuk simulasi/testing)
+  Future<void> clearCache() async {
+    final box = await _getFnbBox();
+    await box.delete('items');
+    await box.delete(keyFnbTimestamp);
   }
 
   /// Generate kode pengambilan F&B unik (format: FNB-XXXXX)
@@ -89,7 +99,7 @@ class FnbService {
     return 'FNB-$number';
   }
 
-  /// Membuat pesanan F&B baru (PB-029)
+  /// Membuat pesanan F&B baru (PB-029: Disimpan ke Hive lokal)
   Future<FnbOrderModel> createOrder({
     required String userId,
     required String cinemaId,
@@ -126,45 +136,18 @@ class FnbService {
       items: items,
     );
 
-    // 1. Simpan ke Hive lokal terlebih dahulu (Offline-first & reliable)
+    // Simpan ke Hive box riwayat lokal
     await ordersBox.put(newOrder.id, newOrder.toJson());
-
-    // 2. Upayakan sinkronisasi ke Supabase
-    try {
-      final client = SupabaseService().client;
-      await client.from('fnb_orders').insert({
-        'id': newOrder.id,
-        'user_id': userId,
-        'cinema_id': cinemaId,
-        'pickup_code': pickupCode,
-        'status': 'processing',
-        'total_price': total,
-        'created_at': newOrder.createdAt.toIso8601String(),
-      });
-
-      // Insert detail item
-      for (final it in items) {
-        await client.from('fnb_order_items').insert({
-          'order_id': newOrder.id,
-          'fnb_item_id': it.fnbItemId,
-          'quantity': it.quantity,
-          'note': it.note,
-          'subtotal': it.subtotal,
-        });
-      }
-    } catch (e) {
-      debugPrint(
-          '[FnbService] Supabase insert order warning (saved to Hive): $e');
-    }
+    debugPrint(
+        '[FnbService] Pesanan F&B ${newOrder.pickupCode} berhasil disimpan ke Hive lokal.');
 
     return newOrder;
   }
 
-  /// Ambil riwayat pesanan F&B pengguna (PB-030)
+  /// Ambil riwayat pesanan F&B pengguna langsung dari Hive (PB-030)
   Future<List<FnbOrderModel>> getUserOrders({String? userId}) async {
     final ordersBox = await _getOrdersBox();
 
-    // 1. Ambil dari Hive cache
     final List<FnbOrderModel> localOrders = [];
     for (var key in ordersBox.keys) {
       try {
@@ -182,38 +165,12 @@ class FnbService {
       }
     }
 
-    // Urutkan dari yang paling baru
+    // Urutkan dari yang terbaru
     localOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-    // Jika Hive ada data, kembalikan segera
-    if (localOrders.isNotEmpty) {
-      return localOrders;
-    }
-
-    // 2. Jika Hive kosong, coba tarik dari Supabase
-    try {
-      final client = SupabaseService().client;
-      var query = client.from('fnb_orders').select('*, fnb_order_items(*)');
-      if (userId != null && userId.isNotEmpty) {
-        query = query.eq('user_id', userId);
-      }
-      final response = await query.order('created_at', ascending: false);
-
-      final List<FnbOrderModel> fetched = [];
-      for (final r in response as List) {
-        final order =
-            FnbOrderModel.fromJson(Map<String, dynamic>.from(r as Map));
-        fetched.add(order);
-        await ordersBox.put(order.id, order.toJson());
-      }
-      return fetched;
-    } catch (e) {
-      debugPrint('[FnbService] Fetch orders from Supabase error: $e');
-      return localOrders;
-    }
+    return localOrders;
   }
 
-  /// Update status pesanan F&B (Simulasi Petugas: processing -> ready -> completed)
+  /// Update status pesanan F&B di Hive lokal (Simulasi: processing -> ready -> completed)
   Future<FnbOrderModel?> updateOrderStatus(
       String orderId, String newStatus) async {
     final ordersBox = await _getOrdersBox();
@@ -224,15 +181,8 @@ class FnbService {
     final updated = order.copyWith(status: newStatus);
 
     await ordersBox.put(orderId, updated.toJson());
-
-    try {
-      final client = SupabaseService().client;
-      await client
-          .from('fnb_orders')
-          .update({'status': newStatus}).eq('id', orderId);
-    } catch (e) {
-      debugPrint('[FnbService] Supabase status update warning: $e');
-    }
+    debugPrint(
+        '[FnbService] Status pesanan $orderId diubah menjadi $newStatus di Hive.');
 
     return updated;
   }

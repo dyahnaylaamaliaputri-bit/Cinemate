@@ -114,6 +114,14 @@ class FnbItemModel {
           category: 'snack',
         ),
         FnbItemModel(
+          id: 'fnb-popcorn-caramel',
+          name: 'Caramel Popcorn Deluxe',
+          description:
+              'Popcorn renyah berbalut karamel manis gurih khas bioskop.',
+          price: 55000,
+          category: 'snack',
+        ),
+        FnbItemModel(
           id: 'fnb-nachos',
           name: 'Nachos Cheese Supreme',
           description:
@@ -133,6 +141,14 @@ class FnbItemModel {
           name: 'Coca-Cola Large',
           description: 'Minuman soda dingin segar ukuran jumbo 600ml.',
           price: 35000,
+          category: 'drink',
+        ),
+        FnbItemModel(
+          id: 'fnb-lemon-tea',
+          name: 'Iced Lemon Tea Jumbo',
+          description:
+              'Teh lemon segar dingin dengan perasan lemon asli ukuran jumbo 600ml.',
+          price: 28000,
           category: 'drink',
         ),
         FnbItemModel(
