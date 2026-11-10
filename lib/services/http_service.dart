@@ -12,11 +12,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'storage_service.dart';
 
 class HttpService {
-  HttpService._internal();
+  HttpService._internal() {
+    initialize();
+  }
   static final HttpService _instance = HttpService._internal();
   factory HttpService() => _instance;
 
   late final Dio _dio;
+  bool _isInitialized = false;
   final _storage = StorageService();
 
   static const int _defaultTimeout = 15;
@@ -24,6 +27,7 @@ class HttpService {
   static const int _maxRetries = 2;
 
   void initialize() {
+    if (_isInitialized) return;
     _dio = Dio(BaseOptions(
       connectTimeout: const Duration(seconds: _defaultTimeout),
       receiveTimeout: const Duration(seconds: _defaultTimeout),
@@ -38,6 +42,7 @@ class HttpService {
       responseBody: false,
       logPrint: (o) => debugPrint('[HTTP] $o'),
     ));
+    _isInitialized = true;
   }
 
   /// GET request

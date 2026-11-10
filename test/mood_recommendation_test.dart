@@ -1,11 +1,38 @@
 // test/mood_recommendation_test.dart
 // Unit tests untuk modul Rekomendasi Film Berbasis Mood AI (PB-031, PB-032, PB-033)
+// Menguji MoodDefinition, MoodController, MoodRecommendationService (Offline Fallback & Hive Cache)
 
+import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+import 'package:cinemate/controllers/mood_controller.dart';
 import 'package:cinemate/models/mood_model.dart';
 import 'package:cinemate/services/mood_service.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  late Directory tempDir;
+
+  setUpAll(() {
+    tempDir = Directory.systemTemp.createTempSync();
+    Hive.init(tempDir.path);
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      const MethodChannel('plugins.flutter.io/path_provider'),
+      (methodCall) async => tempDir.path,
+    );
+  });
+
+  tearDownAll(() {
+    try {
+      tempDir.deleteSync(recursive: true);
+    } catch (_) {}
+  });
+
   group('MoodDefinition Model Tests (PB-031)', () {
     test('allMoods should contain exactly 6 distinct moods', () {
       final moods = MoodDefinition.allMoods;
@@ -59,7 +86,7 @@ void main() {
     });
 
     test(
-        'getRecommendations should return recommendations with AI match and personal reasoning',
+        'getRecommendations should return recommendations with AI match and personal reasoning without Supabase',
         () async {
       final results = await service.getRecommendations(MoodType.happy);
 
@@ -101,6 +128,68 @@ void main() {
       final firstRec = results.first;
       expect(firstRec.aiReason.toLowerCase(),
           anyOf(contains('adrenalin'), contains('tegang'), contains('aksi')));
+    });
+
+    test('All 6 moods produce valid curated recommendations', () async {
+      for (final mood in MoodDefinition.allMoods) {
+        final results = await service.getRecommendations(mood.type);
+        expect(results, isNotEmpty, reason: 'Mood ${mood.title} harus punya rekomendasi');
+        expect(results.first.matchPercentage, inInclusiveRange(88, 99));
+        expect(results.first.aiReason, isNotEmpty);
+      }
+    });
+  });
+
+  group('MoodController Reactive State Tests (PB-031)', () {
+    test('MoodController initializes with 6 moods and loads default happy mood',
+        () async {
+      Get.testMode = true;
+      final controller = MoodController();
+      expect(controller.allMoods.length, equals(6));
+      expect(controller.selectedMood.value.type, equals(MoodType.happy));
+
+      await controller.loadRecommendations();
+      expect(controller.recommendations.isNotEmpty, isTrue);
+      expect(controller.isLoading.value, isFalse);
+      expect(controller.errorMessage.value, isEmpty);
+    });
+
+    test('MoodController selectMood updates selected mood and reloads list',
+        () async {
+      Get.testMode = true;
+      final controller = MoodController();
+
+      final sadMood = MoodDefinition.allMoods
+          .firstWhere((m) => m.type == MoodType.sad);
+      await controller.selectMood(sadMood);
+
+      expect(controller.selectedMood.value.type, equals(MoodType.sad));
+      expect(controller.recommendations.isNotEmpty, isTrue);
+      expect(controller.recommendations.first.aiReason.toLowerCase(),
+          anyOf(contains('karakter'), contains('emosional'), contains('katarsis')));
+
+      // Ganti ke bored
+      final boredMood = MoodDefinition.allMoods
+          .firstWhere((m) => m.type == MoodType.bored);
+      await controller.selectMood(boredMood);
+
+      expect(controller.selectedMood.value.type, equals(MoodType.bored));
+      expect(controller.recommendations.first.aiReason.toLowerCase(),
+          anyOf(contains('twist'), contains('teka-teki'), contains('bosan')));
+    });
+
+    test('Selecting the already active mood does not trigger duplicate load',
+        () async {
+      Get.testMode = true;
+      final controller = MoodController();
+      await controller.loadRecommendations();
+
+      final currentCount = controller.recommendations.length;
+      final currentMood = controller.selectedMood.value;
+
+      // Memanggil kembali mood yang sama
+      await controller.selectMood(currentMood);
+      expect(controller.recommendations.length, equals(currentCount));
     });
   });
 }

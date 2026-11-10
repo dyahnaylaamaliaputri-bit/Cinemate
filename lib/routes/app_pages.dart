@@ -20,6 +20,7 @@ import '../views/movie_detail/movie_detail_view.dart';
 import '../views/fnb/fnb_checkout_view.dart';
 import '../views/fnb/fnb_order_detail_view.dart';
 import '../views/mood/mood_picker_view.dart';
+import '../controllers/mood_controller.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -93,6 +94,11 @@ class AppPages {
     GetPage(
       name: Routes.moodPicker,
       page: () => const MoodPickerView(),
+      binding: BindingsBuilder(() {
+        if (!Get.isRegistered<MoodController>()) {
+          Get.lazyPut<MoodController>(() => MoodController());
+        }
+      }),
     ),
   ];
 }

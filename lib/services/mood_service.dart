@@ -1,10 +1,12 @@
 // lib/services/mood_service.dart
-// Service untuk discovery film TMDB berbasis emosi dan AI reasoning (PB-032, PB-033)
+// Service untuk discovery film TMDB berbasis emosi dan AI reasoning (PB-031, PB-032, PB-033)
+// Mendukung offline-first caching dengan Hive dan kurasi lokal tanpa Supabase.
 
 import 'dart:math';
 import '../models/mood_model.dart';
 import '../models/movie_model.dart';
 import 'http_service.dart';
+import 'storage_service.dart';
 
 class MoodRecommendationService {
   MoodRecommendationService._internal();
@@ -13,14 +15,35 @@ class MoodRecommendationService {
   factory MoodRecommendationService() => _instance;
 
   final HttpService _http = HttpService();
+  final StorageService _storage = StorageService();
 
   /// Mengambil rekomendasi film berdasarkan mood pengguna (PB-032)
+  /// Mendukung cache Hive lokal dan fallback kurasi offline tanpa Supabase.
   Future<List<MoodRecommendationItem>> getRecommendations(
-      MoodType moodType) async {
+    MoodType moodType, {
+    bool forceRefresh = false,
+  }) async {
     final moodDef =
         MoodDefinition.allMoods.firstWhere((m) => m.type == moodType);
     final genresParam = moodDef.genreIds.join(',');
+    final cacheKey = 'mood_${moodType.name}';
 
+    // 1. Cek cache Hive terlebih dahulu jika tidak force refresh
+    if (!forceRefresh) {
+      try {
+        final cached = await _storage.getCachedMovies(cacheKey);
+        if (cached.data != null &&
+            cached.data!.isNotEmpty &&
+            !cached.isExpired) {
+          final movies = cached.data!.map(MovieModel.fromJson).toList();
+          return _generateMoodRecommendations(moodDef, movies);
+        }
+      } catch (e) {
+        debugPrint('[MoodService] Hive cache read warning: $e');
+      }
+    }
+
+    // 2. Coba fetch online dari TMDB API
     try {
       final response = await _http.get(
         'https://api.themoviedb.org/3/discover/movie',
@@ -36,19 +59,35 @@ class MoodRecommendationService {
       if (response.statusCode == 200 && response.data != null) {
         final List results = response.data['results'] as List? ?? [];
         if (results.isNotEmpty) {
-          final movies = results
+          final rawMovies = results
               .take(6)
-              .map((raw) => MovieModel.fromJson(raw as Map<String, dynamic>))
+              .map((raw) => raw as Map<String, dynamic>)
               .toList();
+
+          // Simpan ke Hive cache lokal
+          try {
+            await _storage.cacheMovies(cacheKey, rawMovies);
+          } catch (_) {}
+
+          final movies = rawMovies.map(MovieModel.fromJson).toList();
           return _generateMoodRecommendations(moodDef, movies);
         }
       }
     } catch (e) {
       debugPrint(
-          '[MoodService] TMDB discover fetch error (using curated fallback): $e');
+          '[MoodService] TMDB discover fetch error (checking cached or curated fallback): $e');
     }
 
-    // Fallback kurasi offline jika API TMDB offline / limit
+    // 3. Fallback jika offline: coba cache Hive yang expired sekalipun
+    try {
+      final cached = await _storage.getCachedMovies(cacheKey);
+      if (cached.data != null && cached.data!.isNotEmpty) {
+        final movies = cached.data!.map(MovieModel.fromJson).toList();
+        return _generateMoodRecommendations(moodDef, movies);
+      }
+    } catch (_) {}
+
+    // 4. Fallback kurasi offline jika API TMDB offline / limit dan belum ada cache
     final fallbackMovies = _getCuratedFallbackMovies(moodType);
     return _generateMoodRecommendations(moodDef, fallbackMovies);
   }

@@ -82,7 +82,7 @@ docs/
 - [x] **PB-030 (Riwayat & Pelacakan Status Pesanan F&B):** Sub-tab *"Pesanan Saya"* dengan status stepper dinamis (*Sedang Disiapkan* ⏳ $\rightarrow$ *Siap Diambil* ✨ $\rightarrow$ *Selesai Diambil* ✅), persistensi offline ke Hive (`fnb_orders_cache`), dan tombol simulasi staf bioskop.
 
 ### 6. Epic Rekomendasi Film Berbasis Mood AI (MOD / AIL — PB 6)
-- [x] **PB-031 (Layar Pemilih Mood Interaktif):** Banner pengantar Mood AI di `HomeTab`, navigasi ke `MoodPickerView` dengan 6 kategori emosi (*Gembira*, *Haru*, *Romantis*, *Tegang*, *Santai*, *Bosan*), visualisasi gradien estetik, dan highlight kartu emosi terpilih.
+- [x] **PB-031 (Layar Pemilih Mood Interaktif — Tanpa Supabase):** Banner pengantar Mood AI di `HomeTab`, navigasi ke `MoodPickerView` dengan 6 kategori emosi (*Gembira*, *Haru*, *Romantis*, *Tegang*, *Santai*, *Bosan*), visualisasi gradien estetik dinamis, highlight kartu emosi terpilih, `MoodController` reaktif, integrasi binding rute, fallback kurasi offline tanpa Supabase, dan penyimpanan Hive cache lokal.
 - [x] **PB-032 (Mood-to-Genre Engine & Filter TMDB Discovery):** `MoodRecommendationService` memetakan genre ID TMDB dan memanggil discovery API `/discover/movie` dengan rating $\ge 7.0$, dilengkapi fallback kurasi offline berkualitas tinggi jika jaringan offline/limit.
 - [x] **PB-033 (Hasil Rekomendasi AI & Aksi Direct Booking):** Kartu rekomendasi film dengan persentase kecocokan AI (*88% - 99% MATCH*), analisis personalisasi berbasis mood, tombol sinopsis, dan tombol *"Pesan Tiket"* yang langsung membuka alur *Book by Movie* (`Routes.bookByMovie`).
 

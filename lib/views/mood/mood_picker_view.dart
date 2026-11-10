@@ -384,7 +384,7 @@ class _MoodPickerViewState extends State<MoodPickerView> {
                   ),
                 ),
                 Text(
-                  ' Film Sesuai',
+                  '${list.length} Film Sesuai',
                   style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 12,
@@ -478,7 +478,7 @@ class _MoodPickerViewState extends State<MoodPickerView> {
                                     color: Colors.white, size: 12),
                                 const SizedBox(width: 4),
                                 Text(
-                                  '% MATCH',
+                                  '${item.matchPercentage}% MATCH',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 11,
