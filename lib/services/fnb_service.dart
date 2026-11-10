@@ -16,6 +16,8 @@ class FnbService {
   static const String boxFnbCache = 'fnb_cache';
   static const String boxFnbOrders = 'fnb_orders_cache';
   static const String keyFnbTimestamp = 'fnb_last_fetched';
+  static const String keyActiveCart = 'active_cart';
+  static const String keyCartNotes = 'cart_notes';
 
   /// Mendapatkan box Hive untuk katalog menu
   Future<Box> _getFnbBox() async {
@@ -90,6 +92,57 @@ class FnbService {
     final box = await _getFnbBox();
     await box.delete('items');
     await box.delete(keyFnbTimestamp);
+  }
+
+  /// Simpan keranjang aktif dan catatan ke Hive lokal (PB-027)
+  Future<void> saveActiveCart(
+      Map<String, int> cart, Map<String, String> notes) async {
+    try {
+      final box = await _getFnbBox();
+      await box.put(keyActiveCart, cart);
+      await box.put(keyCartNotes, notes);
+    } catch (e) {
+      debugPrint('[FnbService] Error saving active cart: $e');
+    }
+  }
+
+  /// Ambil keranjang aktif dari Hive lokal (PB-027)
+  Future<Map<String, int>> loadActiveCart() async {
+    try {
+      final box = await _getFnbBox();
+      final raw = box.get(keyActiveCart);
+      if (raw is Map) {
+        return raw.map((k, v) => MapEntry(k.toString(), (v as num).toInt()));
+      }
+    } catch (e) {
+      debugPrint('[FnbService] Error loading active cart: $e');
+    }
+    return {};
+  }
+
+  /// Ambil catatan keranjang dari Hive lokal (PB-027)
+  Future<Map<String, String>> loadActiveCartNotes() async {
+    try {
+      final box = await _getFnbBox();
+      final raw = box.get(keyCartNotes);
+      if (raw is Map) {
+        return raw.map((k, v) => MapEntry(k.toString(), v.toString()));
+      }
+    } catch (e) {
+      debugPrint('[FnbService] Error loading active cart notes: $e');
+    }
+    return {};
+  }
+
+  /// Bersihkan keranjang aktif dari Hive lokal
+  Future<void> clearActiveCart() async {
+    try {
+      final box = await _getFnbBox();
+      await box.delete(keyActiveCart);
+      await box.delete(keyCartNotes);
+    } catch (e) {
+      debugPrint('[FnbService] Error clearing active cart from Hive: $e');
+    }
   }
 
   /// Generate kode pengambilan F&B unik (format: FNB-XXXXX)

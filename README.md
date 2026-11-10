@@ -76,7 +76,7 @@ docs/
 
 ### 5. Epic Pesan Makanan & Minuman / F&B (FNB — PB 5)
 - [x] **PB-026 (Katalog F&B Offline-First & Hive Cache — Tanpa Supabase):** Model `FnbItemModel` dengan 12 varian menu lengkap, `FnbService` berbasis Hive box `fnb_cache` (100% offline-first murni tanpa ketergantungan Supabase), banner indikator status Hive cache & timestamp sinkronisasi, filter chip kategori dinamis (*Semua*, *Snack*, *Minuman*, *Paket Combo*, *Makanan Berat*) dengan counter kuantitas menu, pencarian real-time dengan tombol clear, shimmer skeleton loading (`FnbListSkeleton`), dan penanganan empty state saat pencarian tidak ditemukan.
-- [x] **PB-027 (Keranjang Pesanan F&B / Reactive Cart Management):** `FnbController` mengelola keranjang reaktif, penambahan/pengurangan item, catatan khusus per menu, subtotal, biaya layanan, dan floating summary checkout bar di bagian bawah layar.
+- [x] **PB-027 (Keranjang Pesanan F&B / Reactive Cart Management — Tanpa Supabase):** `FnbController` mengelola keranjang belanja reaktif (`cart`), penambahan/pengurangan item, persistensi otomatis ke Hive box `fnb_cache` (`active_cart` & `cart_notes`), instruksi/catatan khusus per menu (`itemNotes`), kalkulasi subtotal, biaya layanan aplikasi Rp 2.000, grand total, floating summary bar interaktif, badge keranjang di AppBar, modal bottom sheet detail keranjang (`FnbCartBottomSheet`), serta dialog konfirmasi pengosongan keranjang.
 - [x] **PB-028 (Pilihan Bioskop & Metode Pengambilan):** `FnbCheckoutView` mendukung pemilihan bioskop concession dan 2 metode pengambilan: *Ambil di Counter Concession* atau *Antar ke Studio & Kursi* (otomatis membaca data studio dan kursi).
 - [x] **PB-029 (Simulasi Pembayaran & E-Voucher QR Code F&B):** Integrasi transaksi ke tabel Supabase `fnb_orders` & `fnb_order_items`, penerbitan kode pickup 5 digit (`FNB-XXXXX`), serta QR Code E-Voucher (`qr_flutter`) untuk verifikasi staf bioskop.
 - [x] **PB-030 (Riwayat & Pelacakan Status Pesanan F&B):** Sub-tab *"Pesanan Saya"* dengan status stepper dinamis (*Sedang Disiapkan* ⏳ $\rightarrow$ *Siap Diambil* ✨ $\rightarrow$ *Selesai Diambil* ✅), persistensi offline ke Hive (`fnb_orders_cache`), dan tombol simulasi staf bioskop.
@@ -109,7 +109,7 @@ docs/
    ```bash
    flutter pub get
    ```
-5. **Jalankan pengujian unit (Semua 44 Unit Test Wajib Passed):**
+5. **Jalankan pengujian unit (Semua 47 Unit Test Wajib Passed):**
    ```bash
    flutter test
    ```

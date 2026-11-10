@@ -53,6 +53,7 @@ class FnbController extends GetxController {
   void onInit() {
     super.onInit();
     fetchFnbCatalog();
+    loadActiveCart();
     loadCinemas();
     fetchUserOrders();
   }
@@ -143,10 +144,30 @@ class FnbController extends GetxController {
 
   // ── Cart Operations (PB-027) ──────────────────────────────────────────────
 
+  Future<void> loadActiveCart() async {
+    try {
+      final savedCart = await _service.loadActiveCart();
+      final savedNotes = await _service.loadActiveCartNotes();
+      if (savedCart.isNotEmpty) {
+        cart.assignAll(savedCart);
+      }
+      if (savedNotes.isNotEmpty) {
+        itemNotes.assignAll(savedNotes);
+      }
+    } catch (e) {
+      debugPrint('[FnbController] Error loading active cart from Hive: $e');
+    }
+  }
+
+  void _persistCart() {
+    _service.saveActiveCart(cart, itemNotes);
+  }
+
   void addToCart(FnbItemModel item) {
     final current = cart[item.id] ?? 0;
     cart[item.id] = current + 1;
     cart.refresh();
+    _persistCart();
   }
 
   void removeFromCart(FnbItemModel item) {
@@ -158,6 +179,7 @@ class FnbController extends GetxController {
       cart[item.id] = current - 1;
     }
     cart.refresh();
+    _persistCart();
   }
 
   void setItemQuantity(FnbItemModel item, int quantity) {
@@ -168,6 +190,7 @@ class FnbController extends GetxController {
       cart[item.id] = quantity;
     }
     cart.refresh();
+    _persistCart();
   }
 
   int getItemQuantity(String itemId) => cart[itemId] ?? 0;
@@ -178,6 +201,7 @@ class FnbController extends GetxController {
     } else {
       itemNotes[itemId] = note.trim();
     }
+    _persistCart();
   }
 
   String getItemNote(String itemId) => itemNotes[itemId] ?? '';
@@ -185,6 +209,7 @@ class FnbController extends GetxController {
   void clearCart() {
     cart.clear();
     itemNotes.clear();
+    _service.clearActiveCart();
   }
 
   int get totalCartItems => cart.values.fold(0, (sum, q) => sum + q);
@@ -205,7 +230,26 @@ class FnbController extends GetxController {
   int get grandTotal => subtotal + serviceFee;
 
   String get formattedSubtotal => _formatRupiah(subtotal);
+  String get formattedServiceFee => _formatRupiah(serviceFee);
   String get formattedGrandTotal => _formatRupiah(grandTotal);
+
+  /// Daftar item terstruktur untuk keranjang bottom sheet & checkout
+  List<Map<String, dynamic>> get cartItemsDetailed {
+    final result = <Map<String, dynamic>>[];
+    for (final entry in cart.entries) {
+      final item = items.firstWhereOrNull((it) => it.id == entry.key);
+      if (item != null) {
+        result.add({
+          'item': item,
+          'quantity': entry.value,
+          'subtotal': item.price * entry.value,
+          'formattedSubtotal': _formatRupiah(item.price * entry.value),
+          'note': itemNotes[item.id] ?? '',
+        });
+      }
+    }
+    return result;
+  }
 
   String _formatRupiah(int amount) {
     final str = amount.toString();

@@ -7,6 +7,7 @@ import '../../../controllers/fnb_controller.dart';
 import '../../../models/fnb_item_model.dart';
 import '../../../routes/app_routes.dart';
 import '../../../utils/app_colors.dart';
+import '../../fnb/widgets/fnb_cart_bottom_sheet.dart';
 import '../../widgets/shimmer_loading.dart';
 
 class FnbTab extends StatefulWidget {
@@ -50,6 +51,47 @@ class _FnbTabState extends State<FnbTab> with SingleTickerProviderStateMixin {
             fontSize: 17,
           ),
         ),
+        actions: [
+          Obx(() {
+            final count = fnbCtrl.totalCartItems;
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.shopping_bag_outlined,
+                      color: AppColors.textPrimary),
+                  tooltip: 'Keranjang Belanja',
+                  onPressed: () => FnbCartBottomSheet.show(context),
+                ),
+                if (count > 0)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 18,
+                        minHeight: 18,
+                      ),
+                      child: Text(
+                        '$count',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          }),
+        ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.primary,
@@ -84,68 +126,85 @@ class _FnbTabState extends State<FnbTab> with SingleTickerProviderStateMixin {
               left: 16,
               right: 16,
               bottom: 16,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.card,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.primary, width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(10),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () => FnbCartBottomSheet.show(context),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.card,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.primary, width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.6),
+                        blurRadius: 16,
+                        offset: const Offset(0, 4),
                       ),
-                      child: const Icon(Icons.shopping_bag_rounded,
-                          color: AppColors.primary, size: 24),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '${fnbCtrl.totalCartItems} Item Dipilih',
-                            style: const TextStyle(
-                                color: AppColors.textSecondary, fontSize: 12),
-                          ),
-                          Text(
-                            fnbCtrl.formattedGrandTotal,
-                            style: const TextStyle(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.shopping_bag_rounded,
+                            color: AppColors.primary, size: 24),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  '${fnbCtrl.totalCartItems} Item Dipilih',
+                                  style: const TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 12),
+                                ),
+                                const SizedBox(width: 6),
+                                const Text(
+                                  '• Ketuk untuk rincian',
+                                  style: TextStyle(
+                                      color: AppColors.primaryLight,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
+                            Text(
+                              fnbCtrl.formattedGrandTotal,
+                              style: const TextStyle(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => Get.toNamed(Routes.fnbCheckout),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                      ElevatedButton(
+                        onPressed: () => Get.toNamed(Routes.fnbCheckout),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: const Text('Checkout →',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13)),
                       ),
-                      child: const Text('Checkout →',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 13)),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );
@@ -502,6 +561,45 @@ class _FnbTabState extends State<FnbTab> with SingleTickerProviderStateMixin {
                       fontSize: 14,
                     ),
                   ),
+                  if (qty > 0) ...[
+                    const SizedBox(height: 5),
+                    InkWell(
+                      onTap: () => FnbCartBottomSheet.show(context),
+                      child: Row(
+                        children: [
+                          Icon(
+                            fnbCtrl.getItemNote(item.id).isNotEmpty
+                                ? Icons.edit_note_rounded
+                                : Icons.add_comment_outlined,
+                            size: 14,
+                            color: fnbCtrl.getItemNote(item.id).isNotEmpty
+                                ? AppColors.primaryLight
+                                : AppColors.textSecondary,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              fnbCtrl.getItemNote(item.id).isNotEmpty
+                                  ? 'Catatan: ${fnbCtrl.getItemNote(item.id)}'
+                                  : '+ Tambah catatan',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: fnbCtrl.getItemNote(item.id).isNotEmpty
+                                    ? AppColors.primaryLight
+                                    : AppColors.textSecondary,
+                                fontSize: 11,
+                                fontStyle:
+                                    fnbCtrl.getItemNote(item.id).isNotEmpty
+                                        ? FontStyle.italic
+                                        : FontStyle.normal,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

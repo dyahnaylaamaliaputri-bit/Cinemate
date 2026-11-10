@@ -191,6 +191,82 @@ void main() {
       expect(controller.getItemQuantity(item.id), equals(0));
       expect(controller.cart.isEmpty, isTrue);
     });
+
+    test(
+        'FnbController Cart calculations subtotal, fee, grandTotal, and detailed list (PB-027)',
+        () async {
+      final controller = FnbController();
+      await controller.fetchFnbCatalog();
+      controller.clearCart();
+
+      final item1 = controller.items[0]; // misal Popcorn Regular: 35.000
+      final item2 = controller.items[1]; // misal Popcorn Large: 50.000
+
+      controller.addToCart(item1);
+      controller.addToCart(item1); // 2 x 35.000 = 70.000
+      controller.addToCart(item2); // 1 x 50.000 = 50.000
+
+      expect(controller.totalCartItems, equals(3));
+      final expectedSubtotal = (item1.price * 2) + (item2.price * 1);
+      expect(controller.subtotal, equals(expectedSubtotal));
+      expect(controller.serviceFee, equals(2000));
+      expect(controller.grandTotal, equals(expectedSubtotal + 2000));
+
+      expect(controller.formattedSubtotal, contains('Rp '));
+      expect(controller.formattedServiceFee, equals('Rp 2.000'));
+      expect(controller.formattedGrandTotal, contains('Rp '));
+
+      // Verifikasi cartItemsDetailed
+      final detailed = controller.cartItemsDetailed;
+      expect(detailed.length, equals(2));
+      expect(detailed.first['quantity'], equals(2));
+    });
+
+    test('FnbController special instructions & notes per item (PB-027)', () {
+      final controller = FnbController();
+      final item = FnbItemModel.seedItems.first;
+
+      controller.addToCart(item);
+      expect(controller.getItemNote(item.id), isEmpty);
+
+      controller.setItemNote(item.id, 'Ekstra bumbu gurih mentega');
+      expect(
+          controller.getItemNote(item.id), equals('Ekstra bumbu gurih mentega'));
+
+      // Hapus catatan dengan string kosong
+      controller.setItemNote(item.id, '');
+      expect(controller.getItemNote(item.id), isEmpty);
+
+      // Isi catatan lagi dan kosongkan keranjang
+      controller.setItemNote(item.id, 'Tanpa es');
+      controller.clearCart();
+      expect(controller.cart.isEmpty, isTrue);
+      expect(controller.getItemNote(item.id), isEmpty);
+    });
+
+    test('FnbService active cart persistence in Hive local storage (PB-027)',
+        () async {
+      final service = FnbService();
+      await service.clearActiveCart();
+
+      final initialCart = await service.loadActiveCart();
+      expect(initialCart.isEmpty, isTrue);
+
+      final dummyCart = {'fnb-popcorn-reg': 2, 'fnb-coke-reg': 3};
+      final dummyNotes = {'fnb-coke-reg': 'Kurangi es batu'};
+
+      await service.saveActiveCart(dummyCart, dummyNotes);
+
+      final loadedCart = await service.loadActiveCart();
+      final loadedNotes = await service.loadActiveCartNotes();
+
+      expect(loadedCart, equals(dummyCart));
+      expect(loadedNotes, equals(dummyNotes));
+
+      await service.clearActiveCart();
+      final clearedCart = await service.loadActiveCart();
+      expect(clearedCart.isEmpty, isTrue);
+    });
   });
 
   group('FnbOrderModel & FnbOrderItemModel Tests (PB-027, PB-028, PB-029, PB-030)',
