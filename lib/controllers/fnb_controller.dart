@@ -6,8 +6,11 @@ import 'package:get/get.dart';
 import '../models/cinema_model.dart';
 import '../models/fnb_item_model.dart';
 import '../models/fnb_order_model.dart';
+import '../models/ticket_model.dart';
 import '../services/cinema_service.dart';
 import '../services/fnb_service.dart';
+import '../services/ticket_service.dart';
+import '../utils/app_colors.dart';
 import 'auth_controller.dart';
 import 'tickets_controller.dart';
 
@@ -42,6 +45,8 @@ class FnbController extends GetxController {
   final pickupMethod = 'counter'.obs; // 'counter' atau 'delivery'
   final studioNumber = ''.obs;
   final seatNumber = ''.obs;
+  final detectedActiveTicket = Rx<TicketModel?>(null);
+  final hasActiveTicketDetected = false.obs;
   final selectedPaymentMethod = 'QRIS'.obs;
   final isSubmittingOrder = false.obs;
 
@@ -268,21 +273,41 @@ class FnbController extends GetxController {
 
   // ── Checkout & Pemesanan (PB-028, PB-029) ─────────────────────────────────
 
-  /// Cek tiket aktif untuk pre-fill pengantaran ke studio & kursi
-  void autoDetectActiveTicket() {
+  /// Cek tiket aktif untuk pre-fill pengantaran ke studio & kursi (PB-028)
+  Future<void> autoDetectActiveTicket() async {
     try {
+      TicketModel? activeTicket;
+
+      // 1. Coba dari TicketsController yang sudah aktif di memori
       if (Get.isRegistered<TicketsController>()) {
         final ticketCtrl = Get.find<TicketsController>();
         if (ticketCtrl.activeTickets.isNotEmpty) {
-          final latestTicket = ticketCtrl.activeTickets.first;
-          studioNumber.value = latestTicket.hallName;
-          if (latestTicket.seats.isNotEmpty) {
-            seatNumber.value = latestTicket.seats.join(', ');
-          }
-          // Cocokkan bioskop jika ada
+          activeTicket = ticketCtrl.activeTickets.first;
+        }
+      }
+
+      // 2. Jika belum ada di controller, baca langsung dari Hive local cache
+      if (activeTicket == null) {
+        final result = await TicketService().getUserTicketsWithMeta();
+        final actives = result.tickets.where((t) => t.isTicketActive).toList();
+        if (actives.isNotEmpty) {
+          activeTicket = actives.first;
+        }
+      }
+
+      if (activeTicket != null) {
+        detectedActiveTicket.value = activeTicket;
+        hasActiveTicketDetected.value = true;
+        studioNumber.value = activeTicket.hallName;
+        if (activeTicket.seats.isNotEmpty) {
+          seatNumber.value = activeTicket.seats.join(', ');
+        }
+
+        // Cocokkan bioskop jika ada
+        if (availableCinemas.isNotEmpty) {
           final matchingCinema = availableCinemas.firstWhereOrNull(
             (c) =>
-                c.name.toLowerCase() == latestTicket.cinemaName.toLowerCase(),
+                c.name.toLowerCase() == activeTicket!.cinemaName.toLowerCase(),
           );
           if (matchingCinema != null) {
             selectedCinema.value = matchingCinema;
@@ -296,14 +321,32 @@ class FnbController extends GetxController {
 
   Future<FnbOrderModel?> submitOrder() async {
     if (cart.isEmpty) {
-      Get.snackbar(
-          'Keranjang Kosong', 'Silakan pilih makanan/minuman terlebih dahulu.');
+      _safeSnackbar(
+        'Keranjang Kosong',
+        'Silakan pilih makanan/minuman terlebih dahulu.',
+      );
       return null;
     }
 
     if (selectedCinema.value == null) {
-      Get.snackbar('Pilih Bioskop', 'Pilih lokasi bioskop tempat pemesanan.');
+      _safeSnackbar(
+        'Pilih Bioskop',
+        'Pilih lokasi bioskop tempat pemesanan F&B.',
+      );
       return null;
+    }
+
+    if (pickupMethod.value == 'delivery') {
+      if (studioNumber.value.trim().isEmpty ||
+          seatNumber.value.trim().isEmpty) {
+        _safeSnackbar(
+          'Lengkapi Data Antar',
+          'Mohon isi nomor studio dan nomor kursi untuk pengantaran ke dalam studio.',
+          backgroundColor: AppColors.card,
+          colorText: AppColors.error,
+        );
+        return null;
+      }
     }
 
     isSubmittingOrder.value = true;
@@ -350,11 +393,29 @@ class FnbController extends GetxController {
       return newOrder;
     } catch (e) {
       debugPrint('[FnbController] Error submitting order: $e');
-      Get.snackbar(
+      _safeSnackbar(
           'Pesanan Gagal', 'Terjadi kesalahan saat memproses pesanan.');
       return null;
     } finally {
       isSubmittingOrder.value = false;
+    }
+  }
+
+  void _safeSnackbar(
+    String title,
+    String message, {
+    Color? backgroundColor,
+    Color? colorText,
+    SnackPosition snackPosition = SnackPosition.BOTTOM,
+  }) {
+    if (Get.context != null) {
+      Get.snackbar(
+        title,
+        message,
+        snackPosition: snackPosition,
+        backgroundColor: backgroundColor,
+        colorText: colorText,
+      );
     }
   }
 
@@ -397,10 +458,9 @@ class FnbController extends GetxController {
         userOrders[index] = updated;
         userOrders.refresh();
       }
-      Get.snackbar(
+      _safeSnackbar(
         'Status Diperbarui',
         'Pesanan ${updated.pickupCode} kini berstatus: ${updated.statusLabel}',
-        snackPosition: SnackPosition.BOTTOM,
       );
     }
   }

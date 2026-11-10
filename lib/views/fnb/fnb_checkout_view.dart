@@ -19,11 +19,45 @@ class FnbCheckoutView extends StatefulWidget {
 
 class _FnbCheckoutViewState extends State<FnbCheckoutView> {
   final fnbCtrl = Get.find<FnbController>();
+  late final TextEditingController _studioController;
+  late final TextEditingController _seatController;
 
   @override
   void initState() {
     super.initState();
-    fnbCtrl.autoDetectActiveTicket();
+    _studioController = TextEditingController(text: fnbCtrl.studioNumber.value);
+    _seatController = TextEditingController(text: fnbCtrl.seatNumber.value);
+
+    _studioController.addListener(() {
+      if (fnbCtrl.studioNumber.value != _studioController.text) {
+        fnbCtrl.studioNumber.value = _studioController.text;
+      }
+    });
+    _seatController.addListener(() {
+      if (fnbCtrl.seatNumber.value != _seatController.text) {
+        fnbCtrl.seatNumber.value = _seatController.text;
+      }
+    });
+
+    fnbCtrl.autoDetectActiveTicket().then((_) {
+      if (mounted) {
+        if (fnbCtrl.studioNumber.value.isNotEmpty &&
+            _studioController.text != fnbCtrl.studioNumber.value) {
+          _studioController.text = fnbCtrl.studioNumber.value;
+        }
+        if (fnbCtrl.seatNumber.value.isNotEmpty &&
+            _seatController.text != fnbCtrl.seatNumber.value) {
+          _seatController.text = fnbCtrl.seatNumber.value;
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _studioController.dispose();
+    _seatController.dispose();
+    super.dispose();
   }
 
   @override
@@ -191,10 +225,19 @@ class _FnbCheckoutViewState extends State<FnbCheckoutView> {
           items: fnbCtrl.availableCinemas.map((cinema) {
             return DropdownMenuItem<CinemaModel>(
               value: cinema,
-              child: Text(
-                '${cinema.name} (${cinema.city})',
-                style:
-                    const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+              child: Row(
+                children: [
+                  const Icon(Icons.location_on, size: 16, color: AppColors.gold),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '${cinema.name} (${cinema.city})',
+                      style: const TextStyle(
+                          color: AppColors.textPrimary, fontSize: 14),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
             );
           }).toList(),
@@ -207,87 +250,194 @@ class _FnbCheckoutViewState extends State<FnbCheckoutView> {
   }
 
   Widget _buildPickupMethodSelector() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        children: [
-          RadioListTile<String>(
-            activeColor: AppColors.primary,
-            title: const Text('Ambil di Counter Concession',
-                style: TextStyle(color: AppColors.textPrimary, fontSize: 14)),
-            subtitle: const Text('Ambil pesanan mandiri dengan E-Voucher QR',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-            value: 'counter',
-            groupValue: fnbCtrl.pickupMethod.value,
-            onChanged: (val) => fnbCtrl.pickupMethod.value = val!,
-          ),
-          Divider(color: AppColors.border, height: 1),
-          RadioListTile<String>(
-            activeColor: AppColors.primary,
-            title: const Text('Antar Langsung ke Studio & Kursi',
-                style: TextStyle(color: AppColors.textPrimary, fontSize: 14)),
-            subtitle: const Text(
-                'Petugas akan mengantar pesanan ke tempat dudukmu',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-            value: 'delivery',
-            groupValue: fnbCtrl.pickupMethod.value,
-            onChanged: (val) => fnbCtrl.pickupMethod.value = val!,
-          ),
-          if (fnbCtrl.pickupMethod.value == 'delivery')
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      style: const TextStyle(
-                          color: AppColors.textPrimary, fontSize: 13),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        labelText: 'Studio',
-                        hintText: 'Misal: Studio 1',
-                        labelStyle: const TextStyle(
-                            color: AppColors.textSecondary, fontSize: 12),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                      ),
-                      controller: TextEditingController(
-                          text: fnbCtrl.studioNumber.value)
-                        ..selection = TextSelection.collapsed(
-                            offset: fnbCtrl.studioNumber.value.length),
-                      onChanged: (v) => fnbCtrl.studioNumber.value = v,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      style: const TextStyle(
-                          color: AppColors.textPrimary, fontSize: 13),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        labelText: 'Nomor Kursi',
-                        hintText: 'Misal: C4, C5',
-                        labelStyle: const TextStyle(
-                            color: AppColors.textSecondary, fontSize: 12),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                      ),
-                      controller:
-                          TextEditingController(text: fnbCtrl.seatNumber.value)
-                            ..selection = TextSelection.collapsed(
-                                offset: fnbCtrl.seatNumber.value.length),
-                      onChanged: (v) => fnbCtrl.seatNumber.value = v,
-                    ),
-                  ),
-                ],
-              ),
+    final ticket = fnbCtrl.detectedActiveTicket.value;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (fnbCtrl.hasActiveTicketDetected.value && ticket != null) ...[
+          Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.primary.withOpacity(0.35)),
             ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.confirmation_number_rounded,
+                    color: AppColors.gold, size: 22),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            'Tiket Aktif Terdeteksi',
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.gold.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'Auto-filled',
+                              style: TextStyle(
+                                color: AppColors.gold,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${ticket.movieTitle} • ${ticket.hallName} • Kursi ${ticket.seats.join(", ")}',
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${ticket.cinemaName} (${ticket.showDate} • ${ticket.showTime})',
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
-      ),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.card,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Column(
+            children: [
+              RadioListTile<String>(
+                activeColor: AppColors.primary,
+                title: const Text('Ambil di Counter Concession',
+                    style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600)),
+                subtitle: const Text(
+                    'Ambil pesanan mandiri dengan E-Voucher QR',
+                    style:
+                        TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                value: 'counter',
+                groupValue: fnbCtrl.pickupMethod.value,
+                onChanged: (val) {
+                  if (val != null) fnbCtrl.pickupMethod.value = val;
+                },
+              ),
+              Divider(color: AppColors.border, height: 1),
+              RadioListTile<String>(
+                activeColor: AppColors.primary,
+                title: const Text('Antar Langsung ke Studio & Kursi',
+                    style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600)),
+                subtitle: const Text(
+                    'Petugas cinema mengantar pesanan ke tempat dudukmu',
+                    style:
+                        TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                value: 'delivery',
+                groupValue: fnbCtrl.pickupMethod.value,
+                onChanged: (val) {
+                  if (val != null) fnbCtrl.pickupMethod.value = val;
+                },
+              ),
+              if (fnbCtrl.pickupMethod.value == 'delivery') ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Detail Kursi Penonton:',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _studioController,
+                              style: const TextStyle(
+                                  color: AppColors.textPrimary, fontSize: 13),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                labelText: 'Studio / Hall',
+                                hintText: 'Misal: Studio 1',
+                                prefixIcon: const Icon(Icons.meeting_room_outlined,
+                                    size: 18, color: AppColors.textSecondary),
+                                labelStyle: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 12),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: TextField(
+                              controller: _seatController,
+                              style: const TextStyle(
+                                  color: AppColors.textPrimary, fontSize: 13),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                labelText: 'Nomor Kursi',
+                                hintText: 'Misal: C4, C5',
+                                prefixIcon: const Icon(
+                                    Icons.event_seat_outlined,
+                                    size: 18,
+                                    color: AppColors.textSecondary),
+                                labelStyle: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 12),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 

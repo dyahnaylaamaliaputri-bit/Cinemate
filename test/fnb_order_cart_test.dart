@@ -4,11 +4,14 @@
 
 import 'dart:io';
 import 'package:cinemate/controllers/fnb_controller.dart';
+import 'package:cinemate/controllers/tickets_controller.dart';
 import 'package:cinemate/models/fnb_item_model.dart';
 import 'package:cinemate/models/fnb_order_model.dart';
+import 'package:cinemate/models/ticket_model.dart';
 import 'package:cinemate/services/fnb_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
 void main() {
@@ -364,6 +367,134 @@ void main() {
       expect(copy.pickupMethod, equals('delivery'));
       expect(copy.studioNumber, equals('1'));
       expect(copy.seatNumber, equals('D8'));
+    });
+  });
+
+  group(
+      'PB-028: Cinema Selection, Pickup Methods & Active Ticket Auto-Detection (Tanpa Supabase)',
+      () {
+    test('Cinema selection and local fallback cinemas without Supabase',
+        () async {
+      final controller = FnbController();
+      await controller.loadCinemas();
+
+      expect(controller.availableCinemas.isNotEmpty, isTrue);
+      expect(controller.selectedCinema.value, isNotNull);
+
+      // Verifikasi bioskop default
+      expect(
+          controller.selectedCinema.value?.name, contains('Cinemate Plaza'));
+
+      // Switch cinema
+      if (controller.availableCinemas.length > 1) {
+        final secondCinema = controller.availableCinemas[1];
+        controller.selectedCinema.value = secondCinema;
+        expect(controller.selectedCinema.value, equals(secondCinema));
+      }
+    });
+
+    test(
+        'Auto-detection of active tickets pre-fills Studio, Seats, and Cinema',
+        () async {
+      Get.testMode = true;
+      final ticketCtrl = Get.put(TicketsController());
+      final dummyTicket = TicketModel(
+        id: 't-test-01',
+        bookingCode: 'CNM-77112',
+        userId: 'usr-test',
+        showtimeId: 'st-01',
+        movieId: 550,
+        movieTitle: 'Fight Club',
+        cinemaId: 'd956c35c-2486-4b51-93f1-effe30152db1',
+        cinemaName: 'Metro Cinema Senayan',
+        cinemaAddress: 'Jl. Asia Afrika No. 8, Jakarta Selatan',
+        hallName: 'Studio 3',
+        experience: 'Regular 2D',
+        showDate: '2026-11-12',
+        showTime: '20:15',
+        seats: ['F7', 'F8'],
+        totalPrice: 110000,
+        qrData: 'CNM-77112',
+        createdAt: DateTime.now(),
+      );
+      ticketCtrl.activeTickets.assignAll([dummyTicket]);
+
+      final fnbCtrl = FnbController();
+      await fnbCtrl.loadCinemas();
+      // Sebelum auto-detect, bioskop default adalah Cinemate Plaza
+      expect(fnbCtrl.selectedCinema.value?.name, equals('Cinemate Plaza'));
+
+      await fnbCtrl.autoDetectActiveTicket();
+
+      expect(fnbCtrl.hasActiveTicketDetected.value, isTrue);
+      expect(fnbCtrl.detectedActiveTicket.value, equals(dummyTicket));
+      expect(fnbCtrl.studioNumber.value, equals('Studio 3'));
+      expect(fnbCtrl.seatNumber.value, equals('F7, F8'));
+      // Setelah auto-detect, bioskop otomatis cocok dengan tiket aktif
+      expect(fnbCtrl.selectedCinema.value?.name,
+          equals('Metro Cinema Senayan'));
+
+      Get.delete<TicketsController>();
+    });
+
+    test('submitOrder validation: delivery requires studio and seat number',
+        () async {
+      Get.testMode = true;
+      final fnbCtrl = FnbController();
+      await fnbCtrl.fetchFnbCatalog();
+      fnbCtrl.clearCart();
+
+      // Empty cart validation
+      var order = await fnbCtrl.submitOrder();
+      expect(order, isNull);
+
+      // Add item to cart
+      fnbCtrl.addToCart(fnbCtrl.items.first);
+      await fnbCtrl.loadCinemas();
+
+      // Set delivery pickup method without studio and seat
+      fnbCtrl.pickupMethod.value = 'delivery';
+      fnbCtrl.studioNumber.value = '';
+      fnbCtrl.seatNumber.value = '';
+
+      order = await fnbCtrl.submitOrder();
+      expect(order, isNull,
+          reason: 'Harus ditolak jika studio & kursi kosong saat delivery');
+
+      // Fill studio only, missing seat
+      fnbCtrl.studioNumber.value = 'Studio 1';
+      fnbCtrl.seatNumber.value = '';
+      order = await fnbCtrl.submitOrder();
+      expect(order, isNull);
+
+      // Fill both studio and seat
+      fnbCtrl.studioNumber.value = 'Studio 1';
+      fnbCtrl.seatNumber.value = 'B4';
+      order = await fnbCtrl.submitOrder();
+      expect(order, isNotNull);
+      expect(order!.pickupMethod, equals('delivery'));
+      expect(order.studioNumber, equals('Studio 1'));
+      expect(order.seatNumber, equals('B4'));
+      expect(order.items.length, equals(1));
+    });
+
+    test('submitOrder counter pickup method succeeds without studio or seat',
+        () async {
+      Get.testMode = true;
+      final fnbCtrl = FnbController();
+      await fnbCtrl.fetchFnbCatalog();
+      fnbCtrl.clearCart();
+      fnbCtrl.addToCart(fnbCtrl.items.first);
+      await fnbCtrl.loadCinemas();
+
+      fnbCtrl.pickupMethod.value = 'counter';
+      fnbCtrl.studioNumber.value = '';
+      fnbCtrl.seatNumber.value = '';
+
+      final order = await fnbCtrl.submitOrder();
+      expect(order, isNotNull);
+      expect(order!.pickupMethod, equals('counter'));
+      expect(order.pickupCode, startsWith('FNB-'));
     });
   });
 }
