@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:cinemate/controllers/mood_controller.dart';
 import 'package:cinemate/models/mood_model.dart';
+import 'package:cinemate/models/movie_model.dart';
 import 'package:cinemate/services/mood_service.dart';
 
 void main() {
@@ -200,6 +201,38 @@ void main() {
 
       controller.setSortBy('vote_average.desc');
       expect(controller.selectedSortBy.value, equals('vote_average.desc'));
+    });
+  });
+
+  group('PB-033: AI Match & Direct Booking Action Tests', () {
+    test('bookMovie and viewMovieDetail direct navigation methods', () async {
+      Get.testMode = true;
+      final controller = MoodController();
+      const movie = MovieModel(
+        id: 1022789,
+        title: 'Inside Out 2',
+        overview: 'Riley beranjak remaja.',
+        voteAverage: 8.0,
+        voteCount: 3000,
+        popularity: 150.0,
+        genreIds: [16, 35, 10751],
+      );
+
+      // Verifikasi metode bookMovie dan viewMovieDetail dapat dieksekusi tanpa error
+      expect(() => controller.bookMovie(movie), returnsNormally);
+      expect(() => controller.viewMovieDetail(movie), returnsNormally);
+    });
+
+    test('AI match percentage is always within high confidence range 88%-99%',
+        () async {
+      final service = MoodRecommendationService();
+      final results = await service.getRecommendations(MoodType.happy);
+
+      for (final rec in results) {
+        expect(rec.matchPercentage, greaterThanOrEqualTo(88));
+        expect(rec.matchPercentage, lessThanOrEqualTo(99));
+        expect(rec.aiReason, contains(rec.movie.title));
+      }
     });
   });
 }

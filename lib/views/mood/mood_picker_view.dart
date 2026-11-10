@@ -456,6 +456,10 @@ class _MoodPickerViewState extends State<MoodPickerView> {
   Widget _buildMovieRecommendationCard(MoodRecommendationItem item) {
     final movie = item.movie;
     final year = movie.releaseYear != '-' ? movie.releaseYear : '';
+    final isTopMatch = item.matchPercentage >= 95;
+    final matchGradient = isTopMatch
+        ? const LinearGradient(colors: [Color(0xFF00B09B), Color(0xFF96C93D)])
+        : const LinearGradient(colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)]);
 
     return Container(
       decoration: BoxDecoration(
@@ -466,120 +470,125 @@ class _MoodPickerViewState extends State<MoodPickerView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Baris Atas: Poster + Info Utama + Match Badge
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Poster Film
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: SizedBox(
-                    width: 80,
-                    height: 118,
-                    child: movie.posterUrl.isNotEmpty
-                        ? Image.network(
-                            movie.posterUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                Container(
-                              color: AppColors.surface,
-                              child: const Icon(Icons.movie_rounded,
-                                  color: AppColors.textSecondary, size: 32),
-                            ),
-                          )
-                        : Container(
-                            color: AppColors.surface,
-                            child: const Icon(Icons.movie_rounded,
-                                color: AppColors.textSecondary, size: 32),
-                          ),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                // Informasi Film
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Badge Match Persentase AI
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF00B09B), Color(0xFF96C93D)],
-                              ),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.auto_awesome_rounded,
-                                    color: Colors.white, size: 12),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${item.matchPercentage}% MATCH',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 0.5,
-                                  ),
+          // Baris Atas: Poster + Info Utama + Match Badge (Klik untuk Detail)
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              onTap: () => controller.viewMovieDetail(movie),
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Poster Film
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: SizedBox(
+                        width: 80,
+                        height: 118,
+                        child: movie.posterUrl.isNotEmpty
+                            ? Image.network(
+                                movie.posterUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Container(
+                                  color: AppColors.surface,
+                                  child: const Icon(Icons.movie_rounded,
+                                      color: AppColors.textSecondary, size: 32),
                                 ),
-                              ],
-                            ),
-                          ),
-                          const Spacer(),
-                          // Rating
+                              )
+                            : Container(
+                                color: AppColors.surface,
+                                child: const Icon(Icons.movie_rounded,
+                                    color: AppColors.textSecondary, size: 32),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    // Informasi Film
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Badge Match Persentase AI
                           Row(
                             children: [
-                              const Icon(Icons.star_rounded,
-                                  color: AppColors.gold, size: 16),
-                              const SizedBox(width: 3),
-                              Text(
-                                movie.voteAverage.toStringAsFixed(1),
-                                style: const TextStyle(
-                                  color: AppColors.textPrimary,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  gradient: matchGradient,
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.auto_awesome_rounded,
+                                        color: Colors.white, size: 12),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${item.matchPercentage}% MATCH',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Spacer(),
+                              // Rating
+                              Row(
+                                children: [
+                                  const Icon(Icons.star_rounded,
+                                      color: AppColors.gold, size: 16),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    movie.voteAverage.toStringAsFixed(1),
+                                    style: const TextStyle(
+                                      color: AppColors.textPrimary,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
+                          const SizedBox(height: 8),
+                          // Judul Film
+                          Text(
+                            movie.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          // Genre & Tahun
+                          Text(
+                            [
+                              if (year.isNotEmpty) year,
+                              if (movie.genreNames.isNotEmpty)
+                                movie.genreNames.take(2).join(', '),
+                            ].join(' • '),
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      // Judul Film
-                      Text(
-                        movie.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      // Genre & Tahun
-                      Text(
-                        [
-                          if (year.isNotEmpty) year,
-                          if (movie.genreNames.isNotEmpty)
-                            movie.genreNames.take(2).join(', '),
-                        ].join(' • '),
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
 

@@ -496,5 +496,36 @@ void main() {
       expect(order!.pickupMethod, equals('counter'));
       expect(order.pickupCode, startsWith('FNB-'));
     });
+
+    test(
+        'PB-033 (FR-036): Independent F&B order without ticket succeeds with processing status and pickup code',
+        () async {
+      Get.testMode = true;
+      final fnbCtrl = FnbController();
+      await fnbCtrl.fetchFnbCatalog();
+      fnbCtrl.clearCart();
+
+      // Pilih 2 item makanan
+      fnbCtrl.addToCart(fnbCtrl.items[0]);
+      fnbCtrl.addToCart(fnbCtrl.items[1]);
+      await fnbCtrl.loadCinemas();
+
+      // Pilih metode ambil di counter mandiri tanpa tiket aktif
+      fnbCtrl.pickupMethod.value = 'counter';
+      expect(fnbCtrl.hasActiveTicketDetected.value, isFalse);
+
+      final order = await fnbCtrl.submitOrder();
+      expect(order, isNotNull);
+      expect(order!.status, equals('processing'));
+      expect(order.statusLabel, contains('Sedang Disiapkan'));
+      expect(order.pickupCode, matches(r'^FNB-\d{5}$'));
+      expect(order.items.length, equals(2));
+
+      // Verifikasi tersimpan di userOrders
+      expect(fnbCtrl.userOrders.any((o) => o.id == order.id), isTrue);
+
+      // Verifikasi keranjang tereset setelah pemesanan
+      expect(fnbCtrl.cart.isEmpty, isTrue);
+    });
   });
 }
