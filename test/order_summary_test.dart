@@ -3,6 +3,7 @@
 
 import 'package:cinemate/models/booking_order_model.dart';
 import 'package:cinemate/models/cinema_model.dart';
+import 'package:cinemate/models/fnb_order_model.dart';
 import 'package:cinemate/models/movie_model.dart';
 import 'package:cinemate/models/seat_model.dart';
 import 'package:cinemate/models/showtime_model.dart';
@@ -169,6 +170,52 @@ void main() {
       expect(restored.selectedSeats, ['E3', 'E4']);
       expect(restored.totalAmount, 206000);
       expect(restored.formattedTotalAmount, 'Rp 206.000');
+    });
+
+    test(
+        'BookingOrderModel with F&B Add-ons (PB-032 / FR-028) calculates total and serializes properly',
+        () {
+      const fnb1 = FnbOrderItemModel(
+        fnbItemId: 'fnb-pop-caramel',
+        name: 'Caramel Popcorn Large',
+        price: 48000,
+        quantity: 1,
+        subtotal: 48000,
+      );
+      const fnb2 = FnbOrderItemModel(
+        fnbItemId: 'fnb-coke',
+        name: 'Coca-Cola Zero',
+        price: 25000,
+        quantity: 2,
+        subtotal: 50000,
+      );
+
+      final orderWithFnb = BookingOrderModel(
+        id: 'ORD-WITH-FNB',
+        movie: movie,
+        cinema: cinema,
+        showtime: showtime,
+        selectedSeats: ['C4', 'C5'], // 2 x 50.000 = 100.000
+        ticketPrice: 50000,
+        serviceFeePerTicket: 3000, // 2 x 3.000 = 6.000
+        fnbItems: [fnb1, fnb2], // 48.000 + 50.000 = 98.000
+        createdAt: DateTime.now(),
+      );
+
+      expect(orderWithFnb.fnbTotal, 98000);
+      expect(orderWithFnb.formattedFnbTotal, 'Rp 98.000');
+      // Total = 100.000 + 6.000 + 98.000 = 204.000
+      expect(orderWithFnb.totalAmount, 204000);
+      expect(orderWithFnb.formattedTotalAmount, 'Rp 204.000');
+
+      // Roundtrip JSON
+      final json = orderWithFnb.toJson();
+      expect(json['fnb_items'], isNotEmpty);
+
+      final copy = BookingOrderModel.fromJson(json);
+      expect(copy.fnbItems.length, 2);
+      expect(copy.fnbTotal, 98000);
+      expect(copy.totalAmount, 204000);
     });
   });
 }

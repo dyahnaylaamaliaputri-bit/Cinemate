@@ -264,6 +264,19 @@ class OrderSummaryView extends GetView<OrderSummaryController> {
                     highlightText: true,
                     trailingBadge: '${order.seatCount} Kursi',
                   ),
+                  if (order.fnbItems.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    const Divider(color: AppColors.divider, height: 1),
+                    const SizedBox(height: 12),
+                    _buildDetailRow(
+                      Icons.fastfood_rounded,
+                      'F&B Tambahan',
+                      order.fnbItems
+                          .map((e) => '${e.name} x${e.quantity}')
+                          .join(', '),
+                      trailingBadge: '${order.fnbItems.length} Item',
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -295,6 +308,13 @@ class OrderSummaryView extends GetView<OrderSummaryController> {
                     'Biaya Layanan (Rp 3.000 x ${order.seatCount})',
                     order.formattedServiceFee,
                   ),
+                  if (order.fnbItems.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    _buildCostRow(
+                      'Camilan & Minuman F&B',
+                      order.formattedFnbTotal,
+                    ),
+                  ],
                   if (controller.isVoucherApplied.value) ...[
                     const SizedBox(height: 8),
                     _buildCostRow(

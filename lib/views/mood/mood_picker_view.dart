@@ -392,6 +392,21 @@ class _MoodPickerViewState extends State<MoodPickerView> {
                 ),
               ],
             ),
+            const SizedBox(height: 10),
+            // Filter Pengurutan Discovery Engine (PB-032)
+            Row(
+              children: [
+                _buildSortChip(
+                  label: '🔥 Terpopuler',
+                  sortBy: 'popularity.desc',
+                ),
+                const SizedBox(width: 8),
+                _buildSortChip(
+                  label: '⭐ Rating Tertinggi',
+                  sortBy: 'vote_average.desc',
+                ),
+              ],
+            ),
             const SizedBox(height: 14),
             ListView.separated(
               shrinkWrap: true,
@@ -404,6 +419,34 @@ class _MoodPickerViewState extends State<MoodPickerView> {
               },
             ),
           ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildSortChip({required String label, required String sortBy}) {
+    return Obx(() {
+      final isSelected = controller.selectedSortBy.value == sortBy;
+      return InkWell(
+        onTap: () => controller.setSortBy(sortBy),
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primary : AppColors.card,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.border,
+            ),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.white : AppColors.textSecondary,
+              fontSize: 11,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
         ),
       );
     });

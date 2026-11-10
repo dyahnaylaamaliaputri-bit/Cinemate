@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/booking_seat_controller.dart';
+import '../../models/fnb_item_model.dart';
 import '../../models/seat_model.dart';
 import '../../utils/app_colors.dart';
 
@@ -80,7 +81,7 @@ class SelectSeatView extends GetView<BookingSeatController> {
             ),
 
             // Sticky Bottom Bar
-            _buildBottomBar(),
+            _buildBottomBar(context),
           ],
         ),
       ),
@@ -337,7 +338,7 @@ class SelectSeatView extends GetView<BookingSeatController> {
   }
 
   /// Sticky Bottom Bar: Rincian Kursi Terpilih & Tombol Lanjut ke Order Summary
-  Widget _buildBottomBar() {
+  Widget _buildBottomBar(BuildContext context) {
     return Obx(() {
       final hasSelected = controller.selectedSeats.isNotEmpty;
       return Container(
@@ -414,7 +415,7 @@ class SelectSeatView extends GetView<BookingSeatController> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                   onPressed:
-                      hasSelected ? controller.proceedToOrderSummary : null,
+                      hasSelected ? () => _showFnbAddonModal(context) : null,
                 ),
               ],
             ),
@@ -422,6 +423,226 @@ class SelectSeatView extends GetView<BookingSeatController> {
         ),
       );
     });
+  }
+
+  void _showFnbAddonModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _FnbAddonBottomSheet(controller: controller),
+    );
+  }
+}
+
+/// Modal Bottom Sheet Tambah Makanan Opsional sebelum Order Summary (PB-032 / FR-028)
+class _FnbAddonBottomSheet extends StatelessWidget {
+  final BookingSeatController controller;
+
+  const _FnbAddonBottomSheet({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final seedItems = FnbItemModel.seedItems.take(5).toList();
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: EdgeInsets.fromLTRB(
+          16, 12, 16, MediaQuery.of(context).viewInsets.bottom + 20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Drag indicator
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.divider,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Header
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Text('🍿', style: TextStyle(fontSize: 22)),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Mau Tambah Camilan Nonton?',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Pesan sekarang & ambil di counter concession.',
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // List Snack & Minuman Cepat
+          Flexible(
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
+              itemCount: seedItems.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final item = seedItems[index];
+                return Obx(() {
+                  final qty = controller.selectedFnbItems[item.id] ?? 0;
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.card,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: qty > 0 ? AppColors.primary : AppColors.border,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.name,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                item.formattedPrice,
+                                style: const TextStyle(
+                                  color: AppColors.gold,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Stepper + / -
+                        Row(
+                          children: [
+                            if (qty > 0) ...[
+                              IconButton(
+                                icon: const Icon(Icons.remove_circle_outline,
+                                    color: AppColors.textSecondary, size: 22),
+                                onPressed: () =>
+                                    controller.removeFnbItem(item.id),
+                              ),
+                              Text(
+                                '$qty',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                            IconButton(
+                              icon: const Icon(Icons.add_circle,
+                                  color: AppColors.primary, size: 24),
+                              onPressed: () => controller.addFnbItem(item.id),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                });
+              },
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Action Buttons
+          Obx(() {
+            final fnbTotal = controller.fnbAddonTotal;
+            return Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      controller.proceedToOrderSummary(directFnbItems: []);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.border),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text('Lewati',
+                        style: TextStyle(color: AppColors.textSecondary)),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      controller.proceedToOrderSummary();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      fnbTotal > 0
+                          ? 'Lanjut (+ ${controller.formattedFnbAddonTotal})'
+                          : 'Lanjut Tanpa Camilan',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }),
+        ],
+      ),
+    );
   }
 }
 

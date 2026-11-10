@@ -191,5 +191,15 @@ void main() {
       await controller.selectMood(currentMood);
       expect(controller.recommendations.length, equals(currentCount));
     });
+
+    test('MoodController setSortBy updates sorting parameter (PB-032)',
+        () async {
+      Get.testMode = true;
+      final controller = MoodController();
+      expect(controller.selectedSortBy.value, equals('popularity.desc'));
+
+      controller.setSortBy('vote_average.desc');
+      expect(controller.selectedSortBy.value, equals('vote_average.desc'));
+    });
   });
 }

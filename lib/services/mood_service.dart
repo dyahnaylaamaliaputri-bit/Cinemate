@@ -22,11 +22,13 @@ class MoodRecommendationService {
   Future<List<MoodRecommendationItem>> getRecommendations(
     MoodType moodType, {
     bool forceRefresh = false,
+    String sortBy = 'popularity.desc',
+    double minRating = 7.0,
   }) async {
     final moodDef =
         MoodDefinition.allMoods.firstWhere((m) => m.type == moodType);
     final genresParam = moodDef.genreIds.join(',');
-    final cacheKey = 'mood_${moodType.name}';
+    final cacheKey = 'mood_${moodType.name}_$sortBy';
 
     // 1. Cek cache Hive terlebih dahulu jika tidak force refresh
     if (!forceRefresh) {
@@ -49,8 +51,8 @@ class MoodRecommendationService {
         'https://api.themoviedb.org/3/discover/movie',
         queryParameters: {
           'with_genres': genresParam,
-          'sort_by': 'popularity.desc',
-          'vote_average.gte': 7.0,
+          'sort_by': sortBy,
+          'vote_average.gte': minRating,
           'include_adult': false,
           'page': 1,
         },

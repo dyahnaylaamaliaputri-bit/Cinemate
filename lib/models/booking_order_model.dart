@@ -2,6 +2,7 @@
 // Model untuk Ringkasan Pesanan (Order Summary) & Pembayaran tiket bioskop (PB-020, PB-021)
 
 import 'cinema_model.dart';
+import 'fnb_order_model.dart';
 import 'movie_model.dart';
 import 'showtime_model.dart';
 
@@ -14,6 +15,7 @@ class BookingOrderModel {
   final int ticketPrice;
   final int serviceFeePerTicket;
   final int discountAmount;
+  final List<FnbOrderItemModel> fnbItems; // PB-032 / FR-028: Tambah Makanan Opsional
   final DateTime createdAt;
   final String status; // 'pending', 'paid', 'expired', 'cancelled'
   final String? paymentMethod; // 'BCA VA', 'GoPay', 'QRIS', dll
@@ -29,6 +31,7 @@ class BookingOrderModel {
     required this.ticketPrice,
     this.serviceFeePerTicket = 3000,
     this.discountAmount = 0,
+    this.fnbItems = const [],
     required this.createdAt,
     this.status = 'pending',
     this.paymentMethod,
@@ -45,9 +48,12 @@ class BookingOrderModel {
   /// Total biaya layanan aplikasi
   int get totalServiceFee => serviceFeePerTicket * seatCount;
 
+  /// Total biaya F&B tambahan (PB-032 / FR-028)
+  int get fnbTotal => fnbItems.fold<int>(0, (sum, it) => sum + it.subtotal);
+
   /// Total tagihan keseluruhan setelah dikurangi voucher diskon promo
   int get totalAmount {
-    final raw = subtotal + totalServiceFee - discountAmount;
+    final raw = subtotal + totalServiceFee + fnbTotal - discountAmount;
     return raw > 0 ? raw : 0;
   }
 
@@ -78,6 +84,7 @@ class BookingOrderModel {
 
   String get formattedSubtotal => formatRupiah(subtotal);
   String get formattedServiceFee => formatRupiah(totalServiceFee);
+  String get formattedFnbTotal => formatRupiah(fnbTotal);
   String get formattedDiscount => formatRupiah(discountAmount);
   String get formattedTicketPrice => formatRupiah(ticketPrice);
   String get formattedTotalAmount => formatRupiah(totalAmount);
@@ -130,6 +137,7 @@ class BookingOrderModel {
     int? ticketPrice,
     int? serviceFeePerTicket,
     int? discountAmount,
+    List<FnbOrderItemModel>? fnbItems,
     DateTime? createdAt,
     String? status,
     String? paymentMethod,
@@ -145,6 +153,7 @@ class BookingOrderModel {
       ticketPrice: ticketPrice ?? this.ticketPrice,
       serviceFeePerTicket: serviceFeePerTicket ?? this.serviceFeePerTicket,
       discountAmount: discountAmount ?? this.discountAmount,
+      fnbItems: fnbItems ?? this.fnbItems,
       createdAt: createdAt ?? this.createdAt,
       status: status ?? this.status,
       paymentMethod: paymentMethod ?? this.paymentMethod,
@@ -163,6 +172,7 @@ class BookingOrderModel {
       'ticket_price': ticketPrice,
       'service_fee_per_ticket': serviceFeePerTicket,
       'discount_amount': discountAmount,
+      'fnb_items': fnbItems.map((e) => e.toJson()).toList(),
       'created_at': createdAt.toIso8601String(),
       'status': status,
       'payment_method': paymentMethod,
@@ -187,6 +197,11 @@ class BookingOrderModel {
       ticketPrice: json['ticket_price'] as int? ?? 50000,
       serviceFeePerTicket: json['service_fee_per_ticket'] as int? ?? 3000,
       discountAmount: json['discount_amount'] as int? ?? 0,
+      fnbItems: (json['fnb_items'] as List<dynamic>?)
+              ?.map((e) => FnbOrderItemModel.fromJson(
+                  Map<String, dynamic>.from(e as Map)))
+              .toList() ??
+          const [],
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
           : DateTime.now(),

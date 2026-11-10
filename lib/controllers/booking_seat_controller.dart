@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/booking_order_model.dart';
 import '../models/cinema_model.dart';
+import '../models/fnb_item_model.dart';
+import '../models/fnb_order_model.dart';
 import '../models/movie_model.dart';
 import '../models/seat_model.dart';
 import '../models/showtime_model.dart';
@@ -161,19 +163,71 @@ class BookingSeatController extends GetxController {
     return sorted.join(', ');
   }
 
-  /// Melanjutkan ke halaman Ringkasan Pesanan (PB-020)
-  void proceedToOrderSummary() {
+  /// List item F&B tambahan opsional (PB-032 / FR-028)
+  final selectedFnbItems = <String, int>{}.obs;
+
+  void addFnbItem(String itemId) {
+    selectedFnbItems[itemId] = (selectedFnbItems[itemId] ?? 0) + 1;
+  }
+
+  void removeFnbItem(String itemId) {
+    if (!selectedFnbItems.containsKey(itemId)) return;
+    if (selectedFnbItems[itemId]! <= 1) {
+      selectedFnbItems.remove(itemId);
+    } else {
+      selectedFnbItems[itemId] = selectedFnbItems[itemId]! - 1;
+    }
+  }
+
+  int get fnbAddonTotal {
+    int total = 0;
+    for (final entry in selectedFnbItems.entries) {
+      final item =
+          FnbItemModel.seedItems.firstWhereOrNull((it) => it.id == entry.key);
+      if (item != null) {
+        total += item.price * entry.value;
+      }
+    }
+    return total;
+  }
+
+  String get formattedFnbAddonTotal =>
+      BookingOrderModel.formatRupiah(fnbAddonTotal);
+
+  /// Melanjutkan ke halaman Ringkasan Pesanan (PB-020, PB-032 / FR-028)
+  void proceedToOrderSummary({List<FnbOrderItemModel>? directFnbItems}) {
     if (selectedSeats.isEmpty) {
-      Get.snackbar(
-        'Pilih Kursi',
-        'Silakan pilih minimal 1 kursi bioskop untuk melanjutkan.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFF16213E),
-        colorText: Colors.white,
-        margin: const EdgeInsets.all(16),
-        icon: const Icon(Icons.event_seat_rounded, color: Color(0xFFE50914)),
-      );
+      if (Get.context != null) {
+        Get.snackbar(
+          'Pilih Kursi',
+          'Silakan pilih minimal 1 kursi bioskop untuk melanjutkan.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: const Color(0xFF16213E),
+          colorText: Colors.white,
+          margin: const EdgeInsets.all(16),
+          icon: const Icon(Icons.event_seat_rounded, color: Color(0xFFE50914)),
+        );
+      }
       return;
+    }
+
+    final List<FnbOrderItemModel> fnbList = [];
+    if (directFnbItems != null) {
+      fnbList.addAll(directFnbItems);
+    } else {
+      for (final entry in selectedFnbItems.entries) {
+        final item =
+            FnbItemModel.seedItems.firstWhereOrNull((it) => it.id == entry.key);
+        if (item != null) {
+          fnbList.add(FnbOrderItemModel(
+            fnbItemId: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: entry.value,
+            subtotal: item.price * entry.value,
+          ));
+        }
+      }
     }
 
     final orderId =
@@ -186,6 +240,7 @@ class BookingSeatController extends GetxController {
       selectedSeats: List<String>.from(selectedSeats)..sort(),
       ticketPrice: showtime.price,
       serviceFeePerTicket: 3000,
+      fnbItems: fnbList,
       createdAt: DateTime.now(),
       status: 'pending',
     );

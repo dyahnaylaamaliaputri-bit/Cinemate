@@ -83,7 +83,7 @@ docs/
 
 ### 6. Epic Rekomendasi Film Berbasis Mood AI (MOD / AIL — PB 6)
 - [x] **PB-031 (Layar Pemilih Mood Interaktif — Tanpa Supabase):** Banner pengantar Mood AI di `HomeTab`, navigasi ke `MoodPickerView` dengan 6 kategori emosi (*Gembira*, *Haru*, *Romantis*, *Tegang*, *Santai*, *Bosan*), visualisasi gradien estetik dinamis, highlight kartu emosi terpilih, `MoodController` reaktif, integrasi binding rute, fallback kurasi offline tanpa Supabase, dan penyimpanan Hive cache lokal.
-- [x] **PB-032 (Mood-to-Genre Engine & Filter TMDB Discovery):** `MoodRecommendationService` memetakan genre ID TMDB dan memanggil discovery API `/discover/movie` dengan rating $\ge 7.0$, dilengkapi fallback kurasi offline berkualitas tinggi jika jaringan offline/limit.
+- [x] **PB-032 (Mood-to-Genre Engine & Filter TMDB Discovery — Tanpa Supabase):** Engine rekomendasi `MoodRecommendationService` memetakan genre ID TMDB dengan filter penemuan discovery cerdas (rating $\ge 7.0$, sorting dinamis *Terpopuler* & *Rating Tertinggi*), fallback kurasi offline berkualitas tinggi dengan TTL di Hive cache tanpa Supabase, serta didukung langkah opsional Tambah Makanan F&B sebelum ringkasan pesanan tiket bioskop (FR-028 / PB-032).
 - [x] **PB-033 (Hasil Rekomendasi AI & Aksi Direct Booking):** Kartu rekomendasi film dengan persentase kecocokan AI (*88% - 99% MATCH*), analisis personalisasi berbasis mood, tombol sinopsis, dan tombol *"Pesan Tiket"* yang langsung membuka alur *Book by Movie* (`Routes.bookByMovie`).
 
 ---

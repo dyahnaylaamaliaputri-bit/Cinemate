@@ -49,6 +49,15 @@ class MoodController extends GetxController {
     await loadRecommendations(forceRefresh: forceRefresh);
   }
 
+  /// Filter pengurutan rekomendasi (PB-032: Mood-to-Genre Discovery Engine)
+  final selectedSortBy = 'popularity.desc'.obs;
+
+  void setSortBy(String sortBy) {
+    if (selectedSortBy.value == sortBy) return;
+    selectedSortBy.value = sortBy;
+    loadRecommendations(forceRefresh: true);
+  }
+
   /// Memuat rekomendasi film dari service (TMDB Discovery + Fallback Offline)
   Future<void> loadRecommendations({bool forceRefresh = false}) async {
     isLoading.value = true;
@@ -58,6 +67,7 @@ class MoodController extends GetxController {
       final items = await _moodService.getRecommendations(
         selectedMood.value.type,
         forceRefresh: forceRefresh,
+        sortBy: selectedSortBy.value,
       );
       recommendations.assignAll(items);
     } catch (e) {
