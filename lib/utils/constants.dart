@@ -10,11 +10,14 @@ class AppConstants {
 
   // ── Env keys & Supabase Config ───────────────────────────────────────────
   static const String envSupabaseUrl = 'SUPABASE_URL';
+  static const String envSupabaseRestUrl = 'SUPABASE_REST_URL';
   static const String envSupabaseAnonKey = 'SUPABASE_ANON_KEY';
   static const String envTmdbApiKey = 'TMDB_API_KEY';
 
   static const String defaultSupabaseUrl =
       'https://hbdhwsofkjkurewqnixk.supabase.co';
+  static const String defaultSupabaseRestUrl =
+      'https://hbdhwsofkjkurewqnixk.supabase.co/rest/v1/';
   static const String defaultSupabaseAnonKey =
       'sb_publishable_ps6_m_mcmw-Qe3fCokDJ2w_hUumridC';
 
@@ -58,7 +61,7 @@ class AppConstants {
   static const int httpTimeoutSeconds = 15;
   static const int llmTimeoutSeconds = 30;
 
-  // ── Validation ────────────────────────────────────────────────────────────
+  // ── Validation ────────────────────────────────────────────────────
   static const int passwordMinLength = 8;
   static const int nameMinLength = 2;
 }
