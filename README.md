@@ -109,7 +109,7 @@ docs/
    ```bash
    flutter pub get
    ```
-5. **Jalankan pengujian unit (Semua 47 Unit Test Wajib Passed):**
+5. **Jalankan pengujian unit (Semua 60 Unit Test Wajib Passed):**
    ```bash
    flutter test
    ```
@@ -121,73 +121,84 @@ docs/
 
 ---
 
-## 🎯 TUGAS SELANJUTNYA UNTUK ANGGOTA TIM (PB 7 & PB 8 DULU AJA)
+## 🎯 Rekomendasi & Panduan Tugas untuk Developer Selanjutnya
 
 > **Pesan untuk Rekan Tim:**  
-> Halo! Pengerjaan **PB 1 s/d PB 6** sudah selesai 100% dan seluruh 41 unit test sudah lolos.  
-> Untuk giliran kamu selanjutnya, silakan fokus kerjakan **2 modul Product Backlog saja terlebih dahulu**, yaitu **PB 7 (Location-Based Services & Peta Bioskop)** dan **PB 8 (Konversi Mata Uang & Penyesuaian Zona Waktu)**.  
-> Panduan implementasi, rincian kriteria, dan file target sudah disiapkan lengkap di bawah ini:
+> Halo developer! Seluruh pengerjaan **Epic 1 s.d. Epic 6 (PB-001 s.d. PB-033)** telah selesai **100%** dengan implementasi *clean architecture GetX*, dukungan *100% offline-first* via Hive cache lokal, serta **60/60 unit tests passed**.  
+> Untuk giliran kamu selanjutnya, berikut adalah **pilihan paket backlog terstruktur** yang siap dikerjakan beserta spesifikasi teknis dan berkas targetnya:
 
 ---
 
 ### 🌿 Panduan Branching Git
-Silakan tarik update terbaru dari `main` dan buat branch baru untuk PB 7 & PB 8:
+Tarik update terbaru dari `main` dan buat branch baru sesuai paket fitur yang kamu pilih:
 ```bash
+git checkout main
 git pull origin main
-git checkout -b feat/pb-7-lbs-and-pb-8-konversi
+
+# Pilihan 1: Jika mengerjakan LBS & Peta Bioskop (PB 7)
+git checkout -b feat/pb-7-lbs-cinema-map
+
+# Pilihan 2: Jika mengerjakan Konversi Kurs & Zona Waktu (PB 8)
+git checkout -b feat/pb-8-currency-timezone
+
+# Pilihan 3: Jika menyempurnakan Alur Pintasan F&B & Stepper Status
+git checkout -b feat/pb-fnb-shortcuts-and-status
+
+# Pilihan 4: Jika mengerjakan AI Profiling & Chatbot
+git checkout -b feat/pb-ai-profiling-chat
 ```
 
 ---
 
-### 📍 1. PB 7: Location-Based Services & Peta Bioskop (Epic LBS)
+### 📍 Pilihan 1: PB 7 — Location-Based Services & Peta Bioskop (Epic LBS)
 *Rujukan Backlog: PB-042 s.d. PB-047, SRS §3.8 FR-046 s.d. FR-051*
 
-- **Tujuan Modul:** Menampilkan bioskop terdekat berdasarkan koordinat GPS pengguna secara akurat, visualisasi penanda pin di peta interaktif, filter radius jangkauan, dan navigasi rute ke lokasi bioskop.
-- **Rincian Fitur yang Harus Dibuat:**
-  1. **Deteksi Lokasi & Izin GPS (`PB-042`):**
+- **Tujuan Modul:** Menampilkan bioskop terdekat berdasarkan koordinat GPS pengguna secara akurat, visualisasi penanda pin di peta interaktif OSM, filter radius jangkauan, dan navigasi rute ke lokasi bioskop.
+- **Rincian Fitur:**
+  1. **Deteksi Lokasi & Izin GPS (`PB-042` / FR-046):**
      - Menggunakan `geolocator` untuk membaca koordinat `latitude` dan `longitude` pengguna.
-     - Penanganan izin (*permission request*): jika izin lokasi ditolak atau GPS mati, tampilkan dialog ramah dengan tombol buka pengaturan atau pilih titik kota secara manual (`PB-047`).
-  2. **Daftar Bioskop Terurut Berdasarkan Jarak (`PB-043`):**
-     - Tampilkan daftar seluruh bioskop yang diurutkan dari jarak paling dekat ke paling jauh dalam satuan kilometer (km).
-  3. **Peta Bioskop Interaktif (`PB-044`):**
-     - Menggunakan `flutter_map` dengan tile OpenStreetMap (OSM) tanpa memerlukan kartu kredit/kunci berbayar.
-     - Tampilkan penanda posisi pengguna (*marker biru/user*) dan penanda pin bioskop (*marker merah bioskop*). Mengetuk pin bioskop memunculkan modal ringkasan bioskop.
-  4. **Filter Radius Bioskop (`PB-045`):**
-     - Filter chip radius: `1 km`, `3 km`, `5 km`, `10 km`, dan `Semua Jarak`.
-     - Baik daftar maupun penanda peta otomatis tersaring sesuai radius yang dipilih.
-  5. **Buka Rute Navigasi Eksternal (`PB-046`):**
-     - Tombol "Petunjuk Arah / Rute" yang membuka aplikasi navigasi eksternal (Google Maps) dengan parameter koordinat tujuan via `url_launcher`.
+     - Penanganan izin (*permission request*): jika izin lokasi ditolak atau GPS nonaktif, berikan fallback ramah dengan dialog pilihan manual kota/bioskop acuan (`PB-047` / FR-051).
+  2. **Daftar Bioskop Terurut Berdasarkan Jarak (`PB-043` / FR-047):**
+     - Tampilkan daftar seluruh bioskop yang diurutkan secara realtime dari jarak paling dekat ke paling jauh (km) menggunakan *Haversine formula*.
+  3. **Peta Bioskop Interaktif (`PB-044` / FR-048):**
+     - Menggunakan `flutter_map` dengan tile OpenStreetMap (OSM) (bebas kuota / tanpa kartu kredit).
+     - Menampilkan marker posisi pengguna (*user pin*) dan marker lokasi bioskop (*cinema pin*). Mengetuk pin bioskop memunculkan modal ringkasan bioskop.
+  4. **Filter Radius Bioskop (`PB-045` / FR-049):**
+     - Filter chip radius dinamis: `1 km`, `3 km`, `5 km`, `10 km`, dan `Semua Jarak`.
+     - Marker pada peta dan daftar bioskop otomatis tersaring sesuai radius aktif.
+  5. **Buka Rute Navigasi Eksternal (`PB-046` / FR-050):**
+     - Tombol *"Petunjuk Arah / Rute"* yang membuka Google Maps via `url_launcher` dengan koordinat tujuan.
 - **Target File yang Dikerjakan:**
-  - `lib/views/cinema/cinema_map_view.dart` (Layar peta bioskop interaktif)
-  - `lib/services/location_service.dart` (Service pembaca lokasi GPS & perizinan)
-  - `lib/controllers/cinema_controller.dart` (Tambahkan method filter radius dan reaktif koordinat)
-  - `test/lbs_cinema_test.dart` (Unit test kalkulasi radius & filter jarak bioskop)
+  - `lib/services/location_service.dart` (Service pembaca GPS, izin perizinan, & fallback acuan)
+  - `lib/views/cinema/cinema_map_view.dart` (Layar peta bioskop interaktif `flutter_map`)
+  - `lib/controllers/cinema_controller.dart` (Filter radius & reaktif koordinat pengguna)
+  - `test/lbs_cinema_test.dart` (Unit test radius filtering, haversine accuracy, & distance sorting)
 
 ---
 
-### 🌐 2. PB 8: Konversi Mata Uang & Penyesuaian Zona Waktu (Epic KNV)
+### 🌐 Pilihan 2: PB 8 — Konversi Mata Uang & Penyesuaian Zona Waktu (Epic KNV)
 *Rujukan Backlog: PB-048 s.d. PB-050, SRS §3.9 FR-052 s.d. FR-056*
 
-- **Tujuan Modul:** Mempermudah pengguna wisatawan dalam memahami biaya tiket/F&B serta waktu penayangan film bioskop sesuai preferensi mata uang dan zona waktu mereka.
-- **Rincian Fitur yang Harus Dibuat:**
-  1. **Konversi Mata Uang Dinamis (`PB-048`):**
+- **Tujuan Modul:** Mempermudah pengguna wisatawan dalam memahami biaya tiket/F&B serta jam penayangan bioskop sesuai preferensi mata uang dan zona waktu mereka.
+- **Rincian Fitur:**
+  1. **Konversi Mata Uang Dinamis (`PB-048` / FR-052, FR-053):**
      - Mata uang yang didukung:
        - **IDR (Rp)** — Rupiah Indonesia *(Default kurs: 1.0)*
-       - **USD ($)** — Dollar Amerika Serikat *(Kurs: 1 USD = Rp 16.000)*
+       - **USD ($)** — Dollar AS *(Kurs: 1 USD = Rp 16.000)*
        - **SGD (S$)** — Dollar Singapura *(Kurs: 1 SGD = Rp 12.000)*
        - **EUR (€)** — Euro Uni Eropa *(Kurs: 1 EUR = Rp 17.500)*
-     - Simpan pilihan pengguna di `GetStorage` via `StorageService` (`key: 'currency_preference'`).
-     - Terapkan helper reaktif agar harga tiket (`OrderSummaryView`) dan harga menu F&B (`FnbTab`, `FnbCheckoutView`) otomatis berubah sesuai mata uang terpilih.
-  2. **Penyesuaian Zona Waktu Penayangan Film (`PB-049`):**
+     - Simpan pilihan pengguna di `GetStorage` / Hive via `StorageService` (`key: 'currency_preference'`).
+     - Terapkan helper reaktif agar harga tiket (`OrderSummaryView`) dan harga menu F&B (`FnbTab`, `FnbCheckoutView`) otomatis terkonversi dan terformat rapi.
+  2. **Penyesuaian Zona Waktu Penayangan Film (`PB-049` / FR-054):**
      - Zona waktu yang didukung:
        - **WIB (UTC+7)** — Waktu Indonesia Barat *(Default jadwal bioskop)*
        - **WITA (UTC+8)** — Waktu Indonesia Tengah *(+1 jam)*
        - **WIT (UTC+9)** — Waktu Indonesia Timur *(+2 jam)*
-       - **UTC (GMT+0)** — Waktu Universal / Greenwich *(-7 jam)*
-     - Simpan preferensi zona waktu di `GetStorage` via `StorageService` (`key: 'timezone_preference'`).
-     - Seluruh jadwal tayang film di `BookByCinemaView`, `BookByMovieView`, `TicketDetailView`, dan `TicketsTab` otomatis bergeser jamnya dan menampilkan label zona waktu (misal: jadwal `14:00 WIB` otomatis tampil `15:00 WITA`).
-  3. **Pengaturan di Profil & Persistensi Lintas Halaman (`PB-050`):**
-     - Tambahkan selector pengaturan "Mata Uang" dan "Zona Waktu" pada `ProfileTab` (`lib/views/dashboard/tabs/profile_tab.dart`).
+       - **UTC (GMT+0)** — Greenwich Mean Time *(-7 jam)*
+     - Simpan preferensi zona waktu di `GetStorage` / Hive (`key: 'timezone_preference'`).
+     - Seluruh jadwal tayang film di `BookByCinemaView`, `BookByMovieView`, `TicketDetailView`, dan `TicketsTab` otomatis bergeser jamnya dan menampilkan label zona waktu (contoh: jadwal `14:00 WIB` otomatis tampil `15:00 WITA`).
+  3. **Pengaturan di Profil & Persistensi Lintas Halaman (`PB-050` / FR-055, FR-056):**
+     - Tambahkan selector pengaturan *"Mata Uang"* dan *"Zona Waktu"* pada `ProfileTab` (`lib/views/dashboard/tabs/profile_tab.dart`).
 - **Target File yang Dikerjakan:**
   - `lib/utils/currency_helper.dart` (Helper konversi kurs & format simbol mata uang)
   - `lib/utils/timezone_helper.dart` (Helper pergeseran jam penayangan & format label zona)
@@ -196,11 +207,52 @@ git checkout -b feat/pb-7-lbs-and-pb-8-konversi
 
 ---
 
+### 🍿 Pilihan 3: Penyempurnaan Alur Pintasan F&B & Stepper Status (Epic FNB)
+*Rujukan Backlog: PB-034 & PB-035, SRS §3.6 FR-037 & FR-038*
+
+- **Tujuan Modul:** Melengkapi kenyamanan pemesanan F&B dari berbagai titik aplikasi serta menyediakan pelacakan status pesanan secara visual dan transparan.
+- **Rincian Fitur:**
+  1. **Pintasan Menu F&B dengan Konteks Bioskop Terbawa (`PB-034` / FR-037):**
+     - Sediakan tombol pintasan *"Pesan F&B untuk Nonton"* di halaman `TicketDetailView`, `OrderSummaryView`, dan banner di `HomeTab`.
+     - Saat ditekan, navigasikan langsung ke `FnbTab` / `FnbCheckoutView` dengan otomatis mengunci bioskop yang sesuai dengan tiket atau bioskop yang sedang aktif.
+  2. **Detail Status Stepper & Simulasi Pesanan F&B (`PB-035` / FR-038):**
+     - Buat layar `FnbOrderDetailView` dengan stepper vertikal dinamis:
+       - ⏳ *Sedang Disiapkan (Processing)*: Pesanan diterima concession.
+       - ✨ *Siap Diambil / Diantar (Ready)*: Makanan selesai dimasak/disiapkan.
+       - ✅ *Selesai (Completed)*: Makanan telah diterima penonton.
+     - Sediakan tombol simulasi petugas bioskop untuk memajukan status pesanan langsung di Hive cache lokal.
+- **Target File yang Dikerjakan:**
+  - `lib/views/fnb/fnb_order_detail_view.dart` (Layar detail pesanan F&B dengan stepper visual)
+  - `lib/views/tickets/ticket_detail_view.dart` (Tambahkan tombol pintasan pesan F&B bioskop)
+  - `lib/controllers/fnb_controller.dart` (Metode navigasi shortcut dengan parameter bioskop & simulasi status)
+  - `test/fnb_order_cart_test.dart` (Unit test shortcut context & update status pesanan)
+
+---
+
+### 🤖 Pilihan 4: AI Profiling & Chatbot Asisten Rekomendasi (Epic AIL)
+*Rujukan Backlog: PB-036 s.d. PB-041, SRS §3.7 FR-039 s.d. FR-045*
+
+- **Tujuan Modul:** Memberikan asisten interaktif cerdas bagi pengguna yang mencari rekomendasi film personal melalui dialog chat atau kuesioner profiling.
+- **Rincian Fitur:**
+  1. **Formulir Profiling Preferensi Nonton (`PB-037` / FR-042):**
+     - Layar kuesioner interaktif: input mood, preferensi genre, teman nonton (sendiri, pasangan, keluarga), durasi maksimal, dan budget.
+  2. **Layanan AI dengan Rule-based Fallback Offline (`PB-036` / FR-044, FR-045):**
+     - Integrasi abstraksi LLM dengan validasi JSON dan skema fallback lokal berkualitas tinggi tanpa Supabase.
+  3. **Chatbot Asisten Bioskop (`PB-039`, `PB-040` / FR-039, FR-040):**
+     - Antarmuka chat interaktif dengan gelembung pesan, typing indicator, dan riwayat obrolan tersimpan di Hive.
+- **Target File yang Dikerjakan:**
+  - `lib/views/ai/ai_profiling_view.dart` & `lib/views/ai/ai_chat_view.dart`
+  - `lib/controllers/ai_controller.dart` & `lib/services/ai_service.dart`
+  - `test/ai_recommendation_test.dart`
+
+---
+
 ### 📌 Standar Koding & Pengujian Sebelum Pull Request (PR)
 
-1. **Arsitektur GetX OOP:**
-   - Pisahkan logika ke `Controller`, data/helper ke `Utils`/`Service`, dan antarmuka ke `View`.
-   - Gunakan warna dari `AppColors` (*Dark Cinema Palette: `#0A0A0A`, `#E50914`, `#1A1A2E`, `#FFD700`*).
+1. **Arsitektur GetX OOP & Offline-First:**
+   - Pisahkan logika ke `Controller`, data/cache ke `Service`/`Utils`, dan antarmuka ke `View`.
+   - Pastikan aplikasi selalu berjalan mulus dalam mode offline dengan fallback data lokal / Hive.
+   - Gunakan palet warna konsisten dari [AppColors](file:///C:/Users/Pongo/Documents/Praktikkum_Pemrogramman_Mobile/project/Cinemate/lib/utils/app_colors.dart) (*Dark Cinema Palette: `#0A0A0A`, `#E50914`, `#1A1A2E`, `#FFD700`*).
 2. **Offline-First & Graceful Fallback:**
    - Preferensi tersimpan di storage lokal sehingga saat aplikasi dibuka kembali dalam mode offline, pilihan mata uang dan zona waktu tetap persisten.
 3. **Checklist Wajib Sebelum Commit & Push:**
