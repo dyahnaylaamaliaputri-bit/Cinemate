@@ -404,9 +404,7 @@ class FnbCartBottomSheet extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        note.isNotEmpty
-                            ? 'Catatan: $note'
-                            : '+ Tambah Catatan',
+                        note.isNotEmpty ? 'Catatan: $note' : '+ Tambah Catatan',
                         style: TextStyle(
                           color: note.isNotEmpty
                               ? AppColors.primaryLight

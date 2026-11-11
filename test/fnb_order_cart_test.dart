@@ -233,8 +233,8 @@ void main() {
       expect(controller.getItemNote(item.id), isEmpty);
 
       controller.setItemNote(item.id, 'Ekstra bumbu gurih mentega');
-      expect(
-          controller.getItemNote(item.id), equals('Ekstra bumbu gurih mentega'));
+      expect(controller.getItemNote(item.id),
+          equals('Ekstra bumbu gurih mentega'));
 
       // Hapus catatan dengan string kosong
       controller.setItemNote(item.id, '');
@@ -272,7 +272,8 @@ void main() {
     });
   });
 
-  group('FnbOrderModel & FnbOrderItemModel Tests (PB-027, PB-028, PB-029, PB-030)',
+  group(
+      'FnbOrderModel & FnbOrderItemModel Tests (PB-027, PB-028, PB-029, PB-030)',
       () {
     test(
         'FnbOrderItemModel should calculate total correctly and serialize properly',
@@ -382,8 +383,7 @@ void main() {
       expect(controller.selectedCinema.value, isNotNull);
 
       // Verifikasi bioskop default
-      expect(
-          controller.selectedCinema.value?.name, contains('Cinemate Plaza'));
+      expect(controller.selectedCinema.value?.name, contains('Cinemate Plaza'));
 
       // Switch cinema
       if (controller.availableCinemas.length > 1) {
@@ -393,8 +393,7 @@ void main() {
       }
     });
 
-    test(
-        'Auto-detection of active tickets pre-fills Studio, Seats, and Cinema',
+    test('Auto-detection of active tickets pre-fills Studio, Seats, and Cinema',
         () async {
       Get.testMode = true;
       final ticketCtrl = Get.put(TicketsController());
@@ -431,8 +430,8 @@ void main() {
       expect(fnbCtrl.studioNumber.value, equals('Studio 3'));
       expect(fnbCtrl.seatNumber.value, equals('F7, F8'));
       // Setelah auto-detect, bioskop otomatis cocok dengan tiket aktif
-      expect(fnbCtrl.selectedCinema.value?.name,
-          equals('Metro Cinema Senayan'));
+      expect(
+          fnbCtrl.selectedCinema.value?.name, equals('Metro Cinema Senayan'));
 
       Get.delete<TicketsController>();
     });

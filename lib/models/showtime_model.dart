@@ -2,6 +2,9 @@
 // Model jadwal penayangan film (Showtime) untuk alur pemesanan tiket (PB-018)
 // Referensi: SRS §3.1, PB-018, tabel Supabase `showtimes`
 
+import '../utils/currency_helper.dart';
+import '../utils/timezone_helper.dart';
+
 class ShowtimeModel {
   final String id;
   final String cinemaId;
@@ -102,5 +105,15 @@ class ShowtimeModel {
       buffer.write(str[i]);
     }
     return buffer.toString();
+  }
+
+  /// Format harga sesuai preferensi mata uang terpilih (PB-048)
+  String formattedPriceWithCurrency([String targetCurrency = 'IDR']) {
+    return CurrencyHelper.format(price, targetCurrency: targetCurrency);
+  }
+
+  /// Format jam tayang sesuai zona waktu terpilih (PB-049)
+  String formattedTimeWithZone([String targetZone = 'WIB']) {
+    return TimezoneHelper.convertTimeString(showTime, targetZone: targetZone);
   }
 }

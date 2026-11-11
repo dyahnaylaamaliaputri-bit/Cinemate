@@ -134,7 +134,8 @@ void main() {
     test('All 6 moods produce valid curated recommendations', () async {
       for (final mood in MoodDefinition.allMoods) {
         final results = await service.getRecommendations(mood.type);
-        expect(results, isNotEmpty, reason: 'Mood ${mood.title} harus punya rekomendasi');
+        expect(results, isNotEmpty,
+            reason: 'Mood ${mood.title} harus punya rekomendasi');
         expect(results.first.matchPercentage, inInclusiveRange(88, 99));
         expect(results.first.aiReason, isNotEmpty);
       }
@@ -160,18 +161,20 @@ void main() {
       Get.testMode = true;
       final controller = MoodController();
 
-      final sadMood = MoodDefinition.allMoods
-          .firstWhere((m) => m.type == MoodType.sad);
+      final sadMood =
+          MoodDefinition.allMoods.firstWhere((m) => m.type == MoodType.sad);
       await controller.selectMood(sadMood);
 
       expect(controller.selectedMood.value.type, equals(MoodType.sad));
       expect(controller.recommendations.isNotEmpty, isTrue);
-      expect(controller.recommendations.first.aiReason.toLowerCase(),
-          anyOf(contains('karakter'), contains('emosional'), contains('katarsis')));
+      expect(
+          controller.recommendations.first.aiReason.toLowerCase(),
+          anyOf(contains('karakter'), contains('emosional'),
+              contains('katarsis')));
 
       // Ganti ke bored
-      final boredMood = MoodDefinition.allMoods
-          .firstWhere((m) => m.type == MoodType.bored);
+      final boredMood =
+          MoodDefinition.allMoods.firstWhere((m) => m.type == MoodType.bored);
       await controller.selectMood(boredMood);
 
       expect(controller.selectedMood.value.type, equals(MoodType.bored));

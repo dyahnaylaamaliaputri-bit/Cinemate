@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../controllers/cinema_controller.dart';
 import '../../models/cinema_model.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/app_colors.dart';
@@ -379,31 +380,61 @@ class CinemaCard extends StatelessWidget {
                 }).toList(),
               ),
               const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.gold,
+                        side: const BorderSide(color: AppColors.gold),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.directions_rounded, size: 18),
+                      label: const Text(
+                        'Petunjuk Arah',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      onPressed: () {
+                        if (Get.isRegistered<CinemaController>()) {
+                          Get.find<CinemaController>()
+                              .openGoogleMapsRoute(cinema);
+                        }
+                      },
                     ),
                   ),
-                  icon: const Icon(Icons.confirmation_num_outlined,
-                      color: Colors.white),
-                  label: const Text(
-                    'Pilih Jadwal Tayang di Bioskop Ini',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.confirmation_num_outlined,
+                          color: Colors.white, size: 18),
+                      label: const Text(
+                        'Pesan Tiket',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        Get.toNamed(Routes.bookByCinema, arguments: cinema);
+                      },
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    Get.toNamed(Routes.bookByCinema, arguments: cinema);
-                  },
-                ),
+                ],
               ),
             ],
           ),

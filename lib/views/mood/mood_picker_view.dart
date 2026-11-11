@@ -474,7 +474,8 @@ class _MoodPickerViewState extends State<MoodPickerView> {
           Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
               onTap: () => controller.viewMovieDetail(movie),
               child: Padding(
                 padding: const EdgeInsets.all(14),

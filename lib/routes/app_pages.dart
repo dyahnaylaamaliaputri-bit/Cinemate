@@ -20,6 +20,8 @@ import '../views/movie_detail/movie_detail_view.dart';
 import '../views/fnb/fnb_checkout_view.dart';
 import '../views/fnb/fnb_order_detail_view.dart';
 import '../views/mood/mood_picker_view.dart';
+import '../views/cinema/cinema_map_view.dart';
+import '../views/profile/edit_profile_view.dart';
 import '../controllers/mood_controller.dart';
 import 'app_routes.dart';
 
@@ -90,6 +92,14 @@ class AppPages {
     GetPage(
       name: Routes.fnbOrderDetail,
       page: () => const FnbOrderDetailView(),
+    ),
+    GetPage(
+      name: Routes.cinemaMap,
+      page: () => const CinemaMapView(),
+    ),
+    GetPage(
+      name: Routes.editProfile,
+      page: () => const EditProfileView(),
     ),
     GetPage(
       name: Routes.moodPicker,

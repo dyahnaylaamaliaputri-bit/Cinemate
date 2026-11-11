@@ -15,7 +15,8 @@ class BookingOrderModel {
   final int ticketPrice;
   final int serviceFeePerTicket;
   final int discountAmount;
-  final List<FnbOrderItemModel> fnbItems; // PB-032 / FR-028: Tambah Makanan Opsional
+  final List<FnbOrderItemModel>
+      fnbItems; // PB-032 / FR-028: Tambah Makanan Opsional
   final DateTime createdAt;
   final String status; // 'pending', 'paid', 'expired', 'cancelled'
   final String? paymentMethod; // 'BCA VA', 'GoPay', 'QRIS', dll

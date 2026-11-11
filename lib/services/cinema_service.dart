@@ -1,6 +1,6 @@
 // lib/services/cinema_service.dart
-// Service untuk mengambil data bioskop dari Supabase & menghitung bioskop terdekat (PB-015)
-// Mendukung offline caching dengan Hive dan seed data fallback.
+// Service untuk mengambil data bioskop dari Supabase & menghitung bioskop terdekat (PB-015, PB-043, PB-045)
+// Mendukung offline caching dengan Hive, seed data multi-kota, dan filter radius.
 
 import 'package:flutter/foundation.dart';
 import '../models/cinema_model.dart';
@@ -15,7 +15,7 @@ class CinemaService {
   final SupabaseService _supabase = SupabaseService();
   final StorageService _storage = StorageService();
 
-  /// Data fallback bioskop jika database Supabase belum terisi atau offline tanpa cache
+  /// Data fallback bioskop jika database Supabase offline tanpa cache
   static const List<Map<String, dynamic>> seedCinemas = [
     {
       'id': '126eef40-67fb-4aee-b4f7-11929e296767',
@@ -60,6 +60,60 @@ class CinemaService {
       'latitude': -6.3728,
       'longitude': 106.8318,
       'city': 'Depok',
+      'image_url': null,
+    },
+    {
+      'id': '78a1bc23-6621-4d32-8df1-123456789abc',
+      'name': 'Cinemate Paris Van Java',
+      'address': 'Jl. Sukajadi No. 137-139, Bandung',
+      'latitude': -6.8893,
+      'longitude': 107.5962,
+      'city': 'Bandung',
+      'image_url': null,
+    },
+    {
+      'id': '89b2cd34-7732-4e43-9ef2-234567890bcd',
+      'name': 'Nusantara XXI Tunjungan Plaza',
+      'address': 'Jl. Basuki Rahmat No. 8-12, Surabaya',
+      'latitude': -7.2618,
+      'longitude': 112.7388,
+      'city': 'Surabaya',
+      'image_url': null,
+    },
+    {
+      'id': '90c3de45-8843-4f54-0fa3-345678901cde',
+      'name': 'Cinemate Plaza Ambarrukmo',
+      'address': 'Jl. Laksda Adisucipto No. 80, Yogyakarta',
+      'latitude': -7.7828,
+      'longitude': 110.4011,
+      'city': 'Yogyakarta',
+      'image_url': null,
+    },
+    {
+      'id': 'a1d4ef56-9954-4a65-1ab4-456789012def',
+      'name': 'Cinemate Supermal Karawaci',
+      'address': 'Boulevard Diponegoro No. 105, Tangerang',
+      'latitude': -6.2255,
+      'longitude': 106.6080,
+      'city': 'Tangerang',
+      'image_url': null,
+    },
+    {
+      'id': 'b2e5fa67-0065-4b76-2bc5-567890123efa',
+      'name': 'Nusantara XXI Centre Point Medan',
+      'address': 'Jl. Timor Blok H No. 1, Medan',
+      'latitude': 3.5925,
+      'longitude': 98.6811,
+      'city': 'Medan',
+      'image_url': null,
+    },
+    {
+      'id': 'c3f6ab78-1176-4c87-3cd6-678901234fab',
+      'name': 'Cinemate Beachwalk Kuta Bali',
+      'address': 'Jl. Pantai Kuta, Badung, Bali',
+      'latitude': -8.7180,
+      'longitude': 115.1691,
+      'city': 'Bali',
       'image_url': null,
     },
   ];
@@ -111,7 +165,7 @@ class CinemaService {
       debugPrint('[CinemaService] Error reading Hive fallback cache: $e');
     }
 
-    // 4. Fallback terakhir: seed data lokal
+    // 4. Fallback terakhir: seed data lokal lengkap multi-kota
     final fallbackList =
         seedCinemas.map((e) => CinemaModel.fromJson(e)).toList();
     return (cinemas: fallbackList, fromCache: true);
@@ -124,6 +178,22 @@ class CinemaService {
     required double userLng,
     int limit = 3,
   }) {
+    final sorted = getCinemasSortedByDistance(
+      cinemas,
+      userLat: userLat,
+      userLng: userLng,
+    );
+    return sorted.take(limit).toList();
+  }
+
+  /// Menghitung jarak seluruh bioskop ke koordinat pengguna dengan formula Haversine,
+  /// mengurutkannya secara ascending (km), dan memfilter berdasarkan radius (PB-043, PB-045).
+  List<CinemaModel> getCinemasSortedByDistance(
+    List<CinemaModel> cinemas, {
+    required double userLat,
+    required double userLng,
+    double? maxRadiusKm,
+  }) {
     if (cinemas.isEmpty) return [];
 
     // Hitung jarak ke user untuk masing-masing bioskop
@@ -132,14 +202,20 @@ class CinemaService {
       return cinema.copyWith(distanceKm: distance);
     }).toList();
 
+    // Filter radius jika diset
+    final filtered = maxRadiusKm != null
+        ? listWithDistance
+            .where((c) => (c.distanceKm ?? double.infinity) <= maxRadiusKm)
+            .toList()
+        : listWithDistance;
+
     // Urutkan ascending berdasarkan jarak terkecil
-    listWithDistance.sort((a, b) {
+    filtered.sort((a, b) {
       final distA = a.distanceKm ?? double.infinity;
       final distB = b.distanceKm ?? double.infinity;
       return distA.compareTo(distB);
     });
 
-    // Ambil sejumlah limit (default 3 terdekat)
-    return listWithDistance.take(limit).toList();
+    return filtered;
   }
 }

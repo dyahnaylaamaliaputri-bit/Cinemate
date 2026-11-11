@@ -400,24 +400,26 @@ class _HomeTabState extends State<HomeTab> {
               const SizedBox(height: 24),
 
               // =============================================================
-              // 4. BIOSKOP TERDEKAT (PB-015 - Location-Based Services)
+              // 4. BIOSKOP TERDEKAT (PB-015, PB-043, PB-044 - Location-Based Services)
               // =============================================================
               _buildSectionHeader(
                 title: 'Bioskop Terdekat',
                 subtitle: 'LBS Geolocation',
-                actionLabel: 'Ganti Titik',
-                actionIcon: Icons.my_location_rounded,
-                onSeeAll: () => _showLocationPicker(context),
+                actionLabel: 'Peta Bioskop',
+                actionIcon: Icons.map_outlined,
+                onSeeAll: () => Get.toNamed(Routes.cinemaMap),
               ),
               const SizedBox(height: 8),
 
-              // Bar Indikator Titik Lokasi Acuan Pengguna
+              // Bar Indikator Titik Lokasi Acuan Pengguna & Tombol GPS
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Obx(() {
                   final locName = _cinemaCtrl.selectedLocationName.value;
                   final lat = _cinemaCtrl.userLat.value;
                   final lng = _cinemaCtrl.userLng.value;
+                  final isDetecting = _cinemaCtrl.isDetectingLocation.value;
+
                   return Container(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -428,41 +430,63 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(
-                          Icons.near_me_rounded,
-                          color: AppColors.primaryLight,
-                          size: 15,
+                        InkWell(
+                          onTap: () => _cinemaCtrl.detectCurrentLocation(),
+                          borderRadius: BorderRadius.circular(6),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4),
+                            child: isDetecting
+                                ? const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: AppColors.primaryLight,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.my_location_rounded,
+                                    color: Colors.greenAccent,
+                                    size: 16,
+                                  ),
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: Text(
-                            'Titik Acuan: $locName (${lat.toStringAsFixed(2)}, ${lng.toStringAsFixed(2)})',
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
+                          child: InkWell(
+                            onTap: () => _showLocationPicker(context),
+                            child: Text(
+                              '$locName (${lat.toStringAsFixed(2)}, ${lng.toStringAsFixed(2)})',
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.card,
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(
-                              color: AppColors.gold.withValues(alpha: 0.3),
+                        InkWell(
+                          onTap: () => _showLocationPicker(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.card,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: AppColors.gold.withValues(alpha: 0.3),
+                              ),
                             ),
-                          ),
-                          child: const Text(
-                            '3 Terdekat',
-                            style: TextStyle(
-                              color: AppColors.gold,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
+                            child: const Text(
+                              'Ganti Kota',
+                              style: TextStyle(
+                                color: AppColors.gold,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -750,6 +774,40 @@ class _HomeTabState extends State<HomeTab> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.greenAccent),
+                    ),
+                    child: const Icon(
+                      Icons.my_location_rounded,
+                      color: Colors.greenAccent,
+                      size: 20,
+                    ),
+                  ),
+                  title: const Text(
+                    'Deteksi GPS Otomatis',
+                    style: TextStyle(
+                      color: Colors.greenAccent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  subtitle: const Text(
+                    'Gunakan sensor GPS perangkat saat ini (PB-042)',
+                    style:
+                        TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                  ),
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    await _cinemaCtrl.detectCurrentLocation();
+                  },
+                ),
+                const Divider(color: AppColors.divider, height: 16),
                 ...CinemaController.presets.map((preset) {
                   return Obx(() {
                     final isSelected =

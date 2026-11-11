@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/order_summary_controller.dart';
+import '../../routes/app_routes.dart';
 import '../../utils/app_colors.dart';
 
 class OrderSummaryView extends GetView<OrderSummaryController> {
@@ -275,6 +276,43 @@ class OrderSummaryView extends GetView<OrderSummaryController> {
                           .map((e) => '${e.name} x${e.quantity}')
                           .join(', '),
                       trailingBadge: '${order.fnbItems.length} Item',
+                    ),
+                  ] else ...[
+                    const SizedBox(height: 12),
+                    const Divider(color: AppColors.divider, height: 1),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      onTap: () => Get.toNamed(Routes.fnbCheckout),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: AppColors.gold.withValues(alpha: 0.4)),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.fastfood_rounded,
+                                color: AppColors.gold, size: 18),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '+ Tambah Popcorn & Minuman (F&B)',
+                                style: TextStyle(
+                                  color: AppColors.gold,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                            Icon(Icons.chevron_right_rounded,
+                                color: AppColors.gold, size: 18),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ],

@@ -4,6 +4,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '../../controllers/dashboard_controller.dart';
+import '../../controllers/fnb_controller.dart';
 import '../../controllers/ticket_detail_controller.dart';
 import '../../routes/app_routes.dart';
 import '../../utils/app_colors.dart';
@@ -108,6 +110,57 @@ class TicketDetailView extends GetView<TicketDetailController> {
               _buildETicketCard(),
 
               const SizedBox(height: 24),
+
+              // Pintasan Pesan Makanan & Minuman di Bioskop Ini (PB-034)
+              Obx(() {
+                final ticket = controller.ticket.value;
+                if (ticket.isTicketHistory) return const SizedBox.shrink();
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.gold,
+                        side:
+                            const BorderSide(color: AppColors.gold, width: 1.2),
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.fastfood_rounded, size: 18),
+                      label: Text(
+                        'Pesan F&B di ${ticket.cinemaName}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      onPressed: () {
+                        if (Get.isRegistered<FnbController>()) {
+                          final fnbCtrl = Get.find<FnbController>();
+                          final match =
+                              fnbCtrl.availableCinemas.firstWhereOrNull(
+                            (c) =>
+                                c.name.toLowerCase() ==
+                                ticket.cinemaName.toLowerCase(),
+                          );
+                          if (match != null) {
+                            fnbCtrl.selectedCinema.value = match;
+                          }
+                        }
+                        if (Get.isRegistered<DashboardController>()) {
+                          Get.find<DashboardController>().changeTab(2);
+                          Get.until((route) =>
+                              route.settings.name == Routes.dashboard);
+                        } else {
+                          Get.toNamed(Routes.fnbCheckout);
+                        }
+                      },
+                    ),
+                  ),
+                );
+              }),
 
               // Tombol Navigasi Bawah
               Obx(() {

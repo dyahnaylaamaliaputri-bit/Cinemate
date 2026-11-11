@@ -227,7 +227,8 @@ class _FnbCheckoutViewState extends State<FnbCheckoutView> {
               value: cinema,
               child: Row(
                 children: [
-                  const Icon(Icons.location_on, size: 16, color: AppColors.gold),
+                  const Icon(Icons.location_on,
+                      size: 16, color: AppColors.gold),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -344,8 +345,8 @@ class _FnbCheckoutViewState extends State<FnbCheckoutView> {
                         fontWeight: FontWeight.w600)),
                 subtitle: const Text(
                     'Ambil pesanan mandiri dengan E-Voucher QR',
-                    style:
-                        TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                    style: TextStyle(
+                        color: AppColors.textSecondary, fontSize: 12)),
                 value: 'counter',
                 groupValue: fnbCtrl.pickupMethod.value,
                 onChanged: (val) {
@@ -362,8 +363,8 @@ class _FnbCheckoutViewState extends State<FnbCheckoutView> {
                         fontWeight: FontWeight.w600)),
                 subtitle: const Text(
                     'Petugas cinema mengantar pesanan ke tempat dudukmu',
-                    style:
-                        TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                    style: TextStyle(
+                        color: AppColors.textSecondary, fontSize: 12)),
                 value: 'delivery',
                 groupValue: fnbCtrl.pickupMethod.value,
                 onChanged: (val) {
@@ -396,8 +397,10 @@ class _FnbCheckoutViewState extends State<FnbCheckoutView> {
                                 isDense: true,
                                 labelText: 'Studio / Hall',
                                 hintText: 'Misal: Studio 1',
-                                prefixIcon: const Icon(Icons.meeting_room_outlined,
-                                    size: 18, color: AppColors.textSecondary),
+                                prefixIcon: const Icon(
+                                    Icons.meeting_room_outlined,
+                                    size: 18,
+                                    color: AppColors.textSecondary),
                                 labelStyle: const TextStyle(
                                     color: AppColors.textSecondary,
                                     fontSize: 12),

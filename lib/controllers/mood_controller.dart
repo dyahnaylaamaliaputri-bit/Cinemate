@@ -38,7 +38,8 @@ class MoodController extends GetxController {
   }
 
   /// Memilih kategori mood baru dan memperbarui rekomendasi film secara reaktif
-  Future<void> selectMood(MoodDefinition mood, {bool forceRefresh = false}) async {
+  Future<void> selectMood(MoodDefinition mood,
+      {bool forceRefresh = false}) async {
     if (!forceRefresh &&
         selectedMood.value.type == mood.type &&
         recommendations.isNotEmpty &&

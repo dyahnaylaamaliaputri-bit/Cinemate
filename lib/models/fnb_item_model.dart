@@ -1,6 +1,8 @@
 // lib/models/fnb_item_model.dart
 // Model untuk item menu Makanan & Minuman (F&B) bioskop (PB-026)
 
+import '../utils/currency_helper.dart';
+
 class FnbItemModel {
   final String id;
   final String name;
@@ -78,6 +80,11 @@ class FnbItemModel {
       }
     }
     return 'Rp ${buffer.toString().split('').reversed.join()}';
+  }
+
+  /// Format harga sesuai preferensi mata uang terpilih (PB-048)
+  String formattedPriceWithCurrency([String targetCurrency = 'IDR']) {
+    return CurrencyHelper.format(price, targetCurrency: targetCurrency);
   }
 
   /// Label kategori yang rapi untuk ditampilkan di UI
