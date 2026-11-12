@@ -139,57 +139,90 @@ docs/
 
 ---
 
-## 🎯 Rekomendasi & Pembagian Tugas Adil untuk Developer Selanjutnya (PB 11 & PB 12)
+## 🎯 Rekomendasi & Pembagian Tugas Adil untuk Developer Selanjutnya (PB 11 s.d. PB 14)
 
 > **⚖️ Prinsip Pembagian Tugas yang Adil & Transparan:**  
 > Seluruh backlog **PB 1 s/d PB 10 (total 40+ user stories)** telah tuntas 100% dengan **79 unit tests lolos (100%)** dan 0 issue statis `dart analyze`.  
-> Untuk sprint berikutnya, developer partner ditugaskan menyelesaikan **2 PB berikutnya (PB 11 dan PB 12)**:
+> Untuk melanjutkan sprint penyelesaian aplikasi Cinemate, developer partner ditugaskan menyelesaikan **4 Backlog Epic berikutnya (PB 11, PB 12, PB 13, dan PB 14)**:
 
 ---
 
-### 📦 Tugas Teman Selanjutnya 1: Epic Pencarian & Filter Katalog (SRC — PB 11)
-*Menuntaskan modul pencarian global lintas film, bioskop, dan F&B (PB-051 s.d. PB-055)*
+### 📦 Tugas Teman 1: Epic Pencarian & Filter Multi-Kriteria (SRC — PB 11)
+*Menuntaskan modul pencarian global lintas film, bioskop, dan F&B (PB-051 s.d. PB-055 / SRS §3.10 FR-057 s.d. FR-061)*
 
 | No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria |
 | :---: | :---: | :--- | :--- |
-| 1 | **PB-051** | Pencarian Multi-Entitas dengan Debounce | Input search bar di dashboard dengan debounce 300ms untuk mencari film, bioskop, dan menu F&B sekaligus. |
-| 2 | **PB-052** | Filter Pencarian Multi-Kriteria | Filter hasil berdasarkan genre, rating ($\ge 7.0$), rentang harga tiket, dan kota bioskop. |
+| 1 | **PB-051** | Pencarian Multi-Entitas dengan Debounce | Input search bar di dashboard dengan debounce 300ms untuk mencari film, bioskop, dan menu F&B sekaligus tanpa lag. |
+| 2 | **PB-052** | Filter Pencarian Multi-Kriteria | Filter hasil berdasarkan genre, rating ($\ge 7.0$), rentang harga tiket, dan kota bioskop terpilih. |
 | 3 | **PB-053** | Pengurutan Hasil Pencarian | Sorting hasil pencarian berdasarkan *Rating Tertinggi*, *Paling Populer*, *Harga Termurah*, dan *Jarak Terdekat*. |
 | 4 | **PB-054** | Riwayat Pencarian Terakhir | Menyimpan 5 pencarian terakhir ke `GetStorage` / Hive dengan tombol hapus riwayat individual & hapus semua. |
 | 5 | **PB-055** | State Kosong & Skeleton Loading | Tampilan empty state ramah ilustrasi saat pencarian tidak ditemukan serta skeleton loading saat proses pencarian. |
 
 - **Target File yang Dikerjakan:**
-  - `lib/controllers/search_controller.dart`
-  - `lib/views/search/search_view.dart`
-  - `test/search_filter_test.dart`
+  - `lib/controllers/search_controller.dart` (Logika debounce pencarian, multi-kriteria filter & search history)
+  - `lib/views/search/search_view.dart` (Layar antarmuka pencarian universal dengan filter chips)
+  - `test/search_filter_test.dart` (Unit test logika filter pencarian, debounce, dan riwayat)
 
 ---
 
-### 📦 Tugas Teman Selanjutnya 2: Epic Notifikasi Lokal & Pengingat Jadwal (NTF — PB 12)
-*Menuntaskan modul notifikasi lokal transaksi dan pengingat tayang film (PB-056 s.d. PB-060)*
+### 📦 Tugas Teman 2: Epic Notifikasi Lokal & Pengingat Jadwal (NTF — PB 12)
+*Menuntaskan modul notifikasi lokal transaksi dan pengingat tayang film (PB-056 s.d. PB-060 / SRS §3.11 FR-062 s.d. FR-066)*
 
 | No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria |
 | :---: | :---: | :--- | :--- |
-| 1 | **PB-056** | Notifikasi Konfirmasi Pemesanan | Notifikasi instan saat checkout tiket bioskop atau pesanan F&B berhasil dengan rincian kode booking. |
-| 2 | **PB-057** | Notifikasi Pengingat Jadwal Film Terjadwal | Penjadwalan alarm notifikasi lokal otomatis H-2 jam sebelum film dimulai menggunakan `flutter_local_notifications`. |
-| 3 | **PB-058** | Pengaturan Izin & Preferensi Notifikasi di Profil | Toggle on/off notifikasi tiket dan promo di `ProfileTab` yang persisten di storage lokal. |
-| 4 | **PB-059** | Deep Link Notifikasi ke E-Ticket | Mengetuk notifikasi konfirmasi langsung membuka halaman `TicketDetailView` tiket bersangkutan. |
-| 5 | **PB-060** | Notifikasi Penawaran Promo F&B Mingguan | Simulasi notifikasi promosi diskon F&B berkala untuk meningkatkan engagement pengguna. |
+| 1 | **PB-056** | Notifikasi Konfirmasi Pemesanan | Notifikasi instan saat checkout tiket bioskop atau pesanan F&B berhasil lengkap dengan rincian kode booking (`CNM-XXXXX` / `FNB-XXXXX`). |
+| 2 | **PB-057** | Notifikasi Pengingat Jadwal Film Terjadwal | Penjadwalan alarm notifikasi lokal otomatis H-2 jam dan H-30 menit sebelum film dimulai menggunakan `flutter_local_notifications`. |
+| 3 | **PB-058** | Pengaturan Izin & Preferensi Notifikasi di Profil | Toggle switch on/off notifikasi tiket, promo, dan F&B di `ProfileTab` yang persisten di local storage. |
+| 4 | **PB-059** | Notifikasi Pengingat Pesanan F&B Siap Diambil | Notifikasi lokal saat status pesanan F&B berubah menjadi *Siap Diambil* (`ready`) di counter concession. |
+| 5 | **PB-060** | Notifikasi Penawaran Promo F&B Mingguan | Simulasi notifikasi promosi diskon F&B berkala untuk meningkatkan engagement penonton bioskop. |
 
 - **Target File yang Dikerjakan:**
-  - `lib/services/notification_service.dart`
-  - `test/notification_service_test.dart`
+  - `lib/services/notification_service.dart` (Inisialisasi plugin notifikasi, scheduling alarm, channel ID)
+  - `lib/views/dashboard/tabs/profile_tab.dart` (Integrasi switch toggle izin preferensi notifikasi)
+  - `test/notification_service_test.dart` (Unit test penjadwalan notifikasi dan payload)
+
+---
+
+### 📦 Tugas Teman 3: Epic Profil Lanjutan & My Cinemate (PRF — PB 13)
+*Menuntaskan modul profil pengguna, personalisasi preferensi genre, dan riwayat AI (PB-061 s.d. PB-065 / SRS §3.12 FR-067 s.d. FR-071)*
+
+| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria |
+| :---: | :---: | :--- | :--- |
+| 1 | **PB-061** | Unggah Foto Profil Pengguna | Fitur ganti foto profil dari Kamera atau Galeri perangkat menggunakan `image_picker`, dengan fallback avatar lokal jika offline. |
+| 2 | **PB-063** | Halaman Pengaturan Aplikasi Lanjutan | Layar pengaturan komprehensif untuk preferensi tema aplikasi, opsi keamanan login biometrik (Fingerprint/Face ID), dan ringkasan preferensi. |
+| 3 | **PB-064** | Layar "My Cinemate" | Dashboard personal penonton yang menampilkan statistik film yang sudah ditonton, preferensi genre favorit yang dapat diubah, dan badge loyalitas. |
+| 4 | **PB-065** | Riwayat Hasil Profiling AI Mood | Menyimpan histori rekomendasi mood yang pernah dilakukan beserta tanggalnya di Hive, sehingga pengguna dapat melihat kembali film hasil rekomendasi AI terdahulu. |
+
+- **Target File yang Dikerjakan:**
+  - `lib/views/profile/my_cinemate_view.dart` (Layar personalisasi penonton & statistik genre)
+  - `lib/views/profile/settings_view.dart` (Layar pengaturan preferensi aplikasi & biometrik)
+  - `lib/controllers/profile_controller.dart` (Pengelolaan unggah foto, riwayat tontonan, & riwayat AI)
+  - `test/profile_cinemate_test.dart` (Unit test preferensi genre penonton & riwayat AI)
+
+---
+
+### 📦 Tugas Teman 4: Epic Sinkronisasi Data & Hardening Kualitas (DAT — PB 14)
+*Menuntaskan sinkronisasi offline-to-online dan standarisasi kualitas rilis aplikasi (PB-066 s.d. PB-067 / SRS §3.13 FR-072, FR-073 & NFR)*
+
+| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria |
+| :---: | :---: | :--- | :--- |
+| 1 | **PB-066** | Sinkronisasi Otomatis Data Lokal & Cloud | Deteksi konektivitas internet; saat perangkat kembali online, transaksi tiket & pesanan F&B offline di Hive otomatis disinkronkan ke tabel Supabase tanpa duplikasi. |
+| 2 | **PB-067** | Pengujian Akhir, Optimasi Cold Start & Hardening Kualitas | Verifikasi performa cold start (< 4 detik), ketahanan crash minimal 98%, integrasi seluruh modul, pengujian responsive layout di resolusi HP Android 8.0+, dan kelengkapan dokumentasi. |
+
+- **Target File yang Dikerjakan:**
+  - `lib/services/sync_service.dart` (Service pendeteksi koneksi dan sinkronisasi dua arah Hive-Supabase)
+  - `test/sync_hardening_test.dart` (Unit test pengujian skenario sinkronisasi saat koneksi pulih)
 
 ---
 
 ### 🌿 Panduan Branching Git untuk Teman
-Tarik update terbaru dari `main` dan buat branch baru untuk PB 11 & PB 12:
+Tarik update terbaru dari `main` dan buat branch baru untuk mengerjakan 4 PB ini:
 ```bash
 git checkout main
 git pull origin main
 
-# Buat branch pengerjaan baru:
-git checkout -b feat/pb-051-060-search-and-notification
+# Buat branch pengerjaan baru untuk PB 11 s.d. PB 14:
+git checkout -b feat/pb-051-067-search-notification-profile-sync
 ```
 
 ---
