@@ -1,10 +1,12 @@
 // lib/views/profile/edit_profile_view.dart
-// Halaman form edit profil pengguna: nama, nomor telepon & avatar (PB-062)
-// Referensi: SRS Â§3.11 FR-067, FR-068, PB-062
+// Halaman form edit profil pengguna: nama, nomor telepon & foto profil kamera/galeri (PB-061, PB-062)
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/profile_controller.dart';
 import '../../utils/app_colors.dart';
 
 class EditProfileView extends StatefulWidget {
@@ -16,6 +18,10 @@ class EditProfileView extends StatefulWidget {
 
 class _EditProfileViewState extends State<EditProfileView> {
   final AuthController _authCtrl = Get.find<AuthController>();
+  final ProfileController _profileCtrl = Get.isRegistered<ProfileController>()
+      ? Get.find<ProfileController>()
+      : Get.put(ProfileController());
+
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _nameCtrl;
@@ -26,27 +32,27 @@ class _EditProfileViewState extends State<EditProfileView> {
     {
       'label': 'Cinephile',
       'icon': Icons.movie_filter_rounded,
-      'color': AppColors.primary
+      'color': AppColors.primary,
     },
     {
       'label': 'VIP Gold',
       'icon': Icons.workspace_premium_rounded,
-      'color': AppColors.gold
+      'color': AppColors.gold,
     },
     {
       'label': 'Director',
       'icon': Icons.videocam_rounded,
-      'color': Colors.deepPurpleAccent
+      'color': Colors.deepPurpleAccent,
     },
     {
       'label': 'Popcorn Fan',
       'icon': Icons.fastfood_rounded,
-      'color': Colors.amber
+      'color': Colors.amber,
     },
     {
       'label': 'Sci-Fi Star',
       'icon': Icons.rocket_launch_rounded,
-      'color': Colors.cyanAccent
+      'color': Colors.cyanAccent,
     },
   ];
 
@@ -65,6 +71,67 @@ class _EditProfileViewState extends State<EditProfileView> {
     super.dispose();
   }
 
+  void _showImagePickerModal() {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Pilih Foto Profil (PB-061)',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading:
+                  const Icon(Icons.camera_alt_outlined, color: AppColors.gold),
+              title: const Text('Ambil dari Kamera',
+                  style: TextStyle(color: AppColors.textPrimary)),
+              onTap: () async {
+                Get.back();
+                await _profileCtrl.pickProfileImage(ImageSource.camera);
+                setState(() {});
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined,
+                  color: AppColors.gold),
+              title: const Text('Pilih dari Galeri',
+                  style: TextStyle(color: AppColors.textPrimary)),
+              onTap: () async {
+                Get.back();
+                await _profileCtrl.pickProfileImage(ImageSource.gallery);
+                setState(() {});
+              },
+            ),
+            if (_profileCtrl.avatarPath.value != null)
+              ListTile(
+                leading: const Icon(Icons.delete_outline_rounded,
+                    color: AppColors.primary),
+                title: const Text('Hapus Foto Kustom (Kembali ke Lencana)',
+                    style: TextStyle(color: AppColors.primary)),
+                onTap: () async {
+                  Get.back();
+                  await _profileCtrl.removeCustomAvatar();
+                  setState(() {});
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _saveProfile() {
     if (!_formKey.currentState!.validate()) return;
 
@@ -73,6 +140,7 @@ class _EditProfileViewState extends State<EditProfileView> {
       final updated = current.copyWith(
         fullName: _nameCtrl.text.trim(),
         phone: _phoneCtrl.text.trim(),
+        avatarUrl: _profileCtrl.avatarPath.value ?? current.avatarUrl,
       );
       _authCtrl.currentUser.value = updated;
     }
@@ -118,33 +186,86 @@ class _EditProfileViewState extends State<EditProfileView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Selector Badge Avatar Anggota
+              // 1. Selector Badge Avatar & Unggah Foto (PB-061)
               Center(
                 child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 44,
-                      backgroundColor: _presetAvatars[_selectedAvatarIndex]
-                          ['color'] as Color,
-                      child: Icon(
-                        _presetAvatars[_selectedAvatarIndex]['icon']
-                            as IconData,
-                        size: 40,
-                        color: Colors.white,
+                    Stack(
+                      children: [
+                        Obx(() {
+                          final path = _profileCtrl.avatarPath.value;
+                          final hasCustomImage =
+                              path != null && File(path).existsSync();
+
+                          if (hasCustomImage) {
+                            return CircleAvatar(
+                              radius: 48,
+                              backgroundColor: AppColors.gold,
+                              child: CircleAvatar(
+                                radius: 45,
+                                backgroundImage: FileImage(File(path)),
+                              ),
+                            );
+                          }
+
+                          return CircleAvatar(
+                            radius: 45,
+                            backgroundColor:
+                                _presetAvatars[_selectedAvatarIndex]['color']
+                                    as Color,
+                            child: Icon(
+                              _presetAvatars[_selectedAvatarIndex]['icon']
+                                  as IconData,
+                              size: 40,
+                              color: Colors.white,
+                            ),
+                          );
+                        }),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: _showImagePickerModal,
+                            child: Container(
+                              padding: const EdgeInsets.all(7),
+                              decoration: const BoxDecoration(
+                                color: AppColors.gold,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.camera_alt_rounded,
+                                size: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: _showImagePickerModal,
+                      icon: const Icon(Icons.photo_camera_rounded, size: 14),
+                      label: const Text(
+                        'Unggah Foto Profil (PB-061)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.gold,
+                        side: const BorderSide(color: AppColors.gold),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      _presetAvatars[_selectedAvatarIndex]['label'] as String,
-                      style: const TextStyle(
-                        color: AppColors.gold,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 16),
                     const Text(
-                      'Pilih Lencana Avatar Anggota:',
+                      'Atau Pilih Lencana Avatar Anggota:',
                       style: TextStyle(
                           color: AppColors.textSecondary, fontSize: 12),
                     ),

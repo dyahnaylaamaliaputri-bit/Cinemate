@@ -25,4 +25,6 @@ abstract class Routes {
   static const cinemaMap = '/cinema-map';
   static const editProfile = '/edit-profile';
   static const search = '/search';
+  static const myCinemate = '/my-cinemate';
+  static const settings = '/settings';
 }

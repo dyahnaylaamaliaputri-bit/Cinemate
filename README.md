@@ -118,6 +118,12 @@ docs/
 - [x] **PB-059 (Notifikasi Pengingat Pesanan F&B Siap Diambil):** Notifikasi lokal instan saat status pesanan F&B berubah menjadi *Ready* di counter concession atau delivery ke kursi studio.
 - [x] **PB-060 (Notifikasi Penawaran Promo F&B Mingguan):** Simulasi berkala penawaran diskon combo popcorn & F&B dengan tombol "Kirim Notifikasi Uji Coba" langsung di layar profil pengguna.
 
+### 13. Profil Lanjutan, My Cinemate & Riwayat AI (PB 13 / PB-061 s.d. PB-065) [SELESAI ✅]
+- [x] **PB-061 (Unggah Foto Profil Pengguna):** Fitur ganti foto profil dari Kamera atau Galeri perangkat menggunakan `image_picker`, preview avatar interaktif dengan fallback lencana avatar bawaan saat offline atau jika dibatalkan.
+- [x] **PB-063 (Halaman Pengaturan Aplikasi Lanjutan):** Layar pengaturan komprehensif (`SettingsView`) untuk preferensi tema aplikasi (*Cinematic Dark*, *Light*, *Mengikuti Sistem*), opsi keamanan login biometrik (Fingerprint / Face ID toggle), ringkasan preferensi aktif, dan pembersihan cache Hive.
+- [x] **PB-064 (Layar "My Cinemate" Dashboard Penonton):** Dashboard personal penonton (`MyCinemateView`) yang menampilkan statistik jumlah film yang ditonton, estimasi jam tontonan, total belanja tiket & F&B, sistem badge loyalitas penonton (*Bronze*, *Silver*, *Gold*, *Platinum*), dan multi-select chips preferensi genre favorit yang tersimpan persisten.
+- [x] **PB-065 (Riwayat Hasil Profiling AI Mood):** Penyimpanan riwayat hasil rekomendasi mood yang pernah dilakukan beserta tanggal/jam dan film-film yang disarankan secara LIFO di local storage, dengan opsi hapus riwayat individual & hapus semua.
+
 ---
 
 ## 🚀 Panduan Setup untuk Anggota Tim
@@ -141,7 +147,7 @@ docs/
    ```bash
    flutter pub get
    ```
-5. **Jalankan pengujian unit (Semua 110 Unit Test Wajib Passed):**
+5. **Jalankan pengujian unit (Semua 125 Unit Test Wajib Passed):**
    ```bash
    flutter test
    ```
@@ -153,11 +159,11 @@ docs/
 
 ---
 
-## 🎯 Rekomendasi & Pembagian Tugas Adil untuk Developer Selanjutnya (PB 13 s.d. PB 14)
+## 🎯 Rekomendasi & Pembagian Tugas Adil untuk Developer Selanjutnya (PB 14)
 
 > **⚖️ Prinsip Pembagian Tugas yang Adil & Transparan:**  
-> Seluruh backlog **PB 1 s/d PB 12 (total 60+ user stories)** telah tuntas 100% dengan **110 unit tests lolos (100%)** dan 0 issue statis `dart analyze`.  
-> Untuk melanjutkan sprint penyelesaian aplikasi Cinemate, developer partner ditugaskan menyelesaikan **2 Backlog Epic berikutnya (PB 13 dan PB 14)**:
+> Seluruh backlog **PB 1 s/d PB 13 (total 70+ user stories)** telah tuntas 100% dengan **125 unit tests lolos (100%)** dan 0 issue statis `dart analyze`.  
+> Untuk menuntaskan tahap akhir rilis aplikasi Cinemate, developer partner ditugaskan menyelesaikan **Backlog Epic Terakhir (PB 14)**:
 
 ---
 
@@ -201,21 +207,25 @@ docs/
 
 ---
 
-### 📦 Tugas Teman 3: Epic Profil Lanjutan & My Cinemate (PRF — PB 13)
-*Menuntaskan modul profil pengguna, personalisasi preferensi genre, dan riwayat AI (PB-061 s.d. PB-065 / SRS §3.12 FR-067 s.d. FR-071)*
+### 📦 Tugas Teman 3: Epic Profil Lanjutan & My Cinemate (PRF — PB 13) [SELESAI ✅]
+*Modul profil pengguna, personalisasi preferensi genre, dan riwayat AI telah tuntas 100% (PB-061 s.d. PB-065 / SRS §3.12 FR-067 s.d. FR-071)*
 
-| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria |
-| :---: | :---: | :--- | :--- |
-| 1 | **PB-061** | Unggah Foto Profil Pengguna | Fitur ganti foto profil dari Kamera atau Galeri perangkat menggunakan `image_picker`, dengan fallback avatar lokal jika offline. |
-| 2 | **PB-063** | Halaman Pengaturan Aplikasi Lanjutan | Layar pengaturan komprehensif untuk preferensi tema aplikasi, opsi keamanan login biometrik (Fingerprint/Face ID), dan ringkasan preferensi. |
-| 3 | **PB-064** | Layar "My Cinemate" | Dashboard personal penonton yang menampilkan statistik film yang sudah ditonton, preferensi genre favorit yang dapat diubah, dan badge loyalitas. |
-| 4 | **PB-065** | Riwayat Hasil Profiling AI Mood | Menyimpan histori rekomendasi mood yang pernah dilakukan beserta tanggalnya di Hive, sehingga pengguna dapat melihat kembali film hasil rekomendasi AI terdahulu. |
+| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria | Status |
+| :---: | :---: | :--- | :--- | :---: |
+| 1 | **PB-061** | Unggah Foto Profil Pengguna | Fitur ganti foto profil dari Kamera atau Galeri perangkat menggunakan `image_picker`, dengan fallback avatar lokal jika offline. | ✅ Selesai |
+| 2 | **PB-063** | Halaman Pengaturan Aplikasi Lanjutan | Layar pengaturan komprehensif (`SettingsView`) untuk preferensi tema aplikasi, opsi keamanan login biometrik (Fingerprint/Face ID), dan ringkasan preferensi. | ✅ Selesai |
+| 3 | **PB-064** | Layar "My Cinemate" | Dashboard personal penonton (`MyCinemateView`) yang menampilkan statistik film yang sudah ditonton, preferensi genre favorit yang dapat diubah, dan badge loyalitas. | ✅ Selesai |
+| 4 | **PB-065** | Riwayat Hasil Profiling AI Mood | Menyimpan histori rekomendasi mood yang pernah dilakukan beserta tanggalnya di storage lokal, sehingga pengguna dapat melihat kembali film hasil rekomendasi AI terdahulu. | ✅ Selesai |
 
-- **Target File yang Dikerjakan:**
-  - `lib/views/profile/my_cinemate_view.dart` (Layar personalisasi penonton & statistik genre)
-  - `lib/views/profile/settings_view.dart` (Layar pengaturan preferensi aplikasi & biometrik)
-  - `lib/controllers/profile_controller.dart` (Pengelolaan unggah foto, riwayat tontonan, & riwayat AI)
-  - `test/profile_cinemate_test.dart` (Unit test preferensi genre penonton & riwayat AI)
+- **File yang Telah Dibuat & Teruji:**
+  - `lib/views/profile/my_cinemate_view.dart` (Layar personalisasi penonton, badge loyalitas, statistik film, dan daftar riwayat AI Mood)
+  - `lib/views/profile/settings_view.dart` (Layar pengaturan preferensi tema, biometrik, ringkasan setelan & reset cache)
+  - `lib/views/profile/edit_profile_view.dart` (Integrasi kamera/galeri `image_picker` dengan fallback lencana avatar)
+  - `lib/controllers/profile_controller.dart` (Pengelolaan unggah foto, statistik tontonan, badge loyalitas, preferensi genre, & riwayat AI)
+  - `lib/controllers/mood_controller.dart` (Perekaman otomatis hasil profiling AI Mood ke storage lokal)
+  - `lib/models/mood_history_model.dart` (Model riwayat profiling mood & rekomendasi film)
+  - `lib/bindings/profile_binding.dart` (Binding GetX rute profile, settings, & my cinemate)
+  - `test/profile_cinemate_test.dart` (15 Unit tests lengkap untuk PB-061 s.d. PB-065 lolos 100%)
 
 ---
 

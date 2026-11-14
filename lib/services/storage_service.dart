@@ -208,6 +208,142 @@ class StorageService {
     notifPromo = v;
   }
 
+  // ================================================================
+  // PROFILE, THEME & PREFERENCES (PB-061, PB-063, PB-064, PB-065)
+  // ================================================================
+
+  /// Mode tema aplikasi ('dark', 'light', 'system') (PB-063)
+  String get themeMode {
+    if (_isTestEnvironment) {
+      return _memoryFallback['theme_mode'] ?? 'dark';
+    }
+    return _prefs.read<String>('theme_mode') ?? 'dark';
+  }
+
+  set themeMode(String mode) {
+    if (_isTestEnvironment) {
+      _memoryFallback['theme_mode'] = mode;
+      return;
+    }
+    _prefs.write('theme_mode', mode);
+  }
+
+  /// Preferensi login biometrik (PB-063)
+  bool get biometricEnabled {
+    if (_isTestEnvironment) {
+      return _memoryFallback['biometric_enabled'] ?? false;
+    }
+    return _prefs.read<bool>('biometric_enabled') ?? false;
+  }
+
+  set biometricEnabled(bool enabled) {
+    if (_isTestEnvironment) {
+      _memoryFallback['biometric_enabled'] = enabled;
+      return;
+    }
+    _prefs.write('biometric_enabled', enabled);
+  }
+
+  /// Path foto profil lokal pengguna (PB-061)
+  String? get avatarPath {
+    if (_isTestEnvironment) {
+      return _memoryFallback['avatar_path'] as String?;
+    }
+    return _prefs.read<String>('avatar_path');
+  }
+
+  set avatarPath(String? path) {
+    if (_isTestEnvironment) {
+      if (path == null) {
+        _memoryFallback.remove('avatar_path');
+      } else {
+        _memoryFallback['avatar_path'] = path;
+      }
+      return;
+    }
+    if (path == null) {
+      _prefs.remove('avatar_path');
+    } else {
+      _prefs.write('avatar_path', path);
+    }
+  }
+
+  /// Preferensi genre film favorit penonton (PB-064)
+  List<String> getFavoriteGenres() {
+    if (_isTestEnvironment) {
+      final mem = _memoryFallback['favorite_genres'];
+      if (mem is List) {
+        return mem.map((e) => e.toString()).toList();
+      }
+      return ['Action', 'Sci-Fi', 'Drama'];
+    }
+    try {
+      final list = _prefs.read<List>('favorite_genres');
+      if (list != null && list.isNotEmpty) {
+        return list.map((e) => e.toString()).toList();
+      }
+    } catch (_) {}
+    return ['Action', 'Sci-Fi', 'Drama'];
+  }
+
+  Future<void> saveFavoriteGenres(List<String> genres) async {
+    if (_isTestEnvironment) {
+      _memoryFallback['favorite_genres'] = List<String>.from(genres);
+      return;
+    }
+    await _prefs.write('favorite_genres', genres);
+  }
+
+  /// Riwayat hasil profiling AI Mood (PB-065)
+  List<Map<String, dynamic>> getMoodHistory() {
+    if (_isTestEnvironment) {
+      final mem = _memoryFallback['mood_history'];
+      if (mem is List) {
+        return mem.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      }
+      return [];
+    }
+    try {
+      final list = _prefs.read<List>('mood_history');
+      if (list != null) {
+        return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  Future<void> saveMoodHistory(List<Map<String, dynamic>> items) async {
+    if (_isTestEnvironment) {
+      _memoryFallback['mood_history'] = List<Map<String, dynamic>>.from(items);
+      return;
+    }
+    await _prefs.write('mood_history', items);
+  }
+
+  Future<void> addMoodHistory(Map<String, dynamic> item) async {
+    final current = getMoodHistory();
+    // Insert di awal (LIFO) dan batasi hingga 20 entri terakhir
+    current.insert(0, item);
+    if (current.length > 20) {
+      current.removeLast();
+    }
+    await saveMoodHistory(current);
+  }
+
+  Future<void> deleteMoodHistory(String id) async {
+    final current = getMoodHistory();
+    current.removeWhere((item) => item['id'] == id);
+    await saveMoodHistory(current);
+  }
+
+  Future<void> clearMoodHistory() async {
+    if (_isTestEnvironment) {
+      _memoryFallback.remove('mood_history');
+      return;
+    }
+    await _prefs.remove('mood_history');
+  }
+
   // Search history (PB-054)
   List<String> getSearchHistory() {
     if (_isTestEnvironment) {
@@ -291,8 +427,10 @@ class StorageService {
 
   /// Menghapus seluruh cache film di Hive
   Future<void> clearMovieCache() async {
-    final box = await _openBox(AppConstants.boxMovies);
-    await box.clear();
+    try {
+      final box = await _openBox(AppConstants.boxMovies);
+      await box.clear();
+    } catch (_) {}
   }
 
   // ================================================================
@@ -322,8 +460,10 @@ class StorageService {
 
   /// Menghapus cache bioskop di Hive
   Future<void> clearCinemaCache() async {
-    final box = await _openBox(AppConstants.boxCinemas);
-    await box.clear();
+    try {
+      final box = await _openBox(AppConstants.boxCinemas);
+      await box.clear();
+    } catch (_) {}
   }
 
   // ================================================================
@@ -378,7 +518,9 @@ class StorageService {
 
   /// Menghapus cache tiket di Hive
   Future<void> clearTicketsCache() async {
-    final box = await _openBox(AppConstants.boxTickets);
-    await box.clear();
+    try {
+      final box = await _openBox(AppConstants.boxTickets);
+      await box.clear();
+    } catch (_) {}
   }
 }

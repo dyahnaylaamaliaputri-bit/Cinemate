@@ -2,10 +2,13 @@
 // Controller untuk modul rekomendasi film berbasis Mood AI (PB-031, PB-032, PB-033)
 
 import 'package:get/get.dart';
+import '../models/mood_history_model.dart';
 import '../models/mood_model.dart';
 import '../models/movie_model.dart';
 import '../routes/app_routes.dart';
 import '../services/mood_service.dart';
+import '../services/storage_service.dart';
+import 'profile_controller.dart';
 
 class MoodController extends GetxController {
   final MoodRecommendationService _moodService;
@@ -71,6 +74,9 @@ class MoodController extends GetxController {
         sortBy: selectedSortBy.value,
       );
       recommendations.assignAll(items);
+      if (items.isNotEmpty) {
+        _recordMoodHistory(items);
+      }
     } catch (e) {
       errorMessage.value = 'Gagal memuat rekomendasi: $e';
     } finally {
@@ -86,5 +92,34 @@ class MoodController extends GetxController {
   /// Membuka halaman detail film
   void viewMovieDetail(MovieModel movie) {
     Get.toNamed(Routes.movieDetail, arguments: movie);
+  }
+
+  /// Menyimpan hasil profiling mood ke riwayat AI (PB-065)
+  void _recordMoodHistory(List<MoodRecommendationItem> items) {
+    try {
+      final historyItem = MoodHistoryModel(
+        id: 'mood-${DateTime.now().millisecondsSinceEpoch}',
+        moodType: selectedMood.value.type.name,
+        moodTitle: selectedMood.value.title,
+        moodEmoji: selectedMood.value.emoji,
+        timestamp: DateTime.now(),
+        movies: items
+            .take(5)
+            .map((item) => MoodHistoryItemModel(
+                  movieId: item.movie.id,
+                  title: item.movie.title,
+                  posterPath: item.movie.posterPath,
+                  matchPercentage: item.matchPercentage,
+                  aiReason: item.aiReason,
+                ))
+            .toList(),
+      );
+
+      if (Get.isRegistered<ProfileController>()) {
+        Get.find<ProfileController>().recordMoodProfiling(historyItem);
+      } else {
+        StorageService().addMoodHistory(historyItem.toJson());
+      }
+    } catch (_) {}
   }
 }

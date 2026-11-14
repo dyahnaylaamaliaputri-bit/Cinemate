@@ -22,7 +22,10 @@ import '../views/fnb/fnb_order_detail_view.dart';
 import '../views/mood/mood_picker_view.dart';
 import '../views/cinema/cinema_map_view.dart';
 import '../views/profile/edit_profile_view.dart';
+import '../views/profile/my_cinemate_view.dart';
+import '../views/profile/settings_view.dart';
 import '../views/search/search_view.dart';
+import '../bindings/profile_binding.dart';
 import '../bindings/search_binding.dart';
 import '../controllers/mood_controller.dart';
 import 'app_routes.dart';
@@ -116,6 +119,16 @@ class AppPages {
       name: Routes.search,
       page: () => const SearchView(),
       binding: SearchBinding(),
+    ),
+    GetPage(
+      name: Routes.myCinemate,
+      page: () => const MyCinemateView(),
+      binding: ProfileBinding(),
+    ),
+    GetPage(
+      name: Routes.settings,
+      page: () => const SettingsView(),
+      binding: ProfileBinding(),
     ),
   ];
 }

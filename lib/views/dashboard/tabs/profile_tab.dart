@@ -1,6 +1,7 @@
 // lib/views/dashboard/tabs/profile_tab.dart
-// Tab Profil: Informasi pengguna, Edit Profil & Selector Preferensi Konversi (PB-011, PB-048, PB-049, PB-050, PB-062)
+// Tab Profil: Informasi pengguna, Edit Profil, My Cinemate & Selector Preferensi (PB-011, PB-048, PB-049, PB-050, PB-058, PB-061, PB-063, PB-064)
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/auth_controller.dart';
@@ -75,14 +76,21 @@ class ProfileTab extends StatelessWidget {
                         CircleAvatar(
                           radius: 30,
                           backgroundColor: AppColors.primary,
-                          child: Text(
-                            name.isNotEmpty ? name[0].toUpperCase() : 'U',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          backgroundImage: user?.avatarUrl != null &&
+                                  File(user!.avatarUrl!).existsSync()
+                              ? FileImage(File(user.avatarUrl!))
+                              : null,
+                          child: user?.avatarUrl != null &&
+                                  File(user!.avatarUrl!).existsSync()
+                              ? null
+                              : Text(
+                                  name.isNotEmpty ? name[0].toUpperCase() : 'U',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -175,6 +183,67 @@ class ProfileTab extends StatelessWidget {
                 ),
               );
             }),
+
+            const SizedBox(height: 16),
+
+            // 1B. BANNER DASHBOARD "MY CINEMATE" (PB-064)
+            InkWell(
+              onTap: () => Get.toNamed(Routes.myCinemate),
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF2A1B4E), Color(0xFF16213E)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  border:
+                      Border.all(color: AppColors.gold.withValues(alpha: 0.5)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.gold.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.stars_rounded,
+                          color: AppColors.gold, size: 26),
+                    ),
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'My Cinemate Dashboard',
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Statistik tontonan, badge loyalitas & preferensi genre (PB-064)',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios_rounded,
+                        color: AppColors.gold, size: 16),
+                  ],
+                ),
+              ),
+            ),
 
             const SizedBox(height: 20),
 
@@ -322,6 +391,13 @@ class ProfileTab extends StatelessWidget {
                   onTap: () => _showTimezonePicker(context, prefCtrl),
                 );
               }),
+              const Divider(color: AppColors.divider, height: 1),
+              _buildInteractiveSettingTile(
+                icon: Icons.tune_rounded,
+                title: 'Pengaturan Aplikasi Lanjutan',
+                subtitle: 'Tema aplikasi, biometrik & manajemen data (PB-063)',
+                onTap: () => Get.toNamed(Routes.settings),
+              ),
             ]),
 
             const SizedBox(height: 20),
