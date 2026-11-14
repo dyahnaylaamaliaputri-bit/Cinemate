@@ -111,6 +111,13 @@ docs/
 - [x] **PB-054 (Riwayat 5 Pencarian Terakhir):** Menyimpan hingga 5 riwayat pencarian terakhir secara persisten di storage lokal dengan urutan LIFO, tombol hapus riwayat individual, tombol *"Hapus Semua Riwayat"*, dan aksi klik riwayat untuk langsung mengisi query pencarian.
 - [x] **PB-055 (State Kosong, Skeleton Loading & Direct Actions):** Shimmer skeleton loading saat pencarian/filtering berlangsung, tampilan empty state ramah saat hasil tidak ditemukan beserta saran ejaan & tombol reset, kartu film dengan tombol direct *"Pesan Tiket"*, kartu bioskop dengan tombol *"Jadwal"*, serta kartu F&B dengan harga terkonversi.
 
+### 12. Notifikasi Lokal & Pengingat Jadwal (PB 12 / PB-056 s.d. PB-060) [SELESAI ✅]
+- [x] **PB-056 (Notifikasi Konfirmasi Pemesanan Tiket & F&B):** Notifikasi lokal instan saat checkout tiket bioskop atau pesanan F&B berhasil, memuat judul film, kode booking (`CNM-XXXXX` / `FNB-XXXXX`), rincian studio, dan payload terstruktur.
+- [x] **PB-057 (Notifikasi Pengingat Jadwal Film Terjadwal):** Penjadwalan otomatis alarm notifikasi lokal H-2 jam dan H-30 menit sebelum film dimulai menggunakan `flutter_local_notifications` dan timezone lokal, serta pembatalan alarm otomatis jika tiket dibatalkan.
+- [x] **PB-058 (Pengaturan Izin & Preferensi Notifikasi di Profil):** 4 switch toggle interaktif di `ProfileTab` (`notifBooking`, `notifReminder`, `notifFnb`, `notifPromo`) yang tersimpan persisten di local storage / Hive.
+- [x] **PB-059 (Notifikasi Pengingat Pesanan F&B Siap Diambil):** Notifikasi lokal instan saat status pesanan F&B berubah menjadi *Ready* di counter concession atau delivery ke kursi studio.
+- [x] **PB-060 (Notifikasi Penawaran Promo F&B Mingguan):** Simulasi berkala penawaran diskon combo popcorn & F&B dengan tombol "Kirim Notifikasi Uji Coba" langsung di layar profil pengguna.
+
 ---
 
 ## 🚀 Panduan Setup untuk Anggota Tim
@@ -134,7 +141,7 @@ docs/
    ```bash
    flutter pub get
    ```
-5. **Jalankan pengujian unit (Semua 96 Unit Test Wajib Passed):**
+5. **Jalankan pengujian unit (Semua 110 Unit Test Wajib Passed):**
    ```bash
    flutter test
    ```
@@ -146,11 +153,11 @@ docs/
 
 ---
 
-## 🎯 Rekomendasi & Pembagian Tugas Adil untuk Developer Selanjutnya (PB 12 s.d. PB 14)
+## 🎯 Rekomendasi & Pembagian Tugas Adil untuk Developer Selanjutnya (PB 13 s.d. PB 14)
 
 > **⚖️ Prinsip Pembagian Tugas yang Adil & Transparan:**  
-> Seluruh backlog **PB 1 s/d PB 11 (total 50+ user stories)** telah tuntas 100% dengan **96 unit tests lolos (100%)** dan 0 issue statis `dart analyze`.  
-> Untuk melanjutkan sprint penyelesaian aplikasi Cinemate, developer partner ditugaskan menyelesaikan **3 Backlog Epic berikutnya (PB 12, PB 13, dan PB 14)**:
+> Seluruh backlog **PB 1 s/d PB 12 (total 60+ user stories)** telah tuntas 100% dengan **110 unit tests lolos (100%)** dan 0 issue statis `dart analyze`.  
+> Untuk melanjutkan sprint penyelesaian aplikasi Cinemate, developer partner ditugaskan menyelesaikan **2 Backlog Epic berikutnya (PB 13 dan PB 14)**:
 
 ---
 
@@ -173,21 +180,24 @@ docs/
 
 ---
 
-### 📦 Tugas Teman 2: Epic Notifikasi Lokal & Pengingat Jadwal (NTF — PB 12)
-*Menuntaskan modul notifikasi lokal transaksi dan pengingat tayang film (PB-056 s.d. PB-060 / SRS §3.11 FR-062 s.d. FR-066)*
+### 📦 Tugas Teman 2: Epic Notifikasi Lokal & Pengingat Jadwal (NTF — PB 12) [SELESAI ✅]
+*Modul notifikasi lokal transaksi dan pengingat tayang film telah tuntas 100% (PB-056 s.d. PB-060 / SRS §3.11 FR-062 s.d. FR-066)*
 
-| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria |
-| :---: | :---: | :--- | :--- |
-| 1 | **PB-056** | Notifikasi Konfirmasi Pemesanan | Notifikasi instan saat checkout tiket bioskop atau pesanan F&B berhasil lengkap dengan rincian kode booking (`CNM-XXXXX` / `FNB-XXXXX`). |
-| 2 | **PB-057** | Notifikasi Pengingat Jadwal Film Terjadwal | Penjadwalan alarm notifikasi lokal otomatis H-2 jam dan H-30 menit sebelum film dimulai menggunakan `flutter_local_notifications`. |
-| 3 | **PB-058** | Pengaturan Izin & Preferensi Notifikasi di Profil | Toggle switch on/off notifikasi tiket, promo, dan F&B di `ProfileTab` yang persisten di local storage. |
-| 4 | **PB-059** | Notifikasi Pengingat Pesanan F&B Siap Diambil | Notifikasi lokal saat status pesanan F&B berubah menjadi *Siap Diambil* (`ready`) di counter concession. |
-| 5 | **PB-060** | Notifikasi Penawaran Promo F&B Mingguan | Simulasi notifikasi promosi diskon F&B berkala untuk meningkatkan engagement penonton bioskop. |
+| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria | Status |
+| :---: | :---: | :--- | :--- | :---: |
+| 1 | **PB-056** | Notifikasi Konfirmasi Pemesanan | Notifikasi instan saat checkout tiket bioskop atau pesanan F&B berhasil lengkap dengan rincian kode booking (`CNM-XXXXX` / `FNB-XXXXX`). | ✅ Selesai |
+| 2 | **PB-057** | Notifikasi Pengingat Jadwal Film Terjadwal | Penjadwalan alarm notifikasi lokal otomatis H-2 jam dan H-30 menit sebelum film dimulai menggunakan `flutter_local_notifications`. | ✅ Selesai |
+| 3 | **PB-058** | Pengaturan Izin & Preferensi Notifikasi di Profil | Toggle switch on/off notifikasi tiket, promo, dan F&B di `ProfileTab` yang persisten di local storage. | ✅ Selesai |
+| 4 | **PB-059** | Notifikasi Pengingat Pesanan F&B Siap Diambil | Notifikasi lokal saat status pesanan F&B berubah menjadi *Siap Diambil* (`ready`) di counter concession. | ✅ Selesai |
+| 5 | **PB-060** | Notifikasi Penawaran Promo F&B Mingguan | Simulasi notifikasi promosi diskon F&B berkala untuk meningkatkan engagement penonton bioskop. | ✅ Selesai |
 
-- **Target File yang Dikerjakan:**
-  - `lib/services/notification_service.dart` (Inisialisasi plugin notifikasi, scheduling alarm, channel ID)
-  - `lib/views/dashboard/tabs/profile_tab.dart` (Integrasi switch toggle izin preferensi notifikasi)
-  - `test/notification_service_test.dart` (Unit test penjadwalan notifikasi dan payload)
+- **File yang Telah Dibuat & Teruji:**
+  - `lib/services/notification_service.dart` (Inisialisasi plugin notifikasi, channels, scheduling alarm H-2h & H-30m, cancelation, F&B ready, promo mingguan)
+  - `lib/views/dashboard/tabs/profile_tab.dart` (4 interactive switch toggles preferensi notifikasi & tombol uji coba notifikasi)
+  - `lib/controllers/payment_controller.dart` (Trigger notifikasi konfirmasi tiket & penjadwalan alarm otomatis saat checkout)
+  - `lib/controllers/fnb_controller.dart` (Trigger notifikasi pemesanan F&B & notifikasi pesanan siap diambil)
+  - `lib/controllers/preference_controller.dart` & `lib/services/storage_service.dart` (Persistensi preferensi notifikasi lokal)
+  - `test/notification_service_test.dart` (14 Unit tests lengkap untuk PB-056 s.d. PB-060 lolos 100%)
 
 ---
 

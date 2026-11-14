@@ -9,6 +9,7 @@ import '../models/fnb_order_model.dart';
 import '../models/ticket_model.dart';
 import '../services/cinema_service.dart';
 import '../services/fnb_service.dart';
+import '../services/notification_service.dart';
 import '../services/ticket_service.dart';
 import '../utils/app_colors.dart';
 import 'auth_controller.dart';
@@ -390,6 +391,13 @@ class FnbController extends GetxController {
       // Tambahkan ke riwayat pesanan
       userOrders.insert(0, newOrder);
 
+      // PB-056: Notifikasi Konfirmasi Pesanan F&B
+      try {
+        await NotificationService.instance.showFnbConfirmation(newOrder);
+      } catch (e) {
+        debugPrint('[FnbController] Error sending F&B notification: $e');
+      }
+
       return newOrder;
     } catch (e) {
       debugPrint('[FnbController] Error submitting order: $e');
@@ -462,6 +470,15 @@ class FnbController extends GetxController {
         'Status Diperbarui',
         'Pesanan ${updated.pickupCode} kini berstatus: ${updated.statusLabel}',
       );
+
+      // PB-059: Notifikasi Pengingat Pesanan F&B Siap Diambil di Concession
+      if (nextStatus == 'ready') {
+        try {
+          await NotificationService.instance.showFnbOrderReady(updated);
+        } catch (e) {
+          debugPrint('[FnbController] Error sending F&B ready notification: $e');
+        }
+      }
     }
   }
 

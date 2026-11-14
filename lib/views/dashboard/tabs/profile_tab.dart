@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../../../controllers/auth_controller.dart';
 import '../../../controllers/preference_controller.dart';
 import '../../../routes/app_routes.dart';
+import '../../../services/notification_service.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/currency_helper.dart';
 import '../../../utils/timezone_helper.dart';
@@ -321,17 +322,95 @@ class ProfileTab extends StatelessWidget {
                   onTap: () => _showTimezonePicker(context, prefCtrl),
                 );
               }),
+            ]),
+
+            const SizedBox(height: 20),
+
+            // 4. PREFERENSI NOTIFIKASI & PENGINGAT (PB-058)
+            _buildSectionHeader('Preferensi Notifikasi & Pengingat (PB-058)'),
+            const SizedBox(height: 8),
+            _buildSettingsCard([
+              Obx(() => _buildSwitchTile(
+                    icon: Icons.confirmation_number_outlined,
+                    title: 'Konfirmasi Pemesanan Tiket & F&B',
+                    subtitle:
+                        'Notifikasi instan saat checkout berhasil (PB-056)',
+                    value: prefCtrl.notifBooking.value,
+                    onChanged: (val) => prefCtrl.setNotifBooking(val),
+                  )),
               const Divider(color: AppColors.divider, height: 1),
-              _buildSettingTile(
-                icon: Icons.notifications_active_outlined,
-                title: 'Notifikasi Tiket & Promo',
-                subtitle: 'Aktif',
+              Obx(() => _buildSwitchTile(
+                    icon: Icons.alarm_rounded,
+                    title: 'Pengingat Jadwal Tayang',
+                    subtitle:
+                        'Alarm otomatis H-2 jam & H-30 menit (PB-057)',
+                    value: prefCtrl.notifReminder.value,
+                    onChanged: (val) => prefCtrl.setNotifReminder(val),
+                  )),
+              const Divider(color: AppColors.divider, height: 1),
+              Obx(() => _buildSwitchTile(
+                    icon: Icons.fastfood_outlined,
+                    title: 'Status Pesanan F&B Siap Diambil',
+                    subtitle:
+                        'Pemberitahuan saat makanan siap di counter (PB-059)',
+                    value: prefCtrl.notifFnb.value,
+                    onChanged: (val) => prefCtrl.setNotifFnb(val),
+                  )),
+              const Divider(color: AppColors.divider, height: 1),
+              Obx(() => _buildSwitchTile(
+                    icon: Icons.local_offer_outlined,
+                    title: 'Penawaran Promo & Film Mingguan',
+                    subtitle:
+                        'Diskon F&B & rekomendasi promo mingguan (PB-060)',
+                    value: prefCtrl.notifPromo.value,
+                    onChanged: (val) => prefCtrl.setNotifPromo(val),
+                  )),
+              const Divider(color: AppColors.divider, height: 1),
+              ListTile(
+                leading: const Icon(Icons.send_rounded,
+                    color: AppColors.gold, size: 20),
+                title: const Text(
+                  'Kirim Notifikasi Uji Coba',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                subtitle: const Text(
+                  'Simulasikan notifikasi promo mingguan ke perangkat',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 11,
+                  ),
+                ),
+                trailing: const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: AppColors.textSecondary,
+                  size: 14,
+                ),
+                onTap: () async {
+                  await NotificationService.instance.showWeeklyPromo(
+                    promoTitle: '🍿 Promo Spesial Akhir Pekan Cinemate!',
+                    promoBody:
+                        'Dapatkan diskon 30% untuk Combo Popcorn & Soft Drink sekarang!',
+                  );
+                  Get.snackbar(
+                    'Notifikasi Terkirim',
+                    'Notifikasi promo mingguan berhasil disimulasikan.',
+                    backgroundColor: AppColors.surface,
+                    colorText: AppColors.textPrimary,
+                    snackPosition: SnackPosition.BOTTOM,
+                    duration: const Duration(seconds: 2),
+                    margin: const EdgeInsets.all(16),
+                  );
+                },
               ),
             ]),
 
             const SizedBox(height: 24),
 
-            // 4. INFORMASI APLIKASI
+            // 5. INFORMASI APLIKASI
             _buildSectionHeader('Tentang Aplikasi'),
             const SizedBox(height: 8),
             _buildSettingsCard([
@@ -452,6 +531,39 @@ class ProfileTab extends StatelessWidget {
         color: AppColors.textSecondary,
         size: 20,
       ),
+    );
+  }
+
+  Widget _buildSwitchTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return SwitchListTile(
+      value: value,
+      onChanged: onChanged,
+      secondary: Icon(icon, color: AppColors.gold, size: 22),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: const TextStyle(
+          color: AppColors.textSecondary,
+          fontSize: 11,
+        ),
+      ),
+      activeThumbColor: AppColors.gold,
+      activeTrackColor: AppColors.gold.withValues(alpha: 0.3),
+      inactiveThumbColor: AppColors.textSecondary,
+      inactiveTrackColor: AppColors.surface,
     );
   }
 

@@ -14,6 +14,7 @@ import '../models/ticket_model.dart';
 import '../routes/app_routes.dart';
 import '../services/storage_service.dart';
 import '../services/ticket_service.dart';
+import '../services/notification_service.dart';
 import 'tickets_controller.dart';
 
 class PaymentController extends GetxController {
@@ -225,6 +226,15 @@ class PaymentController extends GetxController {
         Get.find<TicketsController>().loadTickets(forceRefresh: true);
       }
     } catch (_) {}
+
+    // PB-056: Notifikasi Konfirmasi Pemesanan Tiket Bioskop
+    // PB-057: Notifikasi Pengingat Jadwal Film Terjadwal (H-2 jam & H-30 menit)
+    try {
+      await NotificationService.instance.showTicketConfirmation(ticket);
+      await NotificationService.instance.scheduleTicketReminders(ticket);
+    } catch (e) {
+      debugPrint('[PaymentController] Error sending local notification: $e');
+    }
 
     isProcessing.value = false;
     isPaymentSuccess.value = true;

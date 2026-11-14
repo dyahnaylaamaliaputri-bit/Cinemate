@@ -109,20 +109,104 @@ class StorageService {
   }
 
   // Currency & timezone (PB-048, PB-049)
-  String get currencyPref => _prefs.read<String>('currency_pref') ?? 'IDR';
-  set currencyPref(String v) => _prefs.write('currency_pref', v);
+  String get currencyPref {
+    if (_isTestEnvironment) {
+      return _memoryFallback['currency_pref'] ?? 'IDR';
+    }
+    return _prefs.read<String>('currency_pref') ?? 'IDR';
+  }
 
-  String get timezonePref =>
-      _prefs.read<String>('timezone_pref') ?? 'Asia/Jakarta';
-  set timezonePref(String v) => _prefs.write('timezone_pref', v);
+  set currencyPref(String v) {
+    if (_isTestEnvironment) {
+      _memoryFallback['currency_pref'] = v;
+      return;
+    }
+    _prefs.write('currency_pref', v);
+  }
+
+  String get timezonePref {
+    if (_isTestEnvironment) {
+      return _memoryFallback['timezone_pref'] ?? 'Asia/Jakarta';
+    }
+    return _prefs.read<String>('timezone_pref') ?? 'Asia/Jakarta';
+  }
+
+  set timezonePref(String v) {
+    if (_isTestEnvironment) {
+      _memoryFallback['timezone_pref'] = v;
+      return;
+    }
+    _prefs.write('timezone_pref', v);
+  }
 
   // Notification settings (PB-058)
-  bool get notifBooking => _prefs.read<bool>('notif_booking') ?? true;
-  bool get notifReminder => _prefs.read<bool>('notif_reminder') ?? true;
-  bool get notifPromo => _prefs.read<bool>('notif_promo') ?? true;
-  set notifBooking(bool v) => _prefs.write('notif_booking', v);
-  set notifReminder(bool v) => _prefs.write('notif_reminder', v);
-  set notifPromo(bool v) => _prefs.write('notif_promo', v);
+  bool get notifBooking {
+    if (_isTestEnvironment) return _memoryFallback['notif_booking'] ?? true;
+    return _prefs.read<bool>('notif_booking') ?? true;
+  }
+
+  bool get notifReminder {
+    if (_isTestEnvironment) return _memoryFallback['notif_reminder'] ?? true;
+    return _prefs.read<bool>('notif_reminder') ?? true;
+  }
+
+  bool get notifFnb {
+    if (_isTestEnvironment) return _memoryFallback['notif_fnb'] ?? true;
+    return _prefs.read<bool>('notif_fnb') ?? true;
+  }
+
+  bool get notifPromo {
+    if (_isTestEnvironment) return _memoryFallback['notif_promo'] ?? true;
+    return _prefs.read<bool>('notif_promo') ?? true;
+  }
+
+  set notifBooking(bool v) {
+    if (_isTestEnvironment) {
+      _memoryFallback['notif_booking'] = v;
+      return;
+    }
+    _prefs.write('notif_booking', v);
+  }
+
+  Future<void> setNotifBooking(bool v) async {
+    notifBooking = v;
+  }
+
+  set notifReminder(bool v) {
+    if (_isTestEnvironment) {
+      _memoryFallback['notif_reminder'] = v;
+      return;
+    }
+    _prefs.write('notif_reminder', v);
+  }
+
+  Future<void> setNotifReminder(bool v) async {
+    notifReminder = v;
+  }
+
+  set notifFnb(bool v) {
+    if (_isTestEnvironment) {
+      _memoryFallback['notif_fnb'] = v;
+      return;
+    }
+    _prefs.write('notif_fnb', v);
+  }
+
+  Future<void> setNotifFnb(bool v) async {
+    notifFnb = v;
+  }
+
+  set notifPromo(bool v) {
+    if (_isTestEnvironment) {
+      _memoryFallback['notif_promo'] = v;
+      return;
+    }
+    _prefs.write('notif_promo', v);
+  }
+
+  Future<void> setNotifPromo(bool v) async {
+    notifPromo = v;
+  }
 
   // Search history (PB-054)
   List<String> getSearchHistory() {
