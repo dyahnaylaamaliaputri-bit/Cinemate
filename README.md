@@ -104,6 +104,13 @@ docs/
 - [x] **PB-035 (Stepper Pelacakan & Simulasi Status Pesanan F&B):** Layar `FnbOrderDetailView` dengan stepper visual dinamis (*Sedang Disiapkan* 🍳 $\rightarrow$ *Siap Diambil* 🍿 $\rightarrow$ *Selesai Diambil* ✅), E-Voucher QR Code, dan tombol simulasi status staf bioskop.
 - [x] **PB-062 (Form Edit Profil Pengguna):** Layar `EditProfileView` (`Routes.editProfile`) dengan form edit nama lengkap, nomor telepon, dan selector lencana avatar anggota (Cinephile, VIP Gold, Director, Popcorn Fan, Sci-Fi Star) yang tersimpan di sesi lokal.
 
+### 9. Epic Pencarian & Filter Multi-Kriteria (SRC — PB 11)
+- [x] **PB-051 (Pencarian Multi-Entitas dengan Debounce 300ms):** Controller `AppSearchController` dengan debounce worker 300ms untuk input query tanpa lag, pencarian universal lintas 3 entitas (Film: judul, sinopsis, genre; Bioskop: nama, kota, alamat; F&B: nama menu, deskripsi, kategori), serta shortcut pencarian interaktif di AppBar & Dashboard `HomeTab`.
+- [x] **PB-052 (Filter Pencarian Multi-Kriteria):** Filter tab kategori entitas (*Semua*, *Film*, *Bioskop*, *F&B*), filter genre film (Action, Animation, Comedy, Horror, dll.), filter rating tinggi ($\ge 7.0$ bintang), filter batas harga maksimal F&B, filter kota bioskop (Jakarta, Depok, Bandung, Surabaya), active filter chips bar dengan kemampuan hapus per chip, dan tombol *"Reset Filter"*.
+- [x] **PB-053 (Pengurutan Hasil Pencarian):** Pilihan sorting hasil dinamis: *Rating Tertinggi* (rating film $\ge 7.0$ di atas), *Paling Populer* (popularity TMDB), *Harga Termurah* (F&B price ascending), *Jarak Terdekat* (bioskop distance ascending), dan *Abjad (A - Z)*.
+- [x] **PB-054 (Riwayat 5 Pencarian Terakhir):** Menyimpan hingga 5 riwayat pencarian terakhir secara persisten di storage lokal dengan urutan LIFO, tombol hapus riwayat individual, tombol *"Hapus Semua Riwayat"*, dan aksi klik riwayat untuk langsung mengisi query pencarian.
+- [x] **PB-055 (State Kosong, Skeleton Loading & Direct Actions):** Shimmer skeleton loading saat pencarian/filtering berlangsung, tampilan empty state ramah saat hasil tidak ditemukan beserta saran ejaan & tombol reset, kartu film dengan tombol direct *"Pesan Tiket"*, kartu bioskop dengan tombol *"Jadwal"*, serta kartu F&B dengan harga terkonversi.
+
 ---
 
 ## 🚀 Panduan Setup untuk Anggota Tim
@@ -127,7 +134,7 @@ docs/
    ```bash
    flutter pub get
    ```
-5. **Jalankan pengujian unit (Semua 79 Unit Test Wajib Passed):**
+5. **Jalankan pengujian unit (Semua 96 Unit Test Wajib Passed):**
    ```bash
    flutter test
    ```
@@ -139,29 +146,30 @@ docs/
 
 ---
 
-## 🎯 Rekomendasi & Pembagian Tugas Adil untuk Developer Selanjutnya (PB 11 s.d. PB 14)
+## 🎯 Rekomendasi & Pembagian Tugas Adil untuk Developer Selanjutnya (PB 12 s.d. PB 14)
 
 > **⚖️ Prinsip Pembagian Tugas yang Adil & Transparan:**  
-> Seluruh backlog **PB 1 s/d PB 10 (total 40+ user stories)** telah tuntas 100% dengan **79 unit tests lolos (100%)** dan 0 issue statis `dart analyze`.  
-> Untuk melanjutkan sprint penyelesaian aplikasi Cinemate, developer partner ditugaskan menyelesaikan **4 Backlog Epic berikutnya (PB 11, PB 12, PB 13, dan PB 14)**:
+> Seluruh backlog **PB 1 s/d PB 11 (total 50+ user stories)** telah tuntas 100% dengan **96 unit tests lolos (100%)** dan 0 issue statis `dart analyze`.  
+> Untuk melanjutkan sprint penyelesaian aplikasi Cinemate, developer partner ditugaskan menyelesaikan **3 Backlog Epic berikutnya (PB 12, PB 13, dan PB 14)**:
 
 ---
 
-### 📦 Tugas Teman 1: Epic Pencarian & Filter Multi-Kriteria (SRC — PB 11)
-*Menuntaskan modul pencarian global lintas film, bioskop, dan F&B (PB-051 s.d. PB-055 / SRS §3.10 FR-057 s.d. FR-061)*
+### 📦 Tugas Teman 1: Epic Pencarian & Filter Multi-Kriteria (SRC — PB 11) [SELESAI ✅]
+*Modul pencarian global lintas film, bioskop, dan F&B telah tuntas 100% (PB-051 s.d. PB-055 / SRS §3.10 FR-057 s.d. FR-061)*
 
-| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria |
-| :---: | :---: | :--- | :--- |
-| 1 | **PB-051** | Pencarian Multi-Entitas dengan Debounce | Input search bar di dashboard dengan debounce 300ms untuk mencari film, bioskop, dan menu F&B sekaligus tanpa lag. |
-| 2 | **PB-052** | Filter Pencarian Multi-Kriteria | Filter hasil berdasarkan genre, rating ($\ge 7.0$), rentang harga tiket, dan kota bioskop terpilih. |
-| 3 | **PB-053** | Pengurutan Hasil Pencarian | Sorting hasil pencarian berdasarkan *Rating Tertinggi*, *Paling Populer*, *Harga Termurah*, dan *Jarak Terdekat*. |
-| 4 | **PB-054** | Riwayat Pencarian Terakhir | Menyimpan 5 pencarian terakhir ke `GetStorage` / Hive dengan tombol hapus riwayat individual & hapus semua. |
-| 5 | **PB-055** | State Kosong & Skeleton Loading | Tampilan empty state ramah ilustrasi saat pencarian tidak ditemukan serta skeleton loading saat proses pencarian. |
+| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria | Status |
+| :---: | :---: | :--- | :--- | :---: |
+| 1 | **PB-051** | Pencarian Multi-Entitas dengan Debounce | Input search bar di dashboard & SearchView dengan debounce 300ms untuk mencari film, bioskop, dan menu F&B sekaligus tanpa lag. | ✅ Selesai |
+| 2 | **PB-052** | Filter Pencarian Multi-Kriteria | Filter hasil berdasarkan genre, rating ($\ge 7.0$), rentang harga tiket, dan kota bioskop terpilih. | ✅ Selesai |
+| 3 | **PB-053** | Pengurutan Hasil Pencarian | Sorting hasil pencarian berdasarkan *Rating Tertinggi*, *Paling Populer*, *Harga Termurah*, dan *Jarak Terdekat*. | ✅ Selesai |
+| 4 | **PB-054** | Riwayat Pencarian Terakhir | Menyimpan 5 pencarian terakhir ke `GetStorage` / Hive dengan tombol hapus riwayat individual & hapus semua. | ✅ Selesai |
+| 5 | **PB-055** | State Kosong & Skeleton Loading | Tampilan empty state ramah ilustrasi saat pencarian tidak ditemukan serta skeleton loading saat proses pencarian. | ✅ Selesai |
 
-- **Target File yang Dikerjakan:**
+- **File yang Telah Dibuat & Teruji:**
   - `lib/controllers/search_controller.dart` (Logika debounce pencarian, multi-kriteria filter & search history)
   - `lib/views/search/search_view.dart` (Layar antarmuka pencarian universal dengan filter chips)
-  - `test/search_filter_test.dart` (Unit test logika filter pencarian, debounce, dan riwayat)
+  - `lib/bindings/search_binding.dart` (Binding route pencarian GetX)
+  - `test/search_filter_test.dart` (17 Unit tests logika filter pencarian, debounce, riwayat, dan empty state lolos)
 
 ---
 

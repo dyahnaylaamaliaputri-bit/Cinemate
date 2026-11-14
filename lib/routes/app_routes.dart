@@ -24,4 +24,5 @@ abstract class Routes {
   static const moodPicker = '/mood-picker';
   static const cinemaMap = '/cinema-map';
   static const editProfile = '/edit-profile';
+  static const search = '/search';
 }

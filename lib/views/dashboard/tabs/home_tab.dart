@@ -93,6 +93,11 @@ class _HomeTabState extends State<HomeTab> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.search_rounded, color: AppColors.textPrimary),
+            tooltip: 'Cari',
+            onPressed: () => Get.toNamed(Routes.search),
+          ),
+          IconButton(
             icon: const Icon(Icons.notifications_none_rounded,
                 color: AppColors.textPrimary),
             onPressed: () {
@@ -152,6 +157,44 @@ class _HomeTabState extends State<HomeTab> {
                     ],
                   );
                 }),
+              ),
+
+              const SizedBox(height: 14),
+
+              // Search Bar Shortcut (PB-051)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: InkWell(
+                  onTap: () => Get.toNamed(Routes.search),
+                  borderRadius: BorderRadius.circular(14),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.inputFill,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.border, width: 1),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.search_rounded,
+                            color: AppColors.textSecondary, size: 20),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Cari film, bioskop, atau F&B...',
+                            style: TextStyle(
+                              color: AppColors.textHint,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                        Icon(Icons.tune_rounded,
+                            color: AppColors.textSecondary, size: 18),
+                      ],
+                    ),
+                  ),
+                ),
               ),
 
               const SizedBox(height: 12),

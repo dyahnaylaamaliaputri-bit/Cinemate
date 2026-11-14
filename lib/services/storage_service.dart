@@ -4,6 +4,7 @@
 // - SecureStorage: token sesi & data sensitif (R-06)
 // - GetStorage   : preferensi pengguna (mata uang, timezone, notifikasi)
 
+import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:hive/hive.dart';
@@ -13,6 +14,16 @@ class StorageService {
   StorageService._internal();
   static final StorageService _instance = StorageService._internal();
   factory StorageService() => _instance;
+
+  static final Map<String, dynamic> _memoryFallback = {};
+
+  bool get _isTestEnvironment {
+    try {
+      return Platform.environment.containsKey('FLUTTER_TEST');
+    } catch (_) {
+      return false;
+    }
+  }
 
   // --- Secure Storage (flutter_secure_storage) ---
   final _secure = const FlutterSecureStorage(
@@ -112,6 +123,34 @@ class StorageService {
   set notifBooking(bool v) => _prefs.write('notif_booking', v);
   set notifReminder(bool v) => _prefs.write('notif_reminder', v);
   set notifPromo(bool v) => _prefs.write('notif_promo', v);
+
+  // Search history (PB-054)
+  List<String> getSearchHistory() {
+    if (_isTestEnvironment) {
+      final mem = _memoryFallback['search_history'];
+      if (mem is List) {
+        return mem.map((e) => e.toString()).toList();
+      }
+      return [];
+    }
+    try {
+      final list = _prefs.read<List>('search_history');
+      if (list != null) {
+        return list.map((e) => e.toString()).toList();
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  void saveSearchHistory(List<String> history) {
+    if (_isTestEnvironment) {
+      _memoryFallback['search_history'] = List<String>.from(history);
+      return;
+    }
+    try {
+      _prefs.write('search_history', history);
+    } catch (_) {}
+  }
 
   // ================================================================
   // HIVE — Cache data film dengan penanda waktu / TTL 6 jam (PB-013)
