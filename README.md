@@ -163,119 +163,101 @@ docs/
 
 ---
 
-## 🎯 Rekapitulasi & Penyelesaian Seluruh Backlog (PB 1 s/d PB 14 — 100% COMPLETE)
+## 🎯 Rekapitulasi Milestone & Pembagian Tugas Tim
 
-> **🎉 Seluruh Epic Backlog PB 1 s/d PB 14 Telah Tuntas 100%!**  
-> Seluruh backlog **PB 1 s/d PB 14 (total 75+ user stories)** telah tuntas 100% dengan **134 unit tests lolos (100%)** dan 0 issue statis `dart analyze`.  
-> Semua modul utama (Autentikasi, Film & Bioskop, Booking & Seat Lock, E-Ticket & QR Offline, Pembayaran Simulasi, Mood AI, LBS Maps, Notifikasi Lokal, Profil & My Cinemate, serta Sinkronisasi Data & Hardening) telah terintegrasi sempurna.
+> **📊 Status Pengerjaan Terkini:**  
+> Seluruh modul **PB 1 s/d PB 14 (total 75+ user stories)** telah tuntas 100% dikerjakan oleh **Developer 1 (Tikodjati)** dengan **134 unit tests lolos (100%)** dan 0 issue statis `dart analyze`.  
+> Untuk melanjutkan pengembangan fitur lanjutan sesuai dengan dokumen **PB-CNM-001 (Product Backlog)** dan **SRS-CNM-001**, berikut adalah **Catatan Tugas untuk Rekan Tim (4 PB)** yang siap dikerjakan secara modular dan terisolasi.
 
 ---
 
-### 📦 Tugas Teman 1: Epic Pencarian & Filter Multi-Kriteria (SRC — PB 11) [SELESAI ✅]
-*Modul pencarian global lintas film, bioskop, dan F&B telah tuntas 100% (PB-051 s.d. PB-055 / SRS §3.10 FR-057 s.d. FR-061)*
+## 📋 Catatan Tugas untuk Rekan Tim (4 PB Lanjutan)
 
-| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria | Status |
+Berikut adalah 4 Product Backlog (PB) berikutnya yang dialokasikan secara adil dan terstruktur untuk rekan pengembang:
+
+### 📦 Tugas Rekan 1: Epic Chatbot Asisten AI Cinemate (AIL — PB 15)
+*Menuntaskan asisten AI interaktif untuk tanya jawab film, sinopsis, jadwal bioskop, dan panduan tiket (PB-039 s.d. PB-041 / SRS §3.8 FR-043 s.d. FR-045)*
+
+| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria (Given-When-Then) | Status |
 | :---: | :---: | :--- | :--- | :---: |
-| 1 | **PB-051** | Pencarian Multi-Entitas dengan Debounce | Input search bar di dashboard & SearchView dengan debounce 300ms untuk mencari film, bioskop, dan menu F&B sekaligus tanpa lag. | ✅ Selesai |
-| 2 | **PB-052** | Filter Pencarian Multi-Kriteria | Filter hasil berdasarkan genre, rating ($\ge 7.0$), rentang harga tiket, dan kota bioskop terpilih. | ✅ Selesai |
-| 3 | **PB-053** | Pengurutan Hasil Pencarian | Sorting hasil pencarian berdasarkan *Rating Tertinggi*, *Paling Populer*, *Harga Termurah*, dan *Jarak Terdekat*. | ✅ Selesai |
-| 4 | **PB-054** | Riwayat Pencarian Terakhir | Menyimpan 5 pencarian terakhir ke `GetStorage` / Hive dengan tombol hapus riwayat individual & hapus semua. | ✅ Selesai |
-| 5 | **PB-055** | State Kosong & Skeleton Loading | Tampilan empty state ramah ilustrasi saat pencarian tidak ditemukan serta skeleton loading saat proses pencarian. | ✅ Selesai |
+| 1 | **PB-039** | Chatbot Interaktif Film & Jadwal | **Given** pengguna mengetik pertanyaan pada input chat, **When** pesan dikirim, **Then** asisten AI merespons dengan konteks film, studio, dan jadwal bioskop yang relevan. | ⏳ Siap Dikerjakan |
+| 2 | **PB-040** | Riwayat Percakapan Chatbot | **Given** percakapan berlangsung, **When** pengguna menutup dan membuka kembali chatbot, **Then** riwayat chat tersimpan di Hive box `chat_history` (dapat dibaca offline) dan dapat dihapus. | ⏳ Siap Dikerjakan |
+| 3 | **PB-041** | Penanganan Error Cerdas & Rate Limiting | **Given** koneksi terputus atau batas kuota tercapai, **When** pesan dikirim, **Then** muncul bubble pesan error ramah, countdown waktu tunggu, dan tombol *"Coba Lagi"*. | ⏳ Siap Dikerjakan |
 
-- **File yang Telah Dibuat & Teruji:**
-  - `lib/controllers/search_controller.dart` (Logika debounce pencarian, multi-kriteria filter & search history)
-  - `lib/views/search/search_view.dart` (Layar antarmuka pencarian universal dengan filter chips)
-  - `lib/bindings/search_binding.dart` (Binding route pencarian GetX)
-  - `test/search_filter_test.dart` (17 Unit tests logika filter pencarian, debounce, riwayat, dan empty state lolos)
+- **Target File yang Dikerjakan:**
+  - `lib/services/chatbot_service.dart` (Service API LLM Gemini / heuristic responder dengan context injection jadwal & film)
+  - `lib/controllers/chatbot_controller.dart` (Pengelolaan pesan reaktif, streaming typing effect, persistensi Hive)
+  - `lib/views/chatbot/chatbot_view.dart` (Antarmuka chat bubble estetik Dark Cinema, input bar, dan scroll-to-bottom otomatis)
+  - `test/chatbot_service_test.dart` (Unit test pengujian alur percakapan, parsing intent, dan penanganan fallback)
 
 ---
 
-### 📦 Tugas Teman 2: Epic Notifikasi Lokal & Pengingat Jadwal (NTF — PB 12) [SELESAI ✅]
-*Modul notifikasi lokal transaksi dan pengingat tayang film telah tuntas 100% (PB-056 s.d. PB-060 / SRS §3.11 FR-062 s.d. FR-066)*
+### 📦 Tugas Rekan 2: Epic Keamanan Akun & Autentikasi Biometrik (AUT — PB 16)
+*Menuntaskan verifikasi biometrik perangkat nyata dan manajemen keamanan kata sandi pengguna (PB-009, PB-010 / SRS §3.2 FR-009, FR-010)*
 
-| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria | Status |
+| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria (Given-When-Then) | Status |
 | :---: | :---: | :--- | :--- | :---: |
-| 1 | **PB-056** | Notifikasi Konfirmasi Pemesanan | Notifikasi instan saat checkout tiket bioskop atau pesanan F&B berhasil lengkap dengan rincian kode booking (`CNM-XXXXX` / `FNB-XXXXX`). | ✅ Selesai |
-| 2 | **PB-057** | Notifikasi Pengingat Jadwal Film Terjadwal | Penjadwalan alarm notifikasi lokal otomatis H-2 jam dan H-30 menit sebelum film dimulai menggunakan `flutter_local_notifications`. | ✅ Selesai |
-| 3 | **PB-058** | Pengaturan Izin & Preferensi Notifikasi di Profil | Toggle switch on/off notifikasi tiket, promo, dan F&B di `ProfileTab` yang persisten di local storage. | ✅ Selesai |
-| 4 | **PB-059** | Notifikasi Pengingat Pesanan F&B Siap Diambil | Notifikasi lokal saat status pesanan F&B berubah menjadi *Siap Diambil* (`ready`) di counter concession. | ✅ Selesai |
-| 5 | **PB-060** | Notifikasi Penawaran Promo F&B Mingguan | Simulasi notifikasi promosi diskon F&B berkala untuk meningkatkan engagement penonton bioskop. | ✅ Selesai |
+| 1 | **PB-009** | Login Biometrik (Fingerprint & Face ID) | **Given** opsi biometrik aktif di preferensi, **When** pengguna membuka login atau verifikasi pembayaran tiket, **Then** sistem memanggil sensor biometrik perangkat (`local_auth`); jika gagal 3x atau dibatalkan, otomatis fallback ke password/PIN. | ⏳ Siap Dikerjakan |
+| 2 | **PB-010** | Layar Ubah Password Pengguna | **Given** pengguna sedang login di `ProfileTab`, **When** memasukkan password lama dan password baru (minimal 8 karakter kombinasi), **Then** sistem memverifikasi hash lama, memperbarui password baru di storage/Supabase, dan mencabut sesi lain. | ⏳ Siap Dikerjakan |
 
-- **File yang Telah Dibuat & Teruji:**
-  - `lib/services/notification_service.dart` (Inisialisasi plugin notifikasi, channels, scheduling alarm H-2h & H-30m, cancelation, F&B ready, promo mingguan)
-  - `lib/views/dashboard/tabs/profile_tab.dart` (4 interactive switch toggles preferensi notifikasi & tombol uji coba notifikasi)
-  - `lib/controllers/payment_controller.dart` (Trigger notifikasi konfirmasi tiket & penjadwalan alarm otomatis saat checkout)
-  - `lib/controllers/fnb_controller.dart` (Trigger notifikasi pemesanan F&B & notifikasi pesanan siap diambil)
-  - `lib/controllers/preference_controller.dart` & `lib/services/storage_service.dart` (Persistensi preferensi notifikasi lokal)
-  - `test/notification_service_test.dart` (14 Unit tests lengkap untuk PB-056 s.d. PB-060 lolos 100%)
+- **Target File yang Dikerjakan:**
+  - `lib/services/biometric_service.dart` (Integrasi plugin `local_auth`, pemeriksaan ketersediaan hardware, dan autentikasi biometrik)
+  - `lib/views/auth/change_password_view.dart` (Layar formulir ganti password lengkap dengan toggle visibility mata dan validasi)
+  - `lib/controllers/auth_controller.dart` (Penambahan metode `changePassword` dan `authenticateWithBiometrics`)
+  - `test/auth_security_test.dart` (Unit test verifikasi keamanan pergantian password dan validasi biometrik)
 
 ---
 
-### 📦 Tugas Teman 3: Epic Profil Lanjutan & My Cinemate (PRF — PB 13) [SELESAI ✅]
-*Modul profil pengguna, personalisasi preferensi genre, dan riwayat AI telah tuntas 100% (PB-061 s.d. PB-065 / SRS §3.12 FR-067 s.d. FR-071)*
+### 📦 Tugas Rekan 3: Epic Rekomendasi AI Dashboard & Quick Access Chatbot (DSH — PB 17)
+*Mengintegrasikan widget rekomendasi AI personal di dashboard dan shortcut akses cepat chatbot (PB-016, PB-017 / SRS §3.3 FR-016, FR-017)*
 
-| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria | Status |
+| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria (Given-When-Then) | Status |
 | :---: | :---: | :--- | :--- | :---: |
-| 1 | **PB-061** | Unggah Foto Profil Pengguna | Fitur ganti foto profil dari Kamera atau Galeri perangkat menggunakan `image_picker`, dengan fallback avatar lokal jika offline. | ✅ Selesai |
-| 2 | **PB-063** | Halaman Pengaturan Aplikasi Lanjutan | Layar pengaturan komprehensif (`SettingsView`) untuk preferensi tema aplikasi, opsi keamanan login biometrik (Fingerprint/Face ID), dan ringkasan preferensi. | ✅ Selesai |
-| 3 | **PB-064** | Layar "My Cinemate" | Dashboard personal penonton (`MyCinemateView`) yang menampilkan statistik film yang sudah ditonton, preferensi genre favorit yang dapat diubah, dan badge loyalitas. | ✅ Selesai |
-| 4 | **PB-065** | Riwayat Hasil Profiling AI Mood | Menyimpan histori rekomendasi mood yang pernah dilakukan beserta tanggalnya di storage lokal, sehingga pengguna dapat melihat kembali film hasil rekomendasi AI terdahulu. | ✅ Selesai |
+| 1 | **PB-016** | Widget Rekomendasi AI di Dashboard | **Given** pengguna pernah melakukan mood profiling, **When** Dashboard dibuka, **Then** kartu rekomendasi film terakhir tampil di `HomeTab`; **Given** belum pernah, **Then** tampil kartu ajakan personal interaktif. | ⏳ Siap Dikerjakan |
+| 2 | **PB-017** | Akses Cepat Tombol Chatbot (Floating FAB) | **Given** pengguna berada di Dashboard atau Detail Film, **When** menekan tombol chatbot melayang (*Floating Action Button*), **Then** halaman chatbot langsung terbuka dalam 1 ketukan. | ⏳ Siap Dikerjakan |
 
-- **File yang Telah Dibuat & Teruji:**
-  - `lib/views/profile/my_cinemate_view.dart` (Layar personalisasi penonton, badge loyalitas, statistik film, dan daftar riwayat AI Mood)
-  - `lib/views/profile/settings_view.dart` (Layar pengaturan preferensi tema, biometrik, ringkasan setelan & reset cache)
-  - `lib/views/profile/edit_profile_view.dart` (Integrasi kamera/galeri `image_picker` dengan fallback lencana avatar)
-  - `lib/controllers/profile_controller.dart` (Pengelolaan unggah foto, statistik tontonan, badge loyalitas, preferensi genre, & riwayat AI)
-  - `lib/controllers/mood_controller.dart` (Perekaman otomatis hasil profiling AI Mood ke storage lokal)
-  - `lib/models/mood_history_model.dart` (Model riwayat profiling mood & rekomendasi film)
-  - `lib/bindings/profile_binding.dart` (Binding GetX rute profile, settings, & my cinemate)
-  - `test/profile_cinemate_test.dart` (15 Unit tests lengkap untuk PB-061 s.d. PB-065 lolos 100%)
+- **Target File yang Dikerjakan:**
+  - `lib/views/dashboard/tabs/home_tab.dart` (Penambahan widget kartu rekomendasi AI personal dan Floating Action Button chatbot)
+  - `lib/controllers/home_controller.dart` (Pemeriksaan riwayat rekomendasi AI lokal saat inisialisasi tab home)
+  - `test/home_dashboard_ai_test.dart` (Unit test verifikasi render kartu rekomendasi AI dan integrasi tombol cepat)
 
 ---
 
-### 📦 Tugas Teman 4: Epic Sinkronisasi Data & Hardening Kualitas (DAT — PB 14) [SELESAI ✅]
-*Modul sinkronisasi offline-to-online dan standarisasi kualitas rilis aplikasi telah tuntas 100% (PB-066 s.d. PB-067 / SRS §3.13 FR-072, FR-073 & NFR)*
+### 📦 Tugas Rekan 4: Epic Profiling Mood Lanjutan & LLM Engine (AIL — PB 18)
+*Menuntaskan formulir profiling penonton multi-kriteria dan integrasi prompt engine LLM terstruktur (PB-036 s.d. PB-038 / SRS §3.8 FR-039 s.d. FR-041)*
 
-| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria | Status |
+| No | Backlog ID | Nama Fitur / User Story | Cakupan Teknis & Acceptance Criteria (Given-When-Then) | Status |
 | :---: | :---: | :--- | :--- | :---: |
-| 1 | **PB-066** | Sinkronisasi Otomatis Data Lokal & Cloud | Deteksi konektivitas internet; saat perangkat kembali online, transaksi tiket & pesanan F&B offline di Hive otomatis disinkronkan ke tabel Supabase tanpa duplikasi (*idempotency*). | ✅ Selesai |
-| 2 | **PB-067** | Pengujian Akhir, Optimasi Cold Start & Hardening Kualitas | Verifikasi performa cold start (< 4 detik), ketahanan crash minimal 98% (`executeProtected`), integrasi seluruh modul, pengujian responsive layout di resolusi HP Android 8.0+, dan kelengkapan dokumentasi. | ✅ Selesai |
+| 1 | **PB-036** | Layanan LLM Terabstraksi & JSON Validation | **Given** prompt dan format schema JSON terdefinisi, **When** LLM merespons, **Then** output divalidasi ke data film nyata; jika API gagal, otomatis fallback ke rule-based curated engine. | ⏳ Siap Dikerjakan |
+| 2 | **PB-037** | Formulir Profiling Multi-Kriteria | **Given** layar profiling dibuka, **When** pengguna mengisi mood, teman nonton (Sendiri/Pasangan/Keluarga), durasi film, dan batas budget, **Then** input divalidasi dan tombol Cari Film aktif. | ⏳ Siap Dikerjakan |
+| 3 | **PB-038** | Kartu Hasil Rekomendasi & Alasan AI | **Given** profiling selesai, **When** hasil ditampilkan, **Then** muncul kartu rekomendasi dengan analisis alasan AI Cinemate serta tombol direct booking tiket bioskop. | ⏳ Siap Dikerjakan |
 
-- **File yang Telah Dibuat & Teruji:**
-  - `lib/services/sync_service.dart` (Service pendeteksi koneksi dan sinkronisasi dua arah Hive-Supabase, auto-sync listener, idempotency check, benchmarking cold start, & crash resistance guard)
-  - `lib/views/profile/settings_view.dart` (Integrasi kartu status koneksi Online/Offline, badge pending sync, dan tombol sinkronisasi instan)
-  - `test/sync_hardening_test.dart` (9 Unit tests lengkap skenario deteksi offline, sinkronisasi idempotensi, benchmarking cold start < 4 detik, dan crash resistance guard lolos 100%)
+- **Target File yang Dikerjakan:**
+  - `lib/services/llm_service.dart` (Abstraksi pemanggilan model LLM, schema prompt JSON, dan fallback rule engine)
+  - `lib/views/mood/advanced_profiling_view.dart` (Formulir interaktif multi-step kriteria penonton)
+  - `lib/controllers/mood_controller.dart` (Pengelolaan state formulir profiling lanjutan dan integrasi hasil)
+  - `test/llm_profiling_test.dart` (Unit test validasi JSON LLM, fallback rule engine, dan data model hasil profiling)
 
 ---
 
-### 🌿 Panduan Branching Git & Kolaborasi
-Seluruh fitur telah dimerge ke branch utama `main`:
+### 🌿 Panduan Branching Git untuk Rekan Tim
+
+Rekan tim dapat langsung menarik kode terbaru dari branch `main` dan membuat branch baru untuk mengerjakan tugas:
+
 ```bash
+# 1. Pastikan branch main lokal up-to-date:
 git checkout main
 git pull origin main
+
+# 2. Buat branch fitur baru untuk pengerjaan 4 PB:
+git checkout -b feat/tugas-rekan-4pb
+
+# Atau jika ingin dikerjakan per modul PB:
+git checkout -b feat/pb-039-041-chatbot-ai
+git checkout -b feat/pb-009-010-biometric-security
+git checkout -b feat/pb-016-017-dashboard-ai-widget
+git checkout -b feat/pb-036-038-llm-advanced-profiling
 ```
-
----
-
-### 📌 Standar Koding & Pengujian Sebelum Pull Request (PR)
-
-1. **Arsitektur GetX OOP & 100% Offline-First:**
-   - Pisahkan logika ke `Controller`, data/cache ke `Service`/`Utils`, dan antarmuka ke `View`.
-   - Wajib berjalan mulus dalam mode offline dengan fallback data lokal / Hive tanpa Supabase.
-   - Gunakan palet warna konsisten dari `AppColors` (*Dark Cinema Palette: `#0A0A0A`, `#E50914`, `#1A1A2E`, `#FFD700`*).
-2. **Checklist Wajib Sebelum Commit & Push:**
-   ```bash
-   # 1. Pastikan tidak ada error atau warning:
-   dart analyze lib test
-
-   # 2. Jalankan seluruh unit test (wajib 100% passed):
-   flutter test
-
-   # 3. Format kode:
-   dart format lib test
-   ```
-3. **Keamanan Kredensial:**
-   - Jangan pernah melakukan commit berkas `assets/.env`.
 
 ---
 
