@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/preference_controller.dart';
 import '../../controllers/profile_controller.dart';
+import '../../services/sync_service.dart';
 import '../../utils/app_colors.dart';
 
 class SettingsView extends StatelessWidget {
@@ -190,7 +191,78 @@ class SettingsView extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // 4. MANAJEMEN PENYIMPANAN & DATA OFFLINE
+            // 4. SINKRONISASI DATA LOKAL & CLOUD (PB-066)
+            _buildSectionHeader('Sinkronisasi Data & Cloud (PB-066)'),
+            const SizedBox(height: 8),
+            _buildCard([
+              Obx(() {
+                final syncService = SyncService.instance;
+                final isSyncing = syncService.isSyncing.value;
+                final isOnline = syncService.isOnline.value;
+                final unsynced = syncService.totalUnsynced;
+                final lastSync = syncService.lastSyncTime.value;
+                final lastSyncText = lastSync != null
+                    ? '${lastSync.hour.toString().padLeft(2, '0')}:${lastSync.minute.toString().padLeft(2, '0')}'
+                    : 'Belum pernah';
+
+                return ListTile(
+                  leading: Icon(
+                    isOnline
+                        ? Icons.cloud_done_rounded
+                        : Icons.cloud_off_rounded,
+                    color: isOnline ? AppColors.success : AppColors.primary,
+                    size: 24,
+                  ),
+                  title: const Text(
+                    'Sinkronisasi Otomatis Hive - Supabase',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  subtitle: Text(
+                    isOnline
+                        ? 'Status: Online | $unsynced data pending | Terakhir: $lastSyncText'
+                        : 'Status: Offline (Data aman di Hive)',
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                    ),
+                  ),
+                  trailing: isSyncing
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.gold,
+                          ),
+                        )
+                      : IconButton(
+                          icon: const Icon(Icons.sync_rounded,
+                              color: AppColors.gold),
+                          onPressed: () async {
+                            final res = await syncService.syncOfflineData();
+                            Get.snackbar(
+                              res.isSuccess
+                                  ? 'Sinkronisasi Selesai'
+                                  : 'Info Sinkronisasi',
+                              res.message,
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: AppColors.card,
+                              colorText: AppColors.textPrimary,
+                              duration: const Duration(seconds: 2),
+                            );
+                          },
+                        ),
+                );
+              }),
+            ]),
+
+            const SizedBox(height: 24),
+
+            // 5. MANAJEMEN PENYIMPANAN & DATA OFFLINE
             _buildSectionHeader('Manajemen Cache & Reset'),
             const SizedBox(height: 8),
             _buildCard([
